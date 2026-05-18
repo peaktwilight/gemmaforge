@@ -87,6 +87,18 @@ Regex-graded vulnerable-pattern count across the 5 demo prompts in `scripts/eval
 
 The full per-prompt output is in `data/lora_eval.json` and re-summarised in §5 below.
 
+### 1.4a Linear vs MLP ablation (representation is the bottleneck, not the classifier)
+
+`data/probe_mlp_ablation.json`:
+
+| Variant | Random split AUC | Py→JS AUC |
+|---|---:|---:|
+| LogReg (shipped baseline) | 0.963 | 0.907 |
+| MLP(64,) | 0.970 | 0.912 |
+| MLP(128, 64) | 0.965 | **0.919** |
+
+MLP closes ~30% of the cross-language gap (0.04 → 0.012 remaining) but the in-distribution number barely moves. **The bulk of the missing 0.04 lives in the representation itself, not in classifier capacity.** This is the honest reading: Gemma 4 E2B layer-17 features are mostly but not entirely language-portable.
+
 ### 1.4b Ensemble of per-layer probes (uniform mean wins)
 
 `data/probe_ensemble.json` — train 4 independent `LogisticRegression(C=1.0)` probes (one per captured layer), evaluate combinations on the same held-out split:

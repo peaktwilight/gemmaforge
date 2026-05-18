@@ -92,8 +92,23 @@ def _wandb_finish(run) -> None:
         pass
 
 
-def fit_layer(X: np.ndarray, y: np.ndarray, seed: int = 7) -> dict:
-    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed, stratify=y)
+def fit_layer(X: np.ndarray, y: np.ndarray, seed: int = 7, groups: np.ndarray | None = None) -> dict:
+    """Fit a LogReg probe on activations.
+
+    If `groups` is provided, uses `GroupShuffleSplit` so paired safe/vulnerable
+    siblings (same `_origin_repo` / `(_file_name, _func_name)`) cannot land in
+    both train and test — closes the training-side leakage in issue #18. If
+    not provided, falls back to the legacy stratified split.
+    """
+    if groups is not None:
+        from sklearn.model_selection import GroupShuffleSplit
+        gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=seed)
+        tr, te = next(gss.split(X, y, groups=groups))
+        Xtr, Xte, ytr, yte = X[tr], X[te], y[tr], y[te]
+        split_kind = "group_shuffle"
+    else:
+        Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed, stratify=y)
+        split_kind = "random_stratified"
     clf = LogisticRegression(max_iter=1000, C=1.0)
     clf.fit(Xtr, ytr)
     yhat_prob = clf.predict_proba(Xte)[:, 1]
@@ -108,6 +123,7 @@ def fit_layer(X: np.ndarray, y: np.ndarray, seed: int = 7) -> dict:
         "pos_rate": float(y.mean()),
         "w": clf.coef_[0].astype(np.float32),
         "b": float(clf.intercept_[0]),
+        "split_kind": split_kind,
     }
 
 
@@ -116,6 +132,13 @@ def main() -> None:
     ap.add_argument("--acts-dir", default="data/activations")
     ap.add_argument("--out", default="data/probe.npz")
     ap.add_argument("--card", default="data/probe_card.json")
+    ap.add_argument(
+        "--pairs",
+        default=None,
+        help="Optional path to pairs.jsonl row-aligned with activations; "
+        "when set, uses GroupShuffleSplit on pair_group_key() to avoid "
+        "sibling leakage during layer selection (issue #18).",
+    )
     ap.add_argument(
         "--wandb-project",
         default=None,
@@ -129,6 +152,22 @@ def main() -> None:
         print(f"[train_probe] no activation files in {acts_dir}", file=sys.stderr)
         sys.exit(1)
 
+    groups: np.ndarray | None = None
+    if args.pairs:
+        try:
+            from src.eval.splits import pair_group_key  # type: ignore
+        except Exception as e:
+            print(f"[train_probe] could not import pair_group_key ({e}); falling back to random split", file=sys.stderr)
+        else:
+            rows = []
+            with open(args.pairs) as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        rows.append(json.loads(line))
+            groups = np.array([pair_group_key(r) for r in rows])
+            print(f"[train_probe] group split enabled — {len(set(groups.tolist()))} unique groups across {len(rows)} rows", file=sys.stderr)
+
     run = _wandb_init(args)
 
     results: list[dict] = []
@@ -137,10 +176,13 @@ def main() -> None:
         npz = np.load(f)
         X, y = npz["X"], npz["y"]
         print(f"[train_probe] layer {layer:02d}  X={X.shape}  y_pos={int(y.sum())}", file=sys.stderr)
-        r = fit_layer(X, y)
+        # If groups were loaded and row counts mismatch, fall back to
+        # random — better than crashing on a misaligned dataset.
+        gr = groups if (groups is not None and len(groups) == X.shape[0]) else None
+        r = fit_layer(X, y, groups=gr)
         r["layer"] = layer
         results.append(r)
-        print(f"[train_probe] layer {layer:02d}  AUC={r['auc']:.3f}  ACC={r['acc']:.3f}", file=sys.stderr)
+        print(f"[train_probe] layer {layer:02d}  AUC={r['auc']:.3f}  ACC={r['acc']:.3f}  split={r['split_kind']}", file=sys.stderr)
         # One log row per layer, indexed by layer id for a clean x-axis.
         _wandb_log(
             run,

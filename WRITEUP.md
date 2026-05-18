@@ -3,7 +3,7 @@
 **Tracks:** Main Track · Impact: Safety & Trust · Special Tech: Ollama
 
 **Repo:** https://github.com/peaktwilight/gemmaforge
-**Live demo:** https://huggingface.co/spaces/peaktwilight/gemma4ge
+**Live demo:** https://huggingface.co/spaces/peaktwilight/gemmaforge
 **Video:** https://youtube.com/watch?v=TODO
 
 ## Team — security meets interpretability

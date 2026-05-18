@@ -34,7 +34,7 @@ Two demo flows:
 1. **IDE-mode (Tier 1 only)** — the probe rides every token Gemma 4 emits. Green (<0.4), yellow (0.4–0.7), red (>0.7). The red cluster above — `db.query(\`SELECT * FROM users WHERE id = ${id}\`)` — is a CWE-89 SQL-injection pattern. This is the streaming UI in `src/stream_with_probe.py` and the HuggingFace Space below.
 2. **Repo-audit mode (Tier 1 → leads → Tier 2)** — `python -m src.scan ./repo --events live.ndjson > leads.jsonl` walks the codebase, emits ranked `gemmaforge.leads/v1` JSONL, streams `gemmaforge.events/v1` to the [pwnkit `/live` dashboard](https://github.com/0sec-labs/pwnkit/pull/371) (Lane 1 · Probe, Lane 2 · Leads), then hands the leads to `pwnkit review --seed-findings ... --runtime ollama` for Gemma 4 8B agentic verification.
 
-**Live HF Space:** [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge) (HuggingFace Space, ZeroGPU).
+**Live HF Space:** [`peaktwilight/gemmaforge`](https://huggingface.co/spaces/peaktwilight/gemmaforge) (HuggingFace Space, ZeroGPU).
 
 ## The story
 
@@ -183,7 +183,7 @@ python -m src.stream_with_probe --serve     # loads shipped data/probe.npz
 # open http://localhost:8787/
 ```
 
-Or visit the hosted Space: [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge).
+Or visit the hosted Space: [`peaktwilight/gemmaforge`](https://huggingface.co/spaces/peaktwilight/gemmaforge).
 
 **Tier 1 + 2 — whole-repo audit (requires Ollama with `gemma4:latest` pulled):**
 

@@ -95,7 +95,7 @@ print(f"out_dir={OUT_DIR}")
 #
 # Kaggle base images already ship recent torch + transformers, so we only
 # install what's missing. `trl>=0.21` keeps `beta`/`max_length` on DPOConfig.
-get_ipython().system('pip install -q --no-warn-script-location peft "trl>=0.21" accelerate datasets huggingface_hub wandb')
+import subprocess; subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
 
 import torch
 print(f"torch={torch.__version__}  cuda_available={torch.cuda.is_available()}")
@@ -105,7 +105,7 @@ assert torch.cuda.is_available(), (
 # Kaggle assigns Tesla T4, P100, V100, or A100 depending on the accelerator
 # setting; print the device name so the notebook author can pick the right one.
 print(f"gpu={torch.cuda.get_device_name(0)}  bf16_ok={torch.cuda.is_bf16_supported()}")
-get_ipython().system('nvidia-smi')
+subprocess.run(["nvidia-smi"], check=False)
 
 # In[4]:
 # ## Login

@@ -133,6 +133,29 @@ class GemmaForgeFilter:
 
     # ---------------- public ---------------- #
 
+    def score_snippet(self, snippet: str) -> dict:
+        """Score a raw snippet with no external CWE claim.
+
+        This is the scan-friendly API used by ``src/scan.py``. The per-CWE
+        head's argmax is always surfaced as ``gemmaforge_top_cwe`` when the
+        per-CWE probe is loaded — there is no claim to compare against here,
+        so ``gemmaforge_cwe_match`` is intentionally omitted from the output.
+        """
+        if not snippet.strip():
+            raise ValueError("snippet must be a non-empty string")
+        h = self._hidden_state(snippet)
+        confidence = _sigmoid(float(np.dot(self._w, h) + self._b))
+        top_cwe: Optional[str] = None
+        if self._W_cwe is not None:
+            logits = self._W_cwe @ h + self._b_cwe
+            top_cwe = self._cwes[int(np.argmax(logits))]
+        return {
+            "gemmaforge_confidence": confidence,
+            "gemmaforge_top_cwe": top_cwe,
+            "gemmaforge_layer": self._layer,
+            "model_id": self.model_id,
+        }
+
     def score_finding(self, finding: dict) -> dict:
         """Score a pwnkit finding.
 

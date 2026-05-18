@@ -446,9 +446,18 @@ Unlocks within-language AUC for C and C++ and a Python↔C cross-language number
 
 The current cross-language headline is Py→JS = 0.907. With Rust or Go added (CyberSecEval-2 or the Go advisory DB), we'd have *three* points on the cross-language curve and could replace "language-portable" (currently a 2-point claim) with a real curve.
 
-### 7.6 Calibration
+### 7.6 Calibration — Platt scaling tested, honest negative result
 
-Current Brier scores range 0.071 (random split) → 0.145 (Py→JS). ECE ranges 0.065 → 0.139. The probe is *miscalibrated* on OOD splits — it's right about the ordering but its absolute confidences drift. Temperature scaling on a held-out validation slice is the obvious one-line fix; nobody has wired it yet.
+Wired (`scripts/calibrate_probe.py`, `data/probe_calibration.json`). Fitted T=1.79, a=−0.27 on the held-out NLL. Results:
+
+| Metric | Before Platt | After Platt |
+|---|---:|---:|
+| AUC | 0.9633 | 0.9633 (invariant — monotone transform) |
+| Brier | 0.0710 | 0.0729 (+0.002) |
+| ECE (10-bin) | 0.0581 | 0.0554 (−0.003) |
+| T3 flip-rate | 0.05 | 0.05 (unchanged) |
+
+**Verdict**: cosmetic only. Platt softens the overconfidence symptom (baseline mean drops ~5 pp, T3 mean drops ~4 pp) and ECE improves marginally, but because Platt is monotonic, AUC and any fixed-threshold flip-rate are mathematically invariant. **Calibration is not a robustness lever** — max-pool aggregation is (§1, 22× T3 robustness gain). `src/calibration.py` exposes `apply_platt()` for downstream consumers that want calibrated probabilities, but it doesn't ship in the streaming server's hot path.
 
 ### 7.7 Beyond linear
 

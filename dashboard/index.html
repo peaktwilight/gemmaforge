@@ -113,7 +113,16 @@
           <div class="title">pwnkit</div>
         </div>
       </div>
-      <div class="cmd">pwnkit-cli review examples/vuln-express-app --seed-findings leads.jsonl --runtime ollama</div>
+      <div class="cmd">pwnkit-cli review examples/vuln-express-app --seed-findings leads.jsonl --runtime api --model google/gemma-4-31b-it</div>
+      <div class="pwnkit-live-controls" style="display:flex;gap:.4rem;margin:.4rem 0 .6rem;flex-wrap:wrap;align-items:center;">
+        <input id="pk-apikey" type="password" placeholder="OpenRouter sk-or-… or Google AIza…"
+               style="flex:1;min-width:14rem;padding:.4rem .55rem;background:#0c1421;border:1px solid #243044;color:#cfdcec;border-radius:6px;font:inherit;font-size:.85rem;" />
+        <button id="pk-run" type="button"
+                style="padding:.4rem .8rem;background:#3563d2;border:0;color:#fff;border-radius:6px;font:inherit;font-weight:600;cursor:pointer;">
+          Run pwnkit live
+        </button>
+        <span id="pk-status" style="font-size:.78rem;color:#8a9bb2;"></span>
+      </div>
       <div class="pwnkit-pills">
         <div class="pwnkit-pill queued"><div class="v" id="pk-queued">0</div><div class="l">leads queued</div></div>
         <div class="pwnkit-pill exploit"><div class="v" id="pk-exploit">0</div><div class="l">exploits verified</div></div>
@@ -121,11 +130,7 @@
       </div>
       <div class="pwnkit-log" id="pk-log"></div>
       <div class="pwnkit-note">
-        Synthetic stream — pwnkit isn't running in this tab. The real
-        integration is live in <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">pwnkit#371</a> +
-        <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a> (both merged): <code>--seed-findings</code> consumes our
-        <code>gemmaforge.leads/v1</code> JSONL and <code>--runtime ollama</code> drives the agent
-        loop on a local Gemma 4 27B.
+        Default stream replays a real <code>pwnkit review</code> run captured offline (3 critical/high findings drafted by Gemma 4). Paste your own <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> key (~1¢ per run on <code>google/gemma-4-31b-it</code>) and click <b>Run pwnkit live</b> to spawn a fresh agent loop on this Space against <code>examples/vuln-express-app</code>. Key is used for one subprocess and immediately forgotten. Real integration in <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">pwnkit#371</a> + <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a> (merged).
       </div>
     </div>
   </section>
@@ -450,30 +455,83 @@
   };
 
   /* ----------------------------------------------------------------------
-   * Panel 4 — pwnkit hand-off (synthetic)
-   * Pure illustrative stream: server cycles queued → exploit → report.
+   * Panel 4 — pwnkit hand-off
+   * Default: replay of a real captured pwnkit run.
+   * Live mode: visitor pastes an OpenRouter key, server spawns pwnkit-cli,
+   * pipeline_events stream back from the SQLite db.
    * -------------------------------------------------------------------- */
   const pkLog = $("pk-log");
-  const pwnkitEvt = new EventSource("/sse/pwnkit");
+  function applyPwnkitEvent(e) {
+    if (e.kind === "pk.counts") {
+      $("pk-queued").textContent = String(e.queued ?? 0);
+      $("pk-exploit").textContent = String(e.exploited ?? 0);
+      $("pk-report").textContent = String(e.reported ?? 0);
+    } else if (e.kind === "pk.log") {
+      const line = document.createElement("div");
+      line.className = `line ${e.level || ""}`;
+      const ts = new Date().toLocaleTimeString([], { hour12: false });
+      line.innerHTML = `<span class="ts">${ts}</span>${escapeHtml(e.message || "")}`;
+      pkLog.appendChild(line);
+      pkLog.scrollTop = pkLog.scrollHeight;
+      while (pkLog.childNodes.length > 60) pkLog.removeChild(pkLog.firstChild);
+    }
+  }
+  let pwnkitEvt = new EventSource("/sse/pwnkit");
   pwnkitEvt.onmessage = (msg) => {
-    try {
-      const e = JSON.parse(msg.data);
-      if (e.kind === "pk.counts") {
-        $("pk-queued").textContent = String(e.queued ?? 0);
-        $("pk-exploit").textContent = String(e.exploited ?? 0);
-        $("pk-report").textContent = String(e.reported ?? 0);
-      } else if (e.kind === "pk.log") {
-        const line = document.createElement("div");
-        line.className = `line ${e.level || ""}`;
-        const ts = new Date().toLocaleTimeString([], { hour12: false });
-        line.innerHTML = `<span class="ts">${ts}</span>${escapeHtml(e.message || "")}`;
-        pkLog.appendChild(line);
-        pkLog.scrollTop = pkLog.scrollHeight;
-        // Keep the log bounded.
-        while (pkLog.childNodes.length > 60) pkLog.removeChild(pkLog.firstChild);
-      }
-    } catch (err) { console.error(err); }
+    try { applyPwnkitEvent(JSON.parse(msg.data)); } catch (err) { console.error(err); }
   };
+
+  /* Live "Run pwnkit" button — POSTs the user's API key to /api/pwnkit/start,
+   * then switches the SSE stream to /sse/pwnkit/live?runId=…. */
+  $("pk-run").addEventListener("click", async () => {
+    const apiKey = $("pk-apikey").value.trim();
+    const statusEl = $("pk-status");
+    if (!apiKey) {
+      statusEl.textContent = "paste an OpenRouter sk-or-… or Google AIza… key first";
+      statusEl.style.color = "#e0a060";
+      return;
+    }
+    statusEl.textContent = "starting pwnkit…";
+    statusEl.style.color = "#8a9bb2";
+
+    try {
+      const res = await fetch("/api/pwnkit/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey, model: "google/gemma-4-31b-it" }),
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        statusEl.textContent = `error: ${t.slice(0, 120)}`;
+        statusEl.style.color = "#d24a4a";
+        return;
+      }
+      const { runId, model } = await res.json();
+      $("pk-apikey").value = ""; // forget the key from the DOM
+      statusEl.textContent = `live · ${model} · run ${runId.slice(0, 8)}`;
+      statusEl.style.color = "#5fb96b";
+
+      // Switch the SSE source from the canned replay to the live run.
+      pwnkitEvt.close();
+      // Reset counters + clear the log to make the live run unambiguous.
+      $("pk-queued").textContent = "0";
+      $("pk-exploit").textContent = "0";
+      $("pk-report").textContent = "0";
+      pkLog.innerHTML = "";
+
+      pwnkitEvt = new EventSource(`/sse/pwnkit/live?runId=${encodeURIComponent(runId)}`);
+      pwnkitEvt.onmessage = (msg) => {
+        try { applyPwnkitEvent(JSON.parse(msg.data)); } catch (err) { console.error(err); }
+      };
+      pwnkitEvt.onerror = () => {
+        statusEl.textContent = "live stream closed";
+        statusEl.style.color = "#8a9bb2";
+      };
+    } catch (err) {
+      statusEl.textContent = `network error: ${err.message || err}`;
+      statusEl.style.color = "#d24a4a";
+    }
+  });
 </script>
 </body>
 </html>

@@ -21,7 +21,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import secrets
+import sqlite3
+import subprocess
 import sys
+import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -33,6 +38,18 @@ from urllib.error import URLError
 DASHBOARD_DIR = Path(__file__).resolve().parent
 REPO_ROOT = DASHBOARD_DIR.parent
 DEFAULT_LEADS = REPO_ROOT / "examples" / "leads.jsonl"
+
+# In-memory run registry. Keys (API tokens) live only for the lifetime of
+# the run + a short grace period — never written to disk, never logged.
+# {run_id: {"api_key": "...", "model": "...", "base_url": "...",
+#           "scan_id": None | "...", "process": Popen | None,
+#           "started_at": float, "done": bool}}
+_RUNS: dict[str, dict] = {}
+_RUNS_LOCK = threading.Lock()
+
+
+def _new_run_id() -> str:
+    return secrets.token_urlsafe(12)
 
 
 def _sse_headers(handler: BaseHTTPRequestHandler) -> None:
@@ -413,11 +430,186 @@ def pwnkit_stream(handler: BaseHTTPRequestHandler, replay_path: Path | None = No
             return
 
 
+def _spawn_pwnkit(run_id: str, leads_path: Path, repo_path: Path, pwnkit_cli: Path, pwnkit_db: Path) -> None:
+    """Background thread target: spawn pwnkit-cli for the given run_id.
+
+    Reads the run config (api_key, model, base_url) from _RUNS[run_id],
+    executes pwnkit, and records the resulting pwnkit scan id back into
+    _RUNS[run_id]['scan_id'] once the new pipeline_events row appears.
+    """
+    with _RUNS_LOCK:
+        cfg = _RUNS.get(run_id, {}).copy()
+    if not cfg:
+        return
+
+    env = os.environ.copy()
+    env["OPENAI_API_KEY"] = cfg["api_key"]
+    env["OPENAI_BASE_URL"] = cfg["base_url"]
+    env["OPENAI_MODEL"] = cfg["model"]
+    env["PWNKIT_DB_PATH"] = str(pwnkit_db)
+    env["PWNKIT_HEARTBEAT"] = "1"
+    # Note: api_key is in env for this subprocess only — never logged.
+
+    cmd = [
+        "node", str(pwnkit_cli),
+        "review", str(repo_path),
+        "--seed-findings", str(leads_path),
+        "--seed-only",
+        "--runtime", "api",
+        "--model", cfg["model"],
+        "--verbose",
+        "--timeout", "600000",
+        "--db-path", str(pwnkit_db),
+    ]
+
+    try:
+        proc = subprocess.Popen(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        with _RUNS_LOCK:
+            if run_id in _RUNS:
+                _RUNS[run_id]["process"] = proc
+        # Read stderr in background to avoid filling the pipe buffer.
+        for line in iter(proc.stderr.readline, b""):
+            # We don't store/log this — it can contain the OpenAI base url
+            # and prompts, no api_key but still noisy.
+            pass
+        proc.wait()
+    except Exception as e:
+        sys.stderr.write(f"[pwnkit-run {run_id}] spawn error: {e}\n")
+    finally:
+        with _RUNS_LOCK:
+            if run_id in _RUNS:
+                _RUNS[run_id]["done"] = True
+                _RUNS[run_id]["api_key"] = ""  # forget the key immediately
+
+
+def _scan_id_for_run(run_id: str, pwnkit_db: Path, started_at: float) -> str | None:
+    """Find the pwnkit scan id created by our spawn after ``started_at``.
+
+    Pwnkit creates a row in `scans` shortly after launch; we identify it
+    by being the most recent scan whose startedAt is after our spawn.
+    """
+    if not pwnkit_db.exists():
+        return None
+    try:
+        con = sqlite3.connect(f"file:{pwnkit_db}?mode=ro", uri=True)
+        cur = con.execute("SELECT id, startedAt FROM scans ORDER BY startedAt DESC LIMIT 5")
+        for sid, started_iso in cur:
+            # startedAt is ISO-8601; parse to epoch.
+            try:
+                from datetime import datetime, timezone
+                t = datetime.fromisoformat(started_iso.replace("Z", "+00:00")).timestamp()
+            except Exception:
+                continue
+            if t >= started_at - 2:  # 2s skew tolerance
+                con.close()
+                return sid
+        con.close()
+    except sqlite3.Error:
+        pass
+    return None
+
+
+def stream_pwnkit_run(handler: BaseHTTPRequestHandler, run_id: str, pwnkit_db: Path) -> None:
+    """Stream pipeline_events for a live pwnkit run as pk.log/pk.counts."""
+    _sse_headers(handler)
+
+    with _RUNS_LOCK:
+        run = _RUNS.get(run_id, {}).copy()
+    if not run:
+        _emit(handler, {"kind": "pk.log", "message": f"unknown run {run_id}", "level": "warn"})
+        return
+
+    started_at = run["started_at"]
+    _emit(handler, {"kind": "pk.log", "message": f"spawning pwnkit · model={run['model']}", "level": ""})
+
+    # Wait for the scan row to appear (up to 30s).
+    scan_id = None
+    deadline = time.time() + 30
+    while time.time() < deadline and scan_id is None:
+        scan_id = _scan_id_for_run(run_id, pwnkit_db, started_at)
+        if scan_id is None:
+            if not _emit(handler, {"kind": "pk.log", "message": "waiting for pwnkit to register the scan…"}):
+                return
+            time.sleep(2)
+
+    if scan_id is None:
+        _emit(handler, {"kind": "pk.log", "message": "pwnkit didn't register a scan within 30s — abort", "level": "warn"})
+        return
+
+    _emit(handler, {"kind": "pk.log", "message": f"scan registered · id={scan_id[:8]}", "level": "ok"})
+
+    # Poll for new pipeline_events.
+    last_ts = 0
+    queued = exploited = reported = 0
+    finished = False
+    poll_deadline = time.time() + 600  # hard cap 10 min stream
+
+    while not finished and time.time() < poll_deadline:
+        try:
+            con = sqlite3.connect(f"file:{pwnkit_db}?mode=ro", uri=True)
+            cur = con.execute(
+                "SELECT timestamp, stage, eventType, payload FROM pipeline_events "
+                "WHERE scanId=? AND timestamp > ? ORDER BY timestamp",
+                (scan_id, last_ts),
+            )
+            rows = cur.fetchall()
+            con.close()
+        except sqlite3.Error as e:
+            _emit(handler, {"kind": "pk.log", "message": f"db read error: {e}", "level": "warn"})
+            rows = []
+
+        for ts, stage, kind, raw_payload in rows:
+            last_ts = ts
+            try:
+                payload = json.loads(raw_payload or "{}")
+            except json.JSONDecodeError:
+                payload = {}
+
+            if kind == "seed_findings_loaded":
+                queued = payload.get("count", queued)
+                _emit(handler, {"kind": "pk.log", "message": f"ingested {queued} seed(s) · sources: {','.join(payload.get('sources', []))}", "level": "warn"})
+                _emit(handler, {"kind": "pk.counts", "queued": queued, "exploited": exploited, "reported": reported})
+            elif kind == "stage_start":
+                _emit(handler, {"kind": "pk.log", "message": f"{stage} stage started"})
+            elif kind == "stage_complete":
+                _emit(handler, {"kind": "pk.log", "message": f"{stage} stage complete", "level": "ok"})
+                if stage == "report":
+                    reported = payload.get("totalFindings", reported)
+                    _emit(handler, {"kind": "pk.counts", "queued": queued, "exploited": exploited, "reported": reported})
+            elif kind == "agent_start":
+                _emit(handler, {"kind": "pk.log", "message": f"agent online · {payload.get('toolCount', '?')} tools · model via OpenRouter"})
+            elif kind == "tool_calls":
+                for tool in payload.get("tools", []):
+                    if tool == "save_finding":
+                        exploited += 1
+                        _emit(handler, {"kind": "pk.log", "message": "tool_use · save_finding", "level": "ok"})
+                        _emit(handler, {"kind": "pk.counts", "queued": queued, "exploited": exploited, "reported": reported})
+                    elif tool != "done":
+                        _emit(handler, {"kind": "pk.log", "message": f"tool_use · {tool}"})
+            elif kind == "agent_complete":
+                fc = payload.get("findingCount", 0)
+                _emit(handler, {"kind": "pk.log", "message": f"agent complete · {fc} finding(s) · {payload.get('turnCount', '?')} turn(s)", "level": "ok"})
+            elif kind == "agent_error":
+                _emit(handler, {"kind": "pk.log", "message": f"agent error: {payload.get('error', '?')[:200]}", "level": "warn"})
+
+        # Check whether the run is done.
+        with _RUNS_LOCK:
+            run = _RUNS.get(run_id, {})
+        if run.get("done"):
+            finished = True
+        else:
+            time.sleep(1.5)
+
+    _emit(handler, {"kind": "pk.log", "message": "pwnkit run finished — stream closing", "level": ""})
+
+
 def make_handler(args):
     leads_path = Path(args.leads_file) if args.leads_file else DEFAULT_LEADS
     events_file = Path(args.events_file) if args.events_file else None
     replay_events = Path(args.replay_events) if args.replay_events else None
     pwnkit_replay = Path(args.pwnkit_replay) if args.pwnkit_replay else None
+    pwnkit_cli = Path(args.pwnkit_cli) if args.pwnkit_cli else None
+    pwnkit_db = Path(args.pwnkit_db) if args.pwnkit_db else Path("/tmp/pwnkit.db")
     speedup = float(args.replay_speedup)
 
     class Handler(BaseHTTPRequestHandler):
@@ -450,9 +642,90 @@ def make_handler(args):
                 _sse_headers(self)
                 pwnkit_stream(self, pwnkit_replay)
                 return
+            if path == "/sse/pwnkit/live":
+                qs = parse_qs(parsed.query)
+                run_id = qs.get("runId", [""])[0]
+                if not run_id:
+                    self.send_response(400)
+                    self.end_headers()
+                    self.wfile.write(b"missing runId")
+                    return
+                if pwnkit_cli is None:
+                    _sse_headers(self)
+                    _emit(self, {"kind": "pk.log", "message": "pwnkit-cli not installed in this build", "level": "warn"})
+                    return
+                stream_pwnkit_run(self, run_id, pwnkit_db)
+                return
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b"not found")
+
+        def do_POST(self):
+            parsed = urlparse(self.path)
+            if parsed.path != "/api/pwnkit/start":
+                self.send_response(404)
+                self.end_headers()
+                return
+            if pwnkit_cli is None:
+                self.send_response(503)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"pwnkit-cli not installed"}')
+                return
+
+            length = int(self.headers.get("Content-Length", "0"))
+            raw = self.rfile.read(length).decode("utf-8") if length else "{}"
+            try:
+                body = json.loads(raw)
+            except json.JSONDecodeError:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"invalid json"}')
+                return
+
+            api_key = (body.get("apiKey") or "").strip()
+            if not api_key.startswith("sk-or-") and not api_key.startswith("AIza"):
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"apiKey looks invalid (expect OpenRouter sk-or- or Google AIza)"}')
+                return
+
+            model = body.get("model") or "google/gemma-4-31b-it"
+            base_url = body.get("baseUrl") or (
+                "https://generativelanguage.googleapis.com/v1beta/openai"
+                if api_key.startswith("AIza")
+                else "https://openrouter.ai/api/v1"
+            )
+
+            # Pick the repo to scan — bake in our vuln-express-app demo.
+            repo_path = REPO_ROOT / "examples" / "vuln-express-app"
+            if not repo_path.exists():
+                # Fallback: use whatever's under /app/examples/vuln-express-app
+                repo_path = Path("/app/examples/vuln-express-app")
+
+            run_id = _new_run_id()
+            with _RUNS_LOCK:
+                _RUNS[run_id] = {
+                    "api_key": api_key,
+                    "model": model,
+                    "base_url": base_url,
+                    "scan_id": None,
+                    "process": None,
+                    "started_at": time.time(),
+                    "done": False,
+                }
+            threading.Thread(
+                target=_spawn_pwnkit,
+                args=(run_id, leads_path, repo_path, pwnkit_cli, pwnkit_db),
+                daemon=True,
+            ).start()
+
+            self.send_response(202)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"runId": run_id, "model": model}).encode())
 
     return Handler
 
@@ -488,6 +761,21 @@ def main(argv=None) -> int:
         help="ND-JSON file of pk.log/pk.counts events for Panel 4. Built by "
         "scripts/build_pwnkit_replay.py from a real pwnkit review run. When "
         "omitted, falls back to a short synthetic illustration.",
+    )
+    ap.add_argument(
+        "--pwnkit-cli",
+        default=None,
+        help="Path to a built pwnkit-cli/dist/index.js. When set, enables the "
+        "POST /api/pwnkit/start + GET /sse/pwnkit/live endpoints so visitors "
+        "can run a live pwnkit review against examples/vuln-express-app using "
+        "their own OpenRouter (or Google AI Studio) API key. The key is "
+        "passed as an env var to one subprocess and immediately discarded.",
+    )
+    ap.add_argument(
+        "--pwnkit-db",
+        default="/tmp/pwnkit.db",
+        help="SQLite db path for pwnkit pipeline_events (must match the one "
+        "pwnkit-cli writes to via --db-path).",
     )
     ap.add_argument(
         "--leads-file",

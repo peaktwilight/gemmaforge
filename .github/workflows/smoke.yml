@@ -1,0 +1,27 @@
+name: smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  probe-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install CPU test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest scikit-learn numpy
+
+      - name: Run probe smoke tests
+        run: python -m pytest tests/test_probe_smoke.py -v

@@ -52,40 +52,15 @@ Best layer: **17 of 35** (mid-network). Multi-layer concat doesn't beat it. **0.
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│ developer's laptop  —  no network required                       │
-│                                                                  │
-│  ┌──────────────┐   hidden states    ┌─────────────────────┐     │
-│  │  Gemma 4     │ ───────────────►   │ linear vuln probe   │     │
-│  │  via Ollama  │  (1536-D vector)   │ (~10 KB, sigmoid)   │     │
-│  │  + MLX hook  │                    └────────┬────────────┘     │
-│  │  for hidden  │   token + risk             │ risk score        │
-│  │  states      │ ─────────────────►  ┌──────▼──────────────┐    │
-│  └──────────────┘                     │  streaming UI       │    │
-│                                       │  green/yellow/red   │    │
-│                                       └─────────────────────┘    │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-Two processes on the user's machine:
-
-1. **Gemma 4**, unmodified — via Ollama for chat and tool-calling, via HuggingFace `transformers` with MPS for the activation hook.
-2. **The probe** — a trained `LogisticRegression` exported as `(w ∈ ℝ¹⁵³⁶, b ∈ ℝ, layer)`. Each generated token: read the last-token hidden state at the chosen layer, compute `σ(w·h + b)`, emit `(token, risk)`.
+Two processes on the laptop, no network:
+1. **Gemma 4** unmodified — Ollama for chat/tool-calling, HuggingFace `transformers` + MPS for the activation hook.
+2. **The probe** — `LogisticRegression(w ∈ ℝ¹⁵³⁶, b, layer)`. Per generated token: read last-token hidden state, compute `σ(w·h + b)`, emit `(token, risk)`.
 
 A small HTML page consumes a Server-Sent-Events feed and colors each token: green (<0.4), yellow (0.4–0.7), red (>0.7).
 
 ## Training the probe
 
-1. **Dataset.** ~1,050 examples:
-   - Doruk's published CVE corpus (`node-forge`, `picomatch`, two more).
-   - `CyberNative/Code_Vulnerability_Security_DPO` — paired vulnerable/patched code across Python, JS, C, Java, 1:1 balanced.
-   - Hand-written seeds covering CWE-22, 78, 79, 89, 94, 295, 327, 330, 352, 502, 798, 918, 1333.
-   - **~55 natural-language safe examples** (chat greetings, markdown, JSON, prose). Without these, an early probe scored every chat sentence as vulnerable — it was a "code detector," not a "vulnerability detector." Adding non-code negatives forced the actual signal.
-2. **Activation capture.** Forward-pass each example through Gemma 4 with `output_hidden_states=True`. Record the last-token hidden state at layers 25%, 50%, 75%, 100%.
-3. **Probe training.** Per layer: 80/20 stratified split, `sklearn.linear_model.LogisticRegression(C=1.0)`. Pick the layer with best held-out AUC. Save `(w, b, layer)` as a 10 KB `.npz`.
-
-End-to-end training: ~90 seconds on an M1 Max once activations are cached. Fast enough to iterate the dataset interactively.
+**Dataset (~1,200 examples):** CyberSecEval position-paired rows (Python+JS) + SVEN char-level spans (C/C++/Python) + ~55 natural-language safe examples (without those, an early probe was a "code detector," not a "vulnerability detector"). **Activation capture:** forward-pass with `output_hidden_states=True`, record last-token hidden state at layers 25/50/75/100% of the decoder. **Training:** per layer, 80/20 stratified, `LogisticRegression(C=1.0)`; pick the best AUC layer. End-to-end: ~90s on M1 Max once activations are cached.
 
 ## What the demo shows
 

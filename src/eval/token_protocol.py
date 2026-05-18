@@ -110,16 +110,21 @@ def _collect_for_indices(
       _           reserved
       span_max_pairs  list of (label, max_prob) per annotated span
 
-    On `data/dataset.jsonl`, every annotated span is positive (no
-    sanitizer entries; negative examples have empty token_labels). To
-    make `span_max` a meaningful binary classifier on that corpus, we
-    add one synthetic *whole-file* negative span per negative example
-    when `pad_negatives_for_span_max=True`. This matches the streaming-UI
-    operational metric: "for a safe file, the max token score should
-    stay low; for a vulnerable file, the max should rise inside the
-    evidence span". Disable the pad on datasets that already include
-    negative spans (e.g. paper-style sanitizer-annotated data).
+    span_max is computed as one pair per example: (example-level label,
+    max prob over all tokens in that example). This matches both the
+    streaming-UI operational rule ("file is risky iff any token's prob
+    is high") and `src/train_probe_spanmax.py`'s `ex_AUC` reporting.
+
+    The previous behaviour emitted one pair per char-range span for
+    positives (max over ~2 span tokens) and one whole-file-max pair for
+    negatives — an asymmetry that inverted AUC for noisy real probes
+    because negative-file max-over-many-tokens easily beat positive
+    max-over-few-tokens. The fix is symmetric per-example aggregation.
+
+    `pad_negatives_for_span_max` is retained for API compatibility but
+    is now a no-op (negatives are always represented, exactly once).
     """
+    del pad_negatives_for_span_max  # no-op; kept for backward compat
     all_probs_chunks: list[np.ndarray] = []
     all_labels_chunks: list[np.ndarray] = []
     in_span_chunks: list[np.ndarray] = []
@@ -131,18 +136,9 @@ def _collect_for_indices(
         all_probs_chunks.append(probs)
         all_labels_chunks.append(labels)
         in_span_chunks.append(mask)
-        for start, end, lbl in spans:
-            end_c = min(end, len(probs) - 1)
-            if end_c < start:
-                continue
-            span_max_pairs.append((int(lbl), float(np.max(probs[start : end_c + 1]))))
-        if (
-            pad_negatives_for_span_max
-            and int(rows[i].get("label", 0)) == 0
-            and len(probs) > 0
-            and not spans
-        ):
-            span_max_pairs.append((0, float(np.max(probs))))
+        if len(probs) > 0:
+            ex_label = int(rows[i].get("label", int(any(lbl == 1 for _, _, lbl in spans))))
+            span_max_pairs.append((ex_label, float(np.max(probs))))
     if not all_probs_chunks:
         return (
             np.empty(0, dtype=float),
@@ -231,14 +227,15 @@ def evaluate_token_split(
                     level["span_auc"] = float(roc_auc_score(span_y, broad_arr[mask]))
                 else:
                     level["span_auc"] = float("nan")
-                # span_max baseline: one prediction per span = ex_score of its
-                # parent example. Rebuild aligned with span_max ordering.
-                ex_score_by_te_idx = dict(zip(te.tolist(), ex_scores))
-                sm_baseline_probs = []
-                for i in te.tolist():
-                    for _ in token_spans[i]:
-                        sm_baseline_probs.append(ex_score_by_te_idx[i])
+                # span_max baseline: one prediction per example = ex_score.
+                # Aligned with span_max_pairs which is also one-per-example
+                # (skipping empty-token rows, in the same iteration order).
                 if span_max and len(np.unique([p[0] for p in span_max])) >= 2:
+                    sm_baseline_probs = [
+                        ex_scores[j]
+                        for j, i in enumerate(te.tolist())
+                        if len(token_probs[i]) > 0
+                    ]
                     sm_b = np.array(sm_baseline_probs, dtype=float)
                     sm_lbl = np.array([p[0] for p in span_max], dtype=int)
                     level["span_max_auc"] = float(roc_auc_score(sm_lbl, sm_b))

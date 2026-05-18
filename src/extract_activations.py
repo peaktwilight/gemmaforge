@@ -39,7 +39,12 @@ def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[
 
     t0 = time.time()
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    dtype = torch.float16 if device != "cpu" else torch.float32
+    if device == "cuda":
+        dtype = torch.bfloat16
+    elif device == "mps":
+        dtype = torch.float16
+    else:
+        dtype = torch.float32
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         dtype=dtype,

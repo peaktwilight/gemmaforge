@@ -1,0 +1,42 @@
+{
+  "loss": "span-max (Obeso, Arditi et al. 2025, arXiv 2509.03531 \u00a73)",
+  "alpha": 10.0,
+  "omega_schedule": "linear 0->1 over all training steps",
+  "epochs": 30,
+  "lr": 0.001,
+  "batch_examples": 8,
+  "best_layer": 8,
+  "best_token_auc": 0.7678509371563257,
+  "best_example_auc": 0.6998089983022071,
+  "previous_sklearn_logreg_layer8_auc": 0.846,
+  "all_layers": [
+    {
+      "layer": 8,
+      "token_auc": 0.7678509371563257,
+      "example_auc": 0.6998089983022071,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 17,
+      "token_auc": 0.743952939550736,
+      "example_auc": 0.674342105263158,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 26,
+      "token_auc": 0.7403173099527707,
+      "example_auc": 0.6782682512733446,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 34,
+      "token_auc": 0.6393237125095499,
+      "example_auc": 0.6685059422750425,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    }
+  ]
+}

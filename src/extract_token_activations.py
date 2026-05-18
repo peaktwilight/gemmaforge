@@ -1,31 +1,29 @@
 """Capture per-token hidden states from Gemma 4, with per-token vulnerability labels.
 
 This is the proper "span-aware" extraction. For each labelled example row:
-  1. Tokenize the full code **once** (with offsets + special tokens) so the
-     model input and the offset mapping are perfectly aligned.
-  2. Resolve per-token labels from the row's `token_labels` char ranges
-     (the SVEN/diff-oracle builder writes these). Positive spans:
-     evidence / vulnerable_line / sink / source. Sanitizer spans are
-     negative (label-0) and are NOT used to mark tokens as vulnerable.
-  3. If a row predates the new builder and lacks `token_labels`, fall
-     back to the legacy `_vuln_line_text` line-locator (graceful
-     degradation for older datasets).
-  4. Forward-pass once through Gemma 4 with `output_hidden_states=True`.
-  5. For each captured layer, store hidden states at **every token
-     position** along with a per-token binary label (1 if token is inside
-     a positive vulnerability span, 0 otherwise).
+  1. Tokenize the full code ONCE, with offset_mapping (special tokens included
+     so offsets line up with the exact input we feed the model).
+  2. Forward-pass through Gemma 4 with `output_hidden_states=True`.
+  3. Map the row's `token_labels` char-range fields (evidence / vulnerable_line
+     / sink / source for positive, sanitizer for negative) directly to token
+     indices via the offset mapping.
+  4. For each captured layer, store hidden states at every token position
+     along with the per-token binary label.
 
-Output: `data/token_activations_layer{NN}.npz` containing
-  - X: float32 array  (N_total_positions, hidden_dim)
-  - y: int8 array     (N_total_positions,)
-  - example_ids: int32 array  (N_total_positions,)  — groups positions
-  - spans: list of (example_id, start, end) — for the span-max loss
+Output (under `--out`):
+  - `token_activations_layer{NN}.npz` per captured layer, each containing:
+        X            : float32 (N_total_positions, hidden_dim)
+        y            : int8    (N_total_positions,)
+        example_ids  : int32   (N_total_positions,)
+  - `spans.json` — list of [example_id, tok_start, tok_end] for every positive
+    char-range that mapped to ≥1 token (used by the span-max trainer's max-pool).
+  - `offsets.npz` — `offsets_row_NNNN` (T,2) int32 arrays, one per row, in
+    the same order as the input dataset (the eval CLI reads this).
 
-This format lets the span-max trainer compute Σ_{s∈S} BCE(y_s, max_{i∈s} p_i)
-by grouping positions by example_id.
-
-Memory note: for 1k examples × ~200 avg tokens × 1536 dims × 4 bytes × 4 layers
-≈ 5 GB float32 → kept on disk per-layer to avoid blowing through 32 GB.
+This fixes #17: the old code looked for `_vuln_line_text` (which the rebuilt
+SVEN builder no longer emits) and fell back to labelling the last 5 tokens of
+every positive row. It also used `add_special_tokens=False` for offsets while
+feeding the model via `tokenizer.encode(...)` — a 1-token offset shift.
 """
 from __future__ import annotations
 import argparse
@@ -37,12 +35,14 @@ from pathlib import Path
 import numpy as np
 import torch
 
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 
-# Keys in `token_labels` that mark tokens as vulnerable (positive).
-POSITIVE_LABEL_KEYS: tuple[str, ...] = ("evidence", "vulnerable_line", "sink", "source")
-# Keys in `token_labels` that mark tokens as mitigated (negative / label-0).
-# We deliberately do NOT mark these as vulnerable.
-NEGATIVE_LABEL_KEYS: tuple[str, ...] = ("sanitizer",)
+from src.eval.token_data import (  # noqa: E402
+    char_spans_to_token_spans,
+    parse_spans,
+    token_labels_array,
+)
 
 
 def _device() -> str:
@@ -53,106 +53,60 @@ def _device() -> str:
     return "cpu"
 
 
-def _row_label(row: dict) -> int:
-    """Return 0/1 label, tolerant to rows that omit `label` (use is_completion_vulnerable)."""
-    lbl = row.get("label")
-    if lbl is not None:
-        try:
-            return int(lbl)
-        except (TypeError, ValueError):
-            pass
-    return 1 if row.get("is_completion_vulnerable") else 0
-
-
 def positive_char_spans(row: dict) -> list[tuple[int, int]]:
-    """Collect deduplicated positive char ranges from `row['token_labels']`.
+    """Return positive (start, end) char ranges from `row['token_labels']`.
 
-    Returns a list of (start_char, end_char) half-open ranges. Sanitizer
-    spans are intentionally excluded — they're negative evidence.
+    Thin wrapper exposing the upstream API name used by
+    `scripts/smoke_extract_token.py`; delegates to `parse_spans`.
     """
-    tl = row.get("token_labels") or {}
-    seen: set[tuple[int, int]] = set()
-    spans: list[tuple[int, int]] = []
-    for key in POSITIVE_LABEL_KEYS:
-        for entry in tl.get(key, []) or []:
-            try:
-                s, e = int(entry[0]), int(entry[1])
-            except (TypeError, ValueError, IndexError):
-                continue
-            if e <= s:
-                continue
-            k = (s, e)
-            if k in seen:
-                continue
-            seen.add(k)
-            spans.append(k)
-    return spans
+    return [(s.start_char, s.end_char) for s in parse_spans(row) if s.label == 1]
 
 
 def char_spans_to_token_indices(
     char_spans: list[tuple[int, int]],
     offsets: list[tuple[int, int]],
 ) -> list[tuple[int, int]]:
-    """Map char ranges → (start_tok, end_tok) inclusive token-index ranges.
+    """Map (start_char, end_char) ranges to inclusive (start_tok, end_tok) ranges."""
+    from src.eval.token_data import TokenSpan  # local to avoid cycle
+    spans = [TokenSpan(s, e, 1, "wrapper") for s, e in char_spans]
+    return [(a, b) for (a, b, _lbl) in char_spans_to_token_spans(spans, offsets)]
 
-    `offsets[i] == (s, e)` is the char span for token i. Special tokens
-    (e.g. BOS) get (0, 0) from HuggingFace tokenizers — those are skipped
-    because their range is empty.
 
-    A char-range maps to every token whose char span overlaps it. Empty
-    overlaps (e.g. a sanitizer span that only touches whitespace tokens)
-    are dropped by the caller.
+def _row_label(row: dict) -> int:
+    """Best-effort 0/1 example-level label across known row schemas.
+
+    `dataset.jsonl` carries `label`; `pairs_rich.jsonl` only carries
+    `is_completion_vulnerable`. Either is acceptable.
     """
-    out: list[tuple[int, int]] = []
-    for c_s, c_e in char_spans:
-        first = last = -1
-        for i, (t_s, t_e) in enumerate(offsets):
-            if t_s == t_e:
-                # Special / empty token. Skip; do not let it anchor a span.
-                continue
-            if t_e <= c_s:
-                continue
-            if t_s >= c_e:
-                break
-            if first < 0:
-                first = i
-            last = i
-        if first >= 0 and last >= first:
-            out.append((first, last))
-    return out
+    if "label" in row:
+        return int(row["label"])
+    return int(bool(row.get("is_completion_vulnerable")))
 
 
-def find_vuln_span(text: str, line_text: str, offsets: list[tuple[int, int]]) -> tuple[int, int] | None:
-    """Legacy fallback: locate vulnerable line via `_vuln_line_text` lookup.
-
-    Used only for rows that predate the SVEN builder and don't have
-    `token_labels`. `offsets` must already come from the same tokenizer
-    call as the model input (i.e. include special-token (0,0) entries).
-    """
-    if not line_text:
-        return None
-    target = line_text.rstrip("\n")
-    char_start = text.find(target)
-    if char_start < 0:
-        ls = target.lstrip()
-        char_start = text.find(ls)
-        if char_start < 0:
-            return None
-        target = ls
-    char_end = char_start + len(target)
-    spans = char_spans_to_token_indices([(char_start, char_end)], offsets)
-    return spans[0] if spans else None
-
-
-def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[int] | None = None) -> None:
+def extract(
+    model_id: str,
+    jsonl_path: Path,
+    out_dir: Path,
+    layer_indices: list[int] | None = None,
+    max_length: int = 1024,
+) -> None:
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     device = _device()
     print(f"[token-extract] device={device}  model={model_id}", file=sys.stderr)
+
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    dtype = torch.float16 if device != "cpu" else torch.float32
+    if device == "cuda":
+        dtype = torch.bfloat16
+    elif device == "mps":
+        dtype = torch.float16
+    else:
+        dtype = torch.float32
+
     t0 = time.time()
-    model = AutoModelForCausalLM.from_pretrained(model_id, dtype=dtype, attn_implementation="eager")
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id, dtype=dtype, attn_implementation="eager"
+    )
     model.to(device).eval()
     print(f"[token-extract] loaded in {time.time()-t0:.1f}s", file=sys.stderr)
 
@@ -174,108 +128,112 @@ def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[
                 rows.append(json.loads(line))
     print(f"[token-extract] processing {len(rows)} rows…", file=sys.stderr)
 
-    # One growing list per layer, plus per-token labels + example ids.
     per_layer: dict[int, list[np.ndarray]] = {i: [] for i in layer_indices}
     labels: list[int] = []
     example_ids: list[int] = []
-    spans: list[tuple[int, int, int]] = []  # (example_id, tok_start_inclusive, tok_end_inclusive)
+    spans: list[tuple[int, int, int]] = []  # (example_id, tok_start_incl, tok_end_incl)
+    offsets_per_row: list[np.ndarray] = []
 
-    skipped = 0
-    fallback_legacy = 0
-    fallback_last5 = 0
+    pos_span_lengths: list[int] = []
+    pos_rows_with_span = 0
+    pos_rows = 0
     t_loop = time.time()
+
     with torch.inference_mode():
         for eid, row in enumerate(rows):
             code = row["code"]
             label = _row_label(row)
+            if label == 1:
+                pos_rows += 1
 
-            # Single tokenize call: produces both the model input ids AND the
-            # offset mapping under the SAME `add_special_tokens` setting, so
-            # there is no off-by-one between hidden states and char spans.
             enc = tokenizer(
                 code,
                 return_offsets_mapping=True,
-                add_special_tokens=True,
                 truncation=True,
-                max_length=1024,
-                return_tensors="pt",
+                max_length=max_length,
+                return_tensors=None,
             )
-            ids = enc["input_ids"].to(device)
-            # `offset_mapping` from return_tensors="pt" is a tensor; convert to
-            # a plain list of (int, int) for our mapper.
-            om = enc["offset_mapping"][0].tolist()
-            offsets: list[tuple[int, int]] = [(int(s), int(e)) for s, e in om]
-            out = model(ids, output_hidden_states=True, use_cache=False)
-            n_pos = ids.shape[1]
+            input_ids = enc["input_ids"]
+            offsets = enc["offset_mapping"]
+            ids_t = torch.tensor([input_ids], dtype=torch.long, device=device)
+
+            out = model(ids_t, output_hidden_states=True, use_cache=False)
             hs = out.hidden_states
+            n_pos = ids_t.shape[1]
 
-            # --- Resolve token spans ---------------------------------------
-            # Preferred: char ranges from the diff-oracle builder.
-            char_spans = positive_char_spans(row) if label == 1 else []
-            tok_spans: list[tuple[int, int]] = []
-            if char_spans:
-                tok_spans = char_spans_to_token_indices(char_spans, offsets)
-            elif label == 1:
-                # Legacy fallback for older datasets without `token_labels`.
-                line_text = row.get("_vuln_line_text") or row.get("vuln_line_text") or ""
-                if line_text:
-                    span = find_vuln_span(code, line_text, offsets)
-                    if span is not None:
-                        tok_spans = [span]
-                        fallback_legacy += 1
+            char_spans = parse_spans(row)
+            tok_spans = char_spans_to_token_spans(char_spans, offsets)
+            tok_labels, _mask = token_labels_array(n_pos, tok_spans)
 
-            # Label tokens inside any positive span as 1, else 0.
-            tok_labels = np.zeros(n_pos, dtype=np.int8)
-            if tok_spans:
-                for s, e in tok_spans:
-                    s = max(0, min(s, n_pos - 1))
-                    e = max(s, min(e, n_pos - 1))
-                    tok_labels[s : e + 1] = 1
+            # Record positive token-spans for the span-max trainer.
+            row_pos_spans = [(s, e) for (s, e, lbl) in tok_spans if lbl == 1]
+            if row_pos_spans:
+                pos_rows_with_span += 1
+                for s, e in row_pos_spans:
                     spans.append((eid, s, e))
-            elif label == 1:
-                # Positive example with no usable span — last-5 fallback.
-                # Logged so the caller can see how often we degrade.
-                fallback_span_start = max(0, n_pos - 5)
-                tok_labels[fallback_span_start:] = 1
-                spans.append((eid, fallback_span_start, n_pos - 1))
-                fallback_last5 += 1
+                    pos_span_lengths.append(e - s + 1)
 
             for li in layer_indices:
                 h = hs[li + 1][0, :, :].detach().to("cpu").float().numpy()  # (n_pos, dim)
                 per_layer[li].append(h)
             labels.extend(tok_labels.tolist())
             example_ids.extend([eid] * n_pos)
+            offsets_per_row.append(np.array(offsets, dtype=np.int32))
 
             if (eid + 1) % 50 == 0:
                 rate = (eid + 1) / (time.time() - t_loop)
-                print(f"[token-extract] {eid+1}/{len(rows)}  {rate:.2f} ex/s", file=sys.stderr)
+                eta = (len(rows) - (eid + 1)) / max(rate, 0.01)
+                print(
+                    f"[token-extract] {eid+1}/{len(rows)}  {rate:.2f} ex/s  eta {eta:.0f}s",
+                    file=sys.stderr,
+                )
 
-    print(
-        f"[token-extract] skipped {skipped} rows | "
-        f"legacy-line fallback: {fallback_legacy} | last-5 fallback: {fallback_last5}",
-        file=sys.stderr,
-    )
     y = np.array(labels, dtype=np.int8)
     eid_arr = np.array(example_ids, dtype=np.int32)
+    pos_token_count = int(y.sum())
 
     out_dir.mkdir(parents=True, exist_ok=True)
     for li in layer_indices:
         mat = np.vstack(per_layer[li]).astype(np.float32)
         p = out_dir / f"token_activations_layer{li:02d}.npz"
-        np.savez_compressed(p, X=mat, y=y, example_ids=eid_arr)
+        np.savez(p, X=mat, y=y, example_ids=eid_arr)
         print(f"[token-extract] saved {p}  X={mat.shape}", file=sys.stderr)
-    # Save spans as JSON since they're metadata not bulk arrays.
+
     (out_dir / "spans.json").write_text(json.dumps(spans))
+    np.savez(
+        out_dir / "offsets.npz",
+        **{f"offsets_row_{i:04d}": offsets_per_row[i] for i in range(len(offsets_per_row))},
+    )
     print(f"[token-extract] saved spans.json with {len(spans)} positive spans", file=sys.stderr)
+    print(f"[token-extract] saved offsets.npz with {len(offsets_per_row)} rows", file=sys.stderr)
+
+    # Smoke-test diagnostic: did spans come out non-trivial?
+    if pos_span_lengths:
+        arr = np.array(pos_span_lengths)
+        print(
+            f"[token-extract] positive rows: {pos_rows}; "
+            f"rows with ≥1 mapped pos span: {pos_rows_with_span}; "
+            f"span tokens: total={pos_token_count} "
+            f"median={int(np.median(arr))} p10={int(np.percentile(arr, 10))} "
+            f"p90={int(np.percentile(arr, 90))} max={int(arr.max())}",
+            file=sys.stderr,
+        )
+    else:
+        print(
+            f"[token-extract] WARNING: no positive spans mapped to tokens "
+            f"(pos_rows={pos_rows}). Check that the input has populated token_labels.",
+            file=sys.stderr,
+        )
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="google/gemma-4-E2B-it")
-    ap.add_argument("--pairs", default="data/pairs.jsonl")
+    ap.add_argument("--pairs", default="data/dataset.jsonl")
     ap.add_argument("--out", default="data/token_activations")
+    ap.add_argument("--max-length", type=int, default=1024)
     args = ap.parse_args()
-    extract(args.model, Path(args.pairs), Path(args.out))
+    extract(args.model, Path(args.pairs), Path(args.out), max_length=args.max_length)
 
 
 if __name__ == "__main__":

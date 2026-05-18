@@ -5,6 +5,9 @@ __pycache__/
 *.pyc
 .venv/
 data/activations/
+data/activations_dataset/
+data/token_activations/
+data/token_activations_smoke/
 .claude/
 .playwright-mcp/
 .DS_Store

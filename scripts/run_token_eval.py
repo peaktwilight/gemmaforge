@@ -68,6 +68,11 @@ def main() -> int:
     ap.add_argument("--sample-activations", default=None,
                     help="Sample-level activation .npz (X, y) aligned to dataset.jsonl rows. "
                          "Required when --probe-baseline is set.")
+    ap.add_argument("--proximity-window", type=int, default=10,
+                    help="Token window for dilated_span_max (#25). For each "
+                         "positive annotated span, the probe's max prob is taken "
+                         "over [s-W, e+W]. 0 disables the level (it falls "
+                         "back to plain span_max).")
     args = ap.parse_args()
 
     rows = token_data.load_token_dataset(args.dataset)
@@ -115,6 +120,7 @@ def main() -> int:
         bootstrap_n=args.bootstrap_n,
         baselines=baselines,
         sample_X=sample_X,
+        proximity_window=args.proximity_window,
     )
 
     # Render: simple markdown table; full JSON dump for downstream.
@@ -123,12 +129,18 @@ def main() -> int:
     md_lines.append("")
     md_lines.append(f"Dataset: `{args.dataset}` (N={full.n_examples}, pos={full.n_pos_examples})")
     md_lines.append("")
-    md_lines.append("## Per-split metrics (three aggregation levels)")
+    md_lines.append(f"## Per-split metrics (W={args.proximity_window} for dilated_span_max)")
     md_lines.append("")
     md_lines.append("| split | level | AUC (95% CI) | F1 | R@10%FPR | Brier | n_total | n_pos |")
     md_lines.append("|---|---|---|---|---|---|---:|---:|")
     for sp in full.splits:
-        for level_name, m in (("all", sp.all_metrics), ("span", sp.span_metrics), ("span_max", sp.span_max_metrics)):
+        for level_name, m in (
+            ("all", sp.all_metrics),
+            ("proximal_all", sp.proximal_all_metrics),
+            ("span", sp.span_metrics),
+            ("span_max", sp.span_max_metrics),
+            ("dilated_span_max", sp.dilated_span_max_metrics),
+        ):
             if m.get("n_total", 0) == 0:
                 continue
             auc = m.get("auc", float("nan"))
@@ -145,15 +157,16 @@ def main() -> int:
     md_lines.append("")
     md_lines.append("## Baselines (AUC at each level)")
     md_lines.append("")
-    md_lines.append("| split | baseline | all | span | span_max |")
-    md_lines.append("|---|---|---:|---:|---:|")
+    md_lines.append("| split | baseline | all | span | span_max | dilated_span_max |")
+    md_lines.append("|---|---|---:|---:|---:|---:|")
     for sp in full.splits:
         for bl_name, lvls in sp.baseline_aucs.items():
             md_lines.append(
                 f"| `{sp.split_name}` | {bl_name} | "
                 f"{lvls.get('all_auc', float('nan')):.3f} | "
                 f"{lvls.get('span_auc', float('nan')):.3f} | "
-                f"{lvls.get('span_max_auc', float('nan')):.3f} |"
+                f"{lvls.get('span_max_auc', float('nan')):.3f} | "
+                f"{lvls.get('dilated_span_max_auc', float('nan')):.3f} |"
             )
     md = "\n".join(md_lines) + "\n"
 

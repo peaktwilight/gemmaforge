@@ -41,6 +41,17 @@ class TokenSplitReport:
     all_metrics: dict[str, float] = field(default_factory=dict)
     span_metrics: dict[str, float] = field(default_factory=dict)
     span_max_metrics: dict[str, float] = field(default_factory=dict)
+    # Closes #25. Same one-pair-per-example shape as span_max, but for
+    # positive examples the max is taken over each annotated span dilated by
+    # `proximity_window` tokens on each side; negatives keep whole-file max.
+    # AUC + standard clf metrics; F1 at threshold=0.5 doubles as the
+    # detection-window operational number described in #25.
+    dilated_span_max_metrics: dict[str, float] = field(default_factory=dict)
+    # Per-token AUC where the ground-truth positive mask is dilated by
+    # `proximity_window` tokens on each side. Rewards firing in the ±W halo
+    # around labelled spans, which is what soft-label training (#26) is
+    # trying to teach.
+    proximal_all_metrics: dict[str, float] = field(default_factory=dict)
     baseline_aucs: dict[str, dict[str, float]] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
@@ -100,7 +111,8 @@ def _collect_for_indices(
     token_spans: list[list[tuple[int, int, int]]],
     *,
     pad_negatives_for_span_max: bool = True,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[tuple[int, float]]]:
+    proximity_window: int = 0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[tuple[int, float]], list[tuple[int, float]]]:
     """Stack per-example token scores and labels.
 
     Returns:
@@ -129,6 +141,7 @@ def _collect_for_indices(
     all_labels_chunks: list[np.ndarray] = []
     in_span_chunks: list[np.ndarray] = []
     span_max_pairs: list[tuple[int, float]] = []
+    dilated_pairs: list[tuple[int, float]] = []
     for i in indices:
         probs = token_probs[i]
         spans = token_spans[i]
@@ -138,7 +151,30 @@ def _collect_for_indices(
         in_span_chunks.append(mask)
         if len(probs) > 0:
             ex_label = int(rows[i].get("label", int(any(lbl == 1 for _, _, lbl in spans))))
-            span_max_pairs.append((ex_label, float(np.max(probs))))
+            whole_file_max = float(np.max(probs))
+            span_max_pairs.append((ex_label, whole_file_max))
+
+            # Dilated span_max (#25): positives → max over each annotated
+            # positive span dilated by ±proximity_window; negatives → whole
+            # file (symmetric with span_max for negatives, where there are
+            # no spans to dilate around).
+            if ex_label == 1 and proximity_window >= 0:
+                pos_spans = [(s, e) for (s, e, lbl) in spans if lbl == 1]
+                if pos_spans:
+                    n_tok = len(probs)
+                    di_mask = np.zeros(n_tok, dtype=bool)
+                    for s, e in pos_spans:
+                        s2 = max(0, s - proximity_window)
+                        e2 = min(n_tok - 1, e + proximity_window)
+                        if e2 >= s2:
+                            di_mask[s2 : e2 + 1] = True
+                    score = float(probs[di_mask].max()) if di_mask.any() else whole_file_max
+                else:
+                    # Positive example but no mapped spans (rare, e.g. truncation).
+                    score = whole_file_max
+            else:
+                score = whole_file_max
+            dilated_pairs.append((ex_label, score))
     if not all_probs_chunks:
         return (
             np.empty(0, dtype=float),
@@ -146,6 +182,7 @@ def _collect_for_indices(
             np.empty(0, dtype=bool),
             np.empty(0, dtype=int),
             span_max_pairs,
+            dilated_pairs,
         )
     return (
         np.concatenate(all_probs_chunks),
@@ -153,6 +190,7 @@ def _collect_for_indices(
         np.concatenate(in_span_chunks),
         np.empty(0, dtype=int),
         span_max_pairs,
+        dilated_pairs,
     )
 
 
@@ -165,6 +203,7 @@ def evaluate_token_split(
     bootstrap_n: int = 1000,
     baselines: Optional[list[Baseline]] = None,
     sample_X: Optional[np.ndarray] = None,
+    proximity_window: int = 0,
 ) -> TokenSplitReport:
     """Evaluate one split at token level.
 
@@ -184,19 +223,54 @@ def evaluate_token_split(
     treated as a token-level signal.
     """
     te = split.test_idx
-    all_p, all_y, mask, _, span_max = _collect_for_indices(
-        te.tolist(), rows, token_probs, None, token_spans
+    all_p, all_y, mask, _, span_max, dilated_max = _collect_for_indices(
+        te.tolist(), rows, token_probs, None, token_spans,
+        proximity_window=proximity_window,
     )
     all_m = _level_metrics(all_y, all_p, bootstrap_n)
     span_p = all_p[mask]
     span_y = all_y[mask]
     span_m = _level_metrics(span_y, span_p, bootstrap_n)
+
+    # proximal_all: same per-token AUC as `all`, but with the positive mask
+    # dilated by ±proximity_window. Tokens in the halo around a labelled
+    # span count as positive too, so the probe is not punished for firing
+    # 5-10 tokens away from the diff anchor. Closes the eval half of #25
+    # in a way that's symmetric across positives and negatives.
+    if proximity_window > 0:
+        proximal_y = np.zeros_like(all_y)
+        offset = 0
+        for i in te.tolist():
+            n_tok = len(token_probs[i])
+            row_spans = token_spans[i]
+            if n_tok > 0 and row_spans:
+                local = np.zeros(n_tok, dtype=np.int8)
+                for s, e, lbl in row_spans:
+                    if lbl != 1:
+                        continue
+                    s2 = max(0, s - proximity_window)
+                    e2 = min(n_tok - 1, e + proximity_window)
+                    if e2 >= s2:
+                        local[s2 : e2 + 1] = 1
+                proximal_y[offset : offset + n_tok] = local
+            offset += n_tok
+        proximal_m = _level_metrics(proximal_y, all_p, bootstrap_n)
+        proximal_m["proximity_window"] = int(proximity_window)
+    else:
+        proximal_m = {"n_total": 0, "n_pos": 0}
     if span_max:
         sm_labels = np.array([p[0] for p in span_max], dtype=int)
         sm_probs = np.array([p[1] for p in span_max], dtype=float)
         span_max_m = _level_metrics(sm_labels, sm_probs, bootstrap_n)
     else:
         span_max_m = {"n_total": 0, "n_pos": 0}
+    if dilated_max and proximity_window > 0:
+        dm_labels = np.array([p[0] for p in dilated_max], dtype=int)
+        dm_probs = np.array([p[1] for p in dilated_max], dtype=float)
+        dilated_m = _level_metrics(dm_labels, dm_probs, bootstrap_n)
+        dilated_m["proximity_window"] = int(proximity_window)
+    else:
+        dilated_m = {"n_total": 0, "n_pos": 0}
 
     # Baselines: score each test row at example level, broadcast.
     baseline_aucs: dict[str, dict[str, float]] = {}
@@ -239,8 +313,16 @@ def evaluate_token_split(
                     sm_b = np.array(sm_baseline_probs, dtype=float)
                     sm_lbl = np.array([p[0] for p in span_max], dtype=int)
                     level["span_max_auc"] = float(roc_auc_score(sm_lbl, sm_b))
+                    # Baseline broadcast-prob is constant across tokens, so
+                    # dilation doesn't change its score per example. Re-use
+                    # the same alignment.
+                    if proximity_window > 0:
+                        level["dilated_span_max_auc"] = float(roc_auc_score(sm_lbl, sm_b))
+                    else:
+                        level["dilated_span_max_auc"] = float("nan")
                 else:
                     level["span_max_auc"] = float("nan")
+                    level["dilated_span_max_auc"] = float("nan")
             except Exception as e:  # noqa: BLE001
                 level["error"] = str(e)
             baseline_aucs[bl.name] = level
@@ -253,6 +335,8 @@ def evaluate_token_split(
         all_metrics=all_m,
         span_metrics=span_m,
         span_max_metrics=span_max_m,
+        dilated_span_max_metrics=dilated_m,
+        proximal_all_metrics=proximal_m,
         baseline_aucs=baseline_aucs,
     )
 
@@ -268,6 +352,7 @@ def full_token_report(
     bootstrap_n: int = 1000,
     baselines: Optional[list[Baseline]] = None,
     sample_X: Optional[np.ndarray] = None,
+    proximity_window: int = 0,
 ) -> FullTokenReport:
     """Run the canonical split bundle on token-level data.
 
@@ -281,6 +366,7 @@ def full_token_report(
         evaluate_token_split(
             rows, token_probs, token_spans, sp,
             bootstrap_n=bootstrap_n, baselines=baselines, sample_X=sample_X,
+            proximity_window=proximity_window,
         )
         for sp in splits
     ]

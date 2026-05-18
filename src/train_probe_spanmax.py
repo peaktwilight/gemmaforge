@@ -78,45 +78,91 @@ def _example_label(y_tokens: np.ndarray) -> int:
 
 # -------- loss --------
 
+def soft_labels_triangular(
+    y_hard: np.ndarray,
+    window: int,
+) -> np.ndarray:
+    """Triangular decay around hard 0/1 token labels (closes #26).
+
+    Inside any positive run: 1.0. Outside, linear ramp `1 - d/window` to 0
+    over `window` tokens, then 0. Overlapping tails resolve via max.
+    `window=0` returns the hard labels unchanged.
+    """
+    if window <= 0:
+        return y_hard.astype(np.float32)
+    n = len(y_hard)
+    if n == 0:
+        return np.zeros(0, dtype=np.float32)
+    soft = y_hard.astype(np.float32).copy()
+    # Identify contiguous positive runs.
+    edges = np.diff(np.concatenate(([0], y_hard, [0])))
+    starts = np.where(edges == 1)[0]
+    ends = np.where(edges == -1)[0] - 1  # inclusive
+    for s, e in zip(starts, ends):
+        # Left tail.
+        for d in range(1, window + 1):
+            i = s - d
+            if i < 0:
+                break
+            v = 1.0 - d / window
+            if v > soft[i]:
+                soft[i] = v
+        # Right tail.
+        for d in range(1, window + 1):
+            i = e + d
+            if i >= n:
+                break
+            v = 1.0 - d / window
+            if v > soft[i]:
+                soft[i] = v
+    return soft
+
+
 def span_max_loss(
     logits: torch.Tensor,
     y_tok: torch.Tensor,
     is_positive: bool,
     omega: float,
     alpha: float = 10.0,
+    y_soft: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Per-example contribution to L_probe.
 
     Args:
         logits: (n_pos,) raw logits for one example's tokens
-        y_tok:  (n_pos,) 0/1 per-token labels
+        y_tok:  (n_pos,) 0/1 per-token HARD labels (drives alpha-weighting and
+                the span-max pool — we still want one peak per annotated span).
         is_positive: whether this example has an annotated span (y_s=1).
         omega: annealed weight in [0, 1].
         alpha: up-weighting factor for entity tokens in the per-token term.
+        y_soft: optional float (n_pos,) target distribution in [0, 1] used by
+                the per-token BCE term. Defaults to `y_tok.float()`. Soft
+                labels with a triangular tail (#26) let the probe also fire
+                on context tokens near the annotated diff range without being
+                punished by hard-0 BCE.
 
     Returns:
         Scalar loss contribution (NOT yet averaged; caller sums then averages).
     """
-    # Per-token weighted BCE (the (1-omega)*sum_{i in T} w_i * BCE(...) term).
+    if y_soft is None:
+        y_soft = y_tok.float()
+    # Per-token weighted BCE against the soft target.
     bce_per_tok = nn.functional.binary_cross_entropy_with_logits(
-        logits, y_tok.float(), reduction="none"
+        logits, y_soft, reduction="none"
     )
     w = torch.where(y_tok > 0, torch.full_like(bce_per_tok, alpha), torch.ones_like(bce_per_tok))
     token_term = (w * bce_per_tok).sum()
 
-    # Span term: BCE(y_s, max_i p_i) for the (single) span on this example.
-    # We follow the paper: only positive examples contribute a span. For negative
-    # examples there is no s in S, so the span term contributes 0 for them.
+    # Span term: BCE(y_s=1, max_i p_i) over the HARD-span tokens. Keep this on
+    # hard labels so the max-pool tracks the actual annotated vuln region, not
+    # the softened halo around it.
     if is_positive:
-        # max over the span tokens (where y_tok == 1). The extractor labels every
-        # token inside the vulnerable line as 1, so that's exactly span s.
         span_logits = logits[y_tok > 0]
         if span_logits.numel() == 0:
             span_term = logits.new_tensor(0.0)
         else:
             max_logit = span_logits.max()
             y_s = logits.new_tensor(1.0)
-            # BCE(y_s=1, sigmoid(max_logit)) = softplus(-max_logit)
             span_term = nn.functional.binary_cross_entropy_with_logits(
                 max_logit, y_s, reduction="sum"
             )
@@ -139,6 +185,7 @@ def train_one_layer(
     seed: int = 7,
     device: str = "cpu",
     verbose: bool = True,
+    label_window: int = 0,
 ) -> dict:
     """Train one LinearProbe with the span-max loss and return metrics + (w, b)."""
     torch.manual_seed(seed)
@@ -164,12 +211,16 @@ def train_one_layer(
     step = 0
 
     # Pre-move tensors to device per example to amortize host->device copies.
-    cache: dict[int, tuple[torch.Tensor, torch.Tensor, bool]] = {}
+    # cache: (X, y_hard, y_soft, is_positive). y_soft == y_hard.float() when
+    # --label-window is 0; otherwise carries the triangular tail (#26).
+    cache: dict[int, tuple[torch.Tensor, torch.Tensor, torch.Tensor, bool]] = {}
     for eid in all_eids:
         Xi, yi = groups[eid]
+        yi_soft = soft_labels_triangular(yi, label_window)
         cache[eid] = (
             torch.from_numpy(Xi).to(device),
             torch.from_numpy(yi).long().to(device),
+            torch.from_numpy(yi_soft).float().to(device),
             bool(_example_label(yi)),
         )
 
@@ -193,9 +244,9 @@ def train_one_layer(
             loss_accum = torch.zeros((), device=device)
             n_tok_total = 0
             for eid in batch:
-                Xi, yi, is_pos = cache[eid]
+                Xi, yi, yi_soft, is_pos = cache[eid]
                 logits = probe(Xi)
-                contrib = span_max_loss(logits, yi, is_pos, omega=omega)
+                contrib = span_max_loss(logits, yi, is_pos, omega=omega, y_soft=yi_soft)
                 loss_accum = loss_accum + contrib
                 n_tok_total += yi.shape[0]
             # Average per token so the scale is comparable across batches.
@@ -214,7 +265,7 @@ def train_one_layer(
             ex_y_all = []
             ex_p_all = []
             for eid in eids_te:
-                Xi, yi, is_pos = cache[eid]
+                Xi, yi, _y_soft, is_pos = cache[eid]
                 logits = probe(Xi)
                 p = torch.sigmoid(logits).detach().to("cpu").numpy()
                 yi_np = yi.detach().to("cpu").numpy()
@@ -291,6 +342,12 @@ def main() -> None:
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--batch-examples", type=int, default=8)
     ap.add_argument("--device", default=None)
+    ap.add_argument(
+        "--label-window", type=int, default=0,
+        help="Soft-label triangular decay window in tokens (#26). 0 = "
+        "hard 0/1 labels (legacy). 8 = label ramps 1 → 0 over 8 tokens "
+        "outside each annotated span.",
+    )
     args = ap.parse_args()
 
     acts_dir = Path(args.acts_dir)
@@ -326,6 +383,7 @@ def main() -> None:
             lr=args.lr,
             batch_examples=args.batch_examples,
             device=device,
+            label_window=args.label_window,
         )
         r["layer"] = li
         results.append(r)
@@ -361,6 +419,7 @@ def main() -> None:
         "epochs": args.epochs,
         "lr": args.lr,
         "batch_examples": args.batch_examples,
+        "label_window": args.label_window,
         "best_layer": best["layer"],
         "best_token_auc": best["tok_auc"],
         "best_example_auc": best["ex_auc"],

@@ -1,0 +1,43 @@
+{
+  "loss": "span-max (Obeso, Arditi et al. 2025, arXiv 2509.03531 \u00a73)",
+  "alpha": 10.0,
+  "omega_schedule": "linear 0->1 over all training steps",
+  "epochs": 30,
+  "lr": 0.001,
+  "batch_examples": 8,
+  "label_window": 8,
+  "best_layer": 8,
+  "best_token_auc": 0.7708548664478891,
+  "best_example_auc": 0.6953522920203736,
+  "previous_sklearn_logreg_layer8_auc": 0.846,
+  "all_layers": [
+    {
+      "layer": 8,
+      "token_auc": 0.7708548664478891,
+      "example_auc": 0.6953522920203736,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 17,
+      "token_auc": 0.7444463567268925,
+      "example_auc": 0.6737054329371817,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 26,
+      "token_auc": 0.7339373788364989,
+      "example_auc": 0.6691426146010186,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    },
+    {
+      "layer": 34,
+      "token_auc": 0.6423621818237099,
+      "example_auc": 0.6678692699490663,
+      "n_train_examples": 1236,
+      "n_eval_examples": 138
+    }
+  ]
+}

@@ -100,7 +100,7 @@
 
   <!-- Panel 4 -->
   <section class="panel" id="panel-pwnkit">
-    <h2>Hand-off to pwnkit <span class="sub">illustrative · downstream consumer</span></h2>
+    <h2>Hand-off to pwnkit <span class="sub">downstream consumer · real integration shipped <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">#371</a> + <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a></span></h2>
     <div class="pwnkit">
       <div class="handoff">
         <div class="node gf">
@@ -113,7 +113,7 @@
           <div class="title">pwnkit</div>
         </div>
       </div>
-      <div class="cmd">pwnkit triage --seed-findings leads.jsonl --target examples/vuln-express-app</div>
+      <div class="cmd">pwnkit-cli review examples/vuln-express-app --seed-findings leads.jsonl --runtime ollama</div>
       <div class="pwnkit-pills">
         <div class="pwnkit-pill queued"><div class="v" id="pk-queued">0</div><div class="l">leads queued</div></div>
         <div class="pwnkit-pill exploit"><div class="v" id="pk-exploit">0</div><div class="l">exploits verified</div></div>
@@ -121,8 +121,11 @@
       </div>
       <div class="pwnkit-log" id="pk-log"></div>
       <div class="pwnkit-note">
-        Synthetic stream: pwnkit isn't running locally — this panel shows what
-        the downstream consumer does with our leads.jsonl in real deployments.
+        Synthetic stream — pwnkit isn't running in this tab. The real
+        integration is live in <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">pwnkit#371</a> +
+        <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a> (both merged): <code>--seed-findings</code> consumes our
+        <code>gemmaforge.leads/v1</code> JSONL and <code>--runtime ollama</code> drives the agent
+        loop on a local Gemma 4 27B.
       </div>
     </div>
   </section>

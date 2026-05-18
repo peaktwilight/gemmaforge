@@ -97,7 +97,9 @@ print(f"out_dir={OUT_DIR}")
 # install what's missing. `trl>=0.21` keeps `beta`/`max_length` on DPOConfig.
 import sys
 import subprocess
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
+# Kaggle's base image has transformers ~4.42 which doesn't know gemma4.
+# Pin transformers >= 4.49 for the gemma4 architecture.
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "--upgrade", "transformers>=4.49", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
 
 import torch
 print(f"torch={torch.__version__}  cuda_available={torch.cuda.is_available()}")

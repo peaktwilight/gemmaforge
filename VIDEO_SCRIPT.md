@@ -94,10 +94,10 @@ $ python -m src.scan ./example-app \
    ┌─ Lane 1 · Probe ─┐  ┌─ Lane 2 · Leads ─┐  ┌─ Lane 3 · Hunt ─┐
 ```
 
-*Lane 1 streams probe.alarm events as they arrive. Lane 2 stacks the leads with file + line range + CWE. Lane 3 shows "Waiting for pwnkit scan events…" — leave it visible, don't pretend.*
+*Lane 1 streams probe.alarm events as they arrive. Lane 2 stacks the leads with file + line range + CWE. Lane 3 streams agent findings live (pwnkit#372 wired this up). Clicking a finding highlights the originating probe lead in Lane 2.*
 
 **Doruk (voiceover):**
-> "The same scan in pictures. Left lane: the probe firing on internal hidden states. Middle lane: the leads that crossed threshold. Click any lead — it lights up the probe firing that produced it. Provenance, end to end, on one screen."
+> "The same scan in pictures. Left lane: the probe firing on internal hidden states. Middle lane: the leads that crossed threshold. Right lane: the big-Gemma agent's verdicts as they land. Click any verdict — it lights up the probe lead that produced it. Two Gemmas, one screen, full provenance."
 
 ### 4c — Tier 2: big Gemma audits the same repo (1:55–2:15)
 
@@ -106,11 +106,12 @@ $ python -m src.scan ./example-app \
 ```
 $ pwnkit review ./example-app \
       --seed-findings leads.jsonl \
+      --seed-only \
       --runtime ollama
 ```
 
 **Doruk (voiceover):**
-> "Tier two. We hand the leads file to my pwnkit framework. With `--runtime ollama`, the agent loop drives **Gemma 4 27B** — same family, bigger sibling — running locally through Ollama with native function calling. It reads files, greps for call sites, asks itself follow-up questions, and writes a structured audit of the repo."
+> "Tier two. The leads become my pwnkit agent's worklist. With `--runtime ollama`, the agent loop drives **Gemma 4 27B** — same family, bigger sibling — running locally through Ollama with native streaming function calls. For every lead, it reads the file, greps for call sites, and writes a verdict. Confirmed bugs surface; false positives get rejected."
 
 *Cut to one of the agent's findings rendered as a card, with the matching lead visible underneath:*
 
@@ -126,7 +127,7 @@ $ pwnkit review ./example-app \
 ```
 
 **Doruk:**
-> "The agent's verdict lines up with the probe's top lead. Two Gemmas — small and large, same family — agreeing on where the bug is. End to end on one laptop. Promoting the probe leads to the agent's primary worklist is the next follow-up issue."
+> "The agent's verdict matches the probe's top lead. Two Gemmas — small and large, same family — agreeing on where the bug is. End to end on one laptop, in about a minute."
 
 ---
 
@@ -165,4 +166,4 @@ $ pwnkit review ./example-app \
 - B-roll: CVE-2026-33896 advisory page (2s) behind the opening line
 - Both faces on camera before 1:05 — judges reward visible humans early
 - Burned-in subtitles for the lane headers (Lane 1/2/3) and the agent verdict card — judges may watch muted
-- **Honesty constraint:** Lane 3 in the dashboard is still a placeholder in pwnkit#371 — leave its "Waiting for pwnkit scan events…" text on screen. Verdicts are shown from the terminal output of `pwnkit review`, not from Lane 3. Do not fake the Hunt lane.
+- **Verification step:** Lane 3 is live-wired in pwnkit#372 — record a real run of `pwnkit review` against the demo repo so the agent's verdicts actually stream into the Hunt lane. If the agent rejects a probe lead (false-positive), show it — that demonstrates Tier 2 doing its job.

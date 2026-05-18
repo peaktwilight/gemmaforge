@@ -8,9 +8,9 @@ GemmaForge is a two-tier, fully-local pipeline built on the Gemma 4 family.
 - **`weak-probe`** — Gemma 4 E2B backbone, bounded line/token windows, high recall, **laptop-class**. Default; what the metrics below validate.
 - **`strong-probe`** — larger Gemma checkpoint as the probe backbone, larger windows, more repo context, better ranking. **Workstation-class.** Same `gemmaforge.leads/v1` schema.
 
-**Tier 2 — pwnkit verifier.** Gemma 4 27B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://github.com/0sec-labs/pwnkit/pull/371)) that reads files, greps call sites, and produces audit verdicts a developer can cross-reference against the leads. Consumes leads from either probe.
+**Tier 2 — pwnkit verifier.** Gemma 4 27B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://github.com/0sec-labs/pwnkit/pull/371)) that consumes the leads as its **primary worklist**, reads files, greps call sites, and produces tool-grounded audit verdicts. Consumes leads from either probe.
 
-Nothing leaves the laptop. The probe is what the metrics below validate. The agent verifier is shipped end-to-end at the CLI + runtime + dashboard layer in [`0sec-labs/pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371) (merged 2026-05-18); promoting the seed findings to the agent's primary worklist is the named follow-up issue [`pwnkit#368`](https://github.com/0sec-labs/pwnkit/issues/368).
+Nothing leaves the laptop. The probe is what the metrics below validate. The agent verifier is shipped end-to-end at the CLI + runtime + dashboard layer in two merged pwnkit PRs: [`#371`](https://github.com/0sec-labs/pwnkit/pull/371) (CLI, Ollama runtime, three-lane dashboard) and [`#372`](https://github.com/0sec-labs/pwnkit/pull/372) (seed-findings worklist injection, streaming Ollama tool-calls, live Hunt lane). Both merged 2026-05-18.
 
 ## Headline numbers
 
@@ -116,19 +116,20 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
                                                                      │
               pwnkit `/live` dashboard ◄── SSE ──┐                    │
               (Lane 1 · Probe, Lane 2 · Leads,                         │
-               Lane 3 · Hunt placeholder)                              │
+               Lane 3 · Hunt — all live)                               │
                                                                      ▼
                               pwnkit review --seed-findings leads.jsonl
-                                            --runtime ollama
+                                            --seed-only --runtime ollama
                                                                      │
                                                                      ▼
-                              Gemma 4 27B (Ollama /api/chat + tools[])
+                              Gemma 4 27B (Ollama /api/chat + tools[],
+                              streaming tool-calls per pwnkit#372)
                               read_file · grep · follow-call-site
                                                                      │
                                                                      ▼
                               structured audit verdicts
-                              (cross-referenced with leads today;
-                               primary worklist in pwnkit#368)
+                              (leads are the primary worklist;
+                               verdicts stream into Lane 3 live)
 ```
 
 **Tier 1 (this repo) — activation-probe scan, two variants:**
@@ -147,9 +148,9 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
 
 **Tier 2 (pwnkit#371, merged 2026-05-18):**
 - `--seed-findings <path|->` — parses our `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s and threads them through the pipeline. Stable wire format.
-- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:27b`. Batched (non-streaming) tool-calling.
-- `/live` dashboard — three lanes; Lanes 1+2 wired to SSE; Lane 3 (Hunt) is a UI placeholder for agent findings in this PR (live wiring is follow-up [pwnkit#370](https://github.com/0sec-labs/pwnkit/issues/370)).
-- **Worklist promotion.** Today the leads are parsed, typed, and made available to the pipeline; the agent runs its own discovery pass over the same repo with its existing tool loop. Cross-referencing the agent's verdicts against `leads.jsonl` is done by the developer. Promoting the leads to the agent's primary worklist is the named follow-up issue [pwnkit#368](https://github.com/0sec-labs/pwnkit/issues/368). We do not pitch behaviour that hasn't shipped.
+- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:27b`. **Streaming tool-calls** ship in [pwnkit#372](https://github.com/0sec-labs/pwnkit/pull/372).
+- `/live` dashboard — three lanes (Probe / Leads / Hunt), all live-wired via SSE. The Hunt lane subscribes to `pwnkit.events/v1`, click-to-highlight resolves a verdict back to its originating lead.
+- **Worklist injection.** `pwnkit#372` converts each `SeedFinding` into a `SemgrepFinding`-shaped record (severity bucketed from probe confidence, `ruleId` prefixed with the source + CWE for visible provenance, full payload preserved in `metadata`) and prepends it to the agent's worklist so the agent sees probe leads first. `--seed-only` honours that by skipping the static-scan pass entirely.
 
 ## Tracks targeted
 
@@ -204,10 +205,11 @@ python -m src.scan ./your-repo \
 #    (install pwnkit from https://github.com/0sec-labs/pwnkit)
 pwnkit review ./your-repo \
     --seed-findings leads.jsonl \
+    --seed-only \
     --runtime ollama
 ```
 
-The pwnkit `/live` dashboard (Lane 1 · Probe, Lane 2 · Leads) can be pointed at `live.ndjson` while the scan runs — see [`0sec-labs/pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371) for the consumer side. Once [pwnkit#368](https://github.com/0sec-labs/pwnkit/issues/368) lands, the leads will be the agent's primary worklist; today the agent runs its own discovery pass and the developer cross-references its verdicts with `leads.jsonl`.
+The pwnkit `/live` dashboard renders all three lanes live (Probe / Leads / Hunt) — see [`pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371) for the CLI + runtime + dashboard scaffold and [`pwnkit#372`](https://github.com/0sec-labs/pwnkit/pull/372) for worklist injection, streaming Ollama tool-calls, and live hunt-lane wiring. With `--seed-only`, the probe's leads are the agent's only worklist; without it, they prepend the static scan.
 
 ## Pipeline: GemmaForge → pwnkit (small Gemma finds, big Gemma hunts)
 

@@ -6,4 +6,4 @@
 
 ## Line
 
-> "OK so the small Gemma tells you *where* the bugs probably are. But finding isn't the same as *proving*. That's where the big one comes in."
+> "Ok so the small Gemma tells you *where* the bugs probably are. But finding isn't the same as *proving*. That's where the big one comes in."

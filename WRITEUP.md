@@ -20,7 +20,7 @@ GemmaForge is a two-tier, fully-local vulnerability auditing pipeline built on t
 - **`weak-probe`** — Gemma 4 E2B (~2B), bounded line/token windows, high recall, laptop-class. The default and the one our metrics validate.
 - **`strong-probe`** — a larger Gemma checkpoint as the probe backbone, with larger windows and more repo context. Better ranking and long-context understanding; needs workstation-class hardware. Same lead schema, same downstream contract.
 
-**Tier 2 is the pwnkit verifier** — Gemma 4 27B driving a tool-using agent (`pwnkit review --seed-findings --runtime ollama`) that consumes the leads as its primary worklist, reads files, greps call sites, and streams tool-grounded audit verdicts back into the dashboard's Hunt lane. **Nothing leaves the laptop.** A solo maintainer with an old MacBook runs `weak-probe`; a developer with a 24GB-class GPU or a 32GB-class M-series Mac can run `strong-probe` and/or the full pipeline through the verifier. Same model family, same tokenizer, same Apache-2.0–licensed glue code.
+**Tier 2 is the pwnkit verifier** — Gemma 4 8B driving a tool-using agent (`pwnkit review --seed-findings --runtime ollama`) that consumes the leads as its primary worklist, reads files, greps call sites, and streams tool-grounded audit verdicts back into the dashboard's Hunt lane. **Nothing leaves the laptop.** A solo maintainer with an old MacBook runs `weak-probe`; a developer with a 24GB-class GPU or a 32GB-class M-series Mac can run `strong-probe` and/or the full pipeline through the verifier. Same model family, same tokenizer, same Apache-2.0–licensed glue code.
 
 ## The problem
 
@@ -79,16 +79,16 @@ Tier 1 emits a JSONL stream in a schema we call `gemmaforge.leads/v1` (see `docs
  "gemmaforge_layer": 17, "model_id": "google/gemma-4-E2B-it", "rank": 0}
 ```
 
-Doruk's pwnkit framework consumes this format directly via [`pwnkit review --seed-findings <jsonl>`](https://github.com/0sec-labs/pwnkit/pull/371) and runs its agentic auditor locally, driven by Gemma 4 27B through Ollama:
+Doruk's pwnkit framework consumes this format directly via [`pwnkit review --seed-findings <jsonl>`](https://github.com/0sec-labs/pwnkit/pull/371) and runs its agentic auditor locally, driven by Gemma 4 8B through Ollama:
 
 ```bash
 pwnkit review ./my-repo --seed-findings leads.jsonl --seed-only --runtime ollama
 ```
 
-The `--runtime ollama` runtime hits Ollama's `/api/chat` with `tools[]` and translates Ollama tool-calls into pwnkit `tool_use` content blocks — full native function-calling, no API key, no network. The default model is `gemma4:27b`.
+The `--runtime ollama` runtime hits Ollama's `/api/chat` with `tools[]` and translates Ollama tool-calls into pwnkit `tool_use` content blocks — full native function-calling, no API key, no network. The default model is `gemma4:latest`.
 
 **What is shipped end-to-end today (two merged pwnkit PRs, both 2026-05-18):**
-- [`pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371): `--seed-findings <path|->` parses `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s; `--runtime ollama` drives Gemma 4 27B locally; `/live` dashboard with three lanes (Probe · Leads · Hunt) on `gemmaforge.events/v1` SSE.
+- [`pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371): `--seed-findings <path|->` parses `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s; `--runtime ollama` drives Gemma 4 8B locally; `/live` dashboard with three lanes (Probe · Leads · Hunt) on `gemmaforge.events/v1` SSE.
 - [`pwnkit#372`](https://github.com/0sec-labs/pwnkit/pull/372): **worklist injection** (`SeedFinding[]` is converted to `SemgrepFinding`-shaped records — severity bucketed from probe confidence, `ruleId` carrying `<source>.<CWE>` provenance, full payload preserved in `metadata` — and **prepended** to the agent's worklist; `--seed-only` skips the static-scan pass); **streaming Ollama tool-calls** (`stream: true` default, per-token `onDelta("assistant_response", …)` events, ND-JSON chunked body); **live Hunt-lane wiring** (new `?huntEvents=<URL>` SSE channel, parser for `pwnkit.events/v1` `tool_use` / `finding` / `stage` shapes, click-to-highlight resolves a finding back to its originating lead by file:line suffix match ±20 lines).
 
 The two-tier pipeline is **end-to-end on the laptop today** — every claim in this writeup maps to merged code in this repo or those two PRs.
@@ -98,8 +98,8 @@ The two-tier pipeline is **end-to-end on the laptop today** — every claim in t
 This is the load-bearing argument. No closed model and no open non-Gemma model gives all of:
 
 1. **Raw hidden states** at every layer — required for Tier 1. GPT-5 and Claude don't expose them. Open-weight Llama and Qwen do, but only Gemma 4 gives you this *plus* the rest below.
-2. **A model-size family — three slots, one architecture.** `weak-probe` runs on Gemma 4 E2B (~2B); `strong-probe` can swap in a larger Gemma checkpoint as the probe backbone; the `pwnkit verifier` runs Gemma 4 27B. All three share the same vocabulary, the same hidden-state geometry conventions, and the same tool schema. The same `gemmaforge.leads/v1` schema is what flows between them. Mixing a Llama probe with a Qwen verifier would mean two licenses, two prompt formats, and no guarantee the small model's notion of "vulnerable-looking" hidden state maps to anything the big model's reasoning prior cares about.
-3. **Native function-calling + 131k context.** Required for the verifier. Gemma 4 27B reads files, greps call sites, and asks follow-up questions inside a 131k-token window — a small repo audit fits in a single context.
+2. **A model-size family — three slots, one architecture.** `weak-probe` runs on Gemma 4 E2B (~2B); `strong-probe` can swap in a larger Gemma checkpoint as the probe backbone; the `pwnkit verifier` runs Gemma 4 8B. All three share the same vocabulary, the same hidden-state geometry conventions, and the same tool schema. The same `gemmaforge.leads/v1` schema is what flows between them. Mixing a Llama probe with a Qwen verifier would mean two licenses, two prompt formats, and no guarantee the small model's notion of "vulnerable-looking" hidden state maps to anything the big model's reasoning prior cares about.
+3. **Native function-calling + 131k context.** Required for the verifier. Gemma 4 8B reads files, greps call sites, and asks follow-up questions inside a 131k-token window — a small repo audit fits in a single context.
 4. **Apache-2.0–licensed glue code; Gemma weights under the Gemma Terms of Use** (open weights, commercial use permitted). One legal review, not two.
 5. **Laptop-sized at the weak end, workstation-sized at the strong end.** E2B (`weak-probe`) fits comfortably on any modern MacBook; the larger checkpoints (`strong-probe`, verifier) fit on a 24GB GPU or a 32GB-class M-series Mac at Q4. The user picks their slot by hardware; the pipeline is the same. No cloud step is forced anywhere.
 
@@ -161,7 +161,7 @@ We demo two flows side by side:
 
 1. **The streaming token demo (Tier 1 in IDE mode).** Two presets frame the same Express handler unsafely vs safely. On the unsafe framing the probe's running mean lifts into the yellow/red band; red clusters around the actual risky lines (string-interpolated SQL, missing validation). On the safe framing, mostly green. **Mean risk lifts ~10 points** between the two framings — a real signal on a 2B model with a single linear classifier.
 
-2. **The whole-repo audit (Tier 1 → leads → Tier 2).** `python -m src.scan ./example-app --events live.ndjson > leads.jsonl` walks the repo. The `/live` dashboard fills in real time: Lane 1 shows the probe firing on individual chunks; Lane 2 stacks the leads that crossed the threshold. We then run `pwnkit review --seed-findings leads.jsonl --seed-only --runtime ollama` and the Gemma 4 27B agent picks up the leads as its primary worklist (per pwnkit#372), reads files with `read_file`, greps call sites, and streams tool-grounded verdicts into Lane 3 with click-to-highlight provenance back to the originating probe lead.
+2. **The whole-repo audit (Tier 1 → leads → Tier 2).** `python -m src.scan ./example-app --events live.ndjson > leads.jsonl` walks the repo. The `/live` dashboard fills in real time: Lane 1 shows the probe firing on individual chunks; Lane 2 stacks the leads that crossed the threshold. We then run `pwnkit review --seed-findings leads.jsonl --seed-only --runtime ollama` and the Gemma 4 8B agent picks up the leads as its primary worklist (per pwnkit#372), reads files with `read_file`, greps call sites, and streams tool-grounded verdicts into Lane 3 with click-to-highlight provenance back to the originating probe lead.
 
 ## Limitations (honest)
 
@@ -170,7 +170,7 @@ We demo two flows side by side:
 - **Tier 1 — train-inference distribution gap.** The shipped probe is trained on last-token activations of complete snippets; streaming inference reads intermediate positions. We mitigate with 8-token mean / max-pool at serving time (max-pool drops adversarial T3 from Δ −0.087 to |Δ| ≤ 0.005 at −0.031 clean AUC, see `data/adversarial_full_suite.json`). A principled fix is the token-level path above.
 - **Tier 1 — surface-form sensitivity.** Full T1–T5 adversarial suite ([Bailey et al. ICLR 2026](https://arxiv.org/abs/2412.09565), [RL-Obfuscation, 2025](https://arxiv.org/abs/2506.14261)): identifier renames + SQL case shift give |Δ| ≤ 0.007 — refutes "probe detects API names." Only T3 (comment + reindent) is meaningfully adversarial at Δ −0.089 last-token; max-pool flattens it.
 - **Tier 1 — coverage.** Python and JS are first-class. C/C++ have SVEN char-level spans but no full activation pass yet. Rust, Go, Ruby, PHP are not in the training set; the scanner scores them but treats them as out-of-distribution. Per-size retraining will be needed for any 26B/27B-A4B variant.
-- **Tier 2 — agent quality is bounded by tool design + Gemma 4 27B's tool-following.** The pwnkit toolkit (read-file, grep, follow-call-site) and the model's adherence to the tool schema are the ceiling.
+- **Tier 2 — agent quality is bounded by tool design + Gemma 4 8B's tool-following.** The pwnkit toolkit (read-file, grep, follow-call-site) and the model's adherence to the tool schema are the ceiling.
 
 ## Bonus: LoRA-augmented safe-code generation
 
@@ -178,7 +178,7 @@ Obeso §3 also trains a LoRA alongside the probe. We wired the analogue (`script
 
 ## Bonus: small Gemma finds, big Gemma hunts (TL;DR of the integration)
 
-`python -m src.scan repo/ > leads.jsonl` walks a codebase with Gemma 4 E2B + probe and emits ranked candidate spans (`gemmaforge.leads/v1`). pwnkit's review agent consumes them with `--seed-findings ... --seed-only` and runs the hunt on **Gemma 4 27B locally via Ollama** (`--runtime ollama`) — leads are the agent's primary worklist, tool-calls stream, verdicts land in the `/live` dashboard's Hunt lane with click-to-highlight provenance back to the originating lead. Two Gemma sizes, two roles, zero cloud. Integration: two merged PRs on pwnkit ([#371](https://github.com/0sec-labs/pwnkit/pull/371), [#372](https://github.com/0sec-labs/pwnkit/pull/372), ~3k LOC) + producer side here (`src/scan.py`, `docs/leads-schema.md`).
+`python -m src.scan repo/ > leads.jsonl` walks a codebase with Gemma 4 E2B + probe and emits ranked candidate spans (`gemmaforge.leads/v1`). pwnkit's review agent consumes them with `--seed-findings ... --seed-only` and runs the hunt on **Gemma 4 8B locally via Ollama** (`--runtime ollama`) — leads are the agent's primary worklist, tool-calls stream, verdicts land in the `/live` dashboard's Hunt lane with click-to-highlight provenance back to the originating lead. Two Gemma sizes, two roles, zero cloud. Integration: two merged PRs on pwnkit ([#371](https://github.com/0sec-labs/pwnkit/pull/371), [#372](https://github.com/0sec-labs/pwnkit/pull/372), ~3k LOC) + producer side here (`src/scan.py`, `docs/leads-schema.md`).
 
 ## What we'd build next
 

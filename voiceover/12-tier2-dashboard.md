@@ -2,7 +2,7 @@
 
 **Speaker:** Doruk (voiceover) · **Target:** 15s · **Position:** 2:00–2:15
 
-**On screen while you read:** the dashboard's **Hand-off to pwnkit** panel fills in real time. Tool-call cards land one after another — `read_file src/users.js`, `grep -n "db.query"`, `read_file src/ping.js`, `verify — string interpolation reaches sink`. A verdict card lands: `CWE-89 · CONFIRMED · sql-injection`. Mouse hovers a row in the Leads panel and clicks it; the matching investigation card in the pwnkit panel glows. Bottom caption sticks: *"Gemma 4 27B via Ollama · tool-calls live · click-to-highlight provenance lead → investigation"*.
+**On screen while you read:** the dashboard's **Hand-off to pwnkit** panel fills in real time. Tool-call cards land one after another — `read_file src/users.js`, `grep -n "db.query"`, `read_file src/ping.js`, `verify — string interpolation reaches sink`. A verdict card lands: `CWE-89 · CONFIRMED · sql-injection`. Mouse hovers a row in the Leads panel and clicks it; the matching investigation card in the pwnkit panel glows. Bottom caption sticks: *"Gemma 4 8B via Ollama · tool-calls live · click-to-highlight provenance lead → investigation"*.
 
 ## Line
 

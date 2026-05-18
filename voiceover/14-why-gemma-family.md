@@ -6,7 +6,7 @@
 
 ```
 ┌──────────┐    ┌──────────┐    ┌──────────────────┐
-│  E2B 2B  │ →  │  E4B 4B  │ →  │  Gemma 4 27B     │
+│  E2B 2B  │ →  │  E4B 4B  │ →  │  Gemma 4 8B      │
 │  probe   │    │  probe+  │    │  agentic verifier│
 │  laptop  │    │  workstn │    │  workstation     │
 └──────────┘    └──────────┘    └──────────────────┘

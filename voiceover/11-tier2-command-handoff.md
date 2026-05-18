@@ -8,10 +8,10 @@
 $ pwnkit-cli review examples/vuln-express-app \
       --seed-findings leads.jsonl \
       --runtime ollama \
-      --model gemma4:27b
+      --model gemma4:latest
 ```
 
-Right-side caption sticks for the full 15 s: *"pwnkit consumes gemmaforge.leads/v1 · Ollama /api/chat with tools[] · Gemma 4 27B locally · 0sec-labs/pwnkit #371 + #372 (merged)"*.
+Right-side caption sticks for the full 15 s: *"pwnkit consumes gemmaforge.leads/v1 · Ollama /api/chat with tools[] · Gemma 4 8B locally · 0sec-labs/pwnkit #371 + #372 (merged)"*.
 
 ## Line
 

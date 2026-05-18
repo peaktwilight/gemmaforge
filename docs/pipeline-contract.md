@@ -27,7 +27,7 @@ the only things that cross the boundary.
                                             pwnkit review
                                               --seed-findings <scored.ndjson>
                                               --runtime ollama
-                                            Gemma 4 27B via Ollama
+                                            Gemma 4 8B via Ollama
                                               file reads, grep, tool-calls
                                                        │
                                                        ▼

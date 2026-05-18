@@ -184,13 +184,13 @@ Doruk Tan Ozturk · pwnkit · 0sec.ai
 $ pwnkit-cli review examples/vuln-express-app \
       --seed-findings leads.jsonl \
       --runtime ollama \
-      --model gemma4:27b
+      --model gemma4:latest
 ```
 
 **Burned-in caption (right side, sticky 15s):**
 ```
 pwnkit consumes gemmaforge.leads/v1
-Ollama  /api/chat  +  tools[]   ·   Gemma 4 27B locally
+Ollama  /api/chat  +  tools[]   ·   Gemma 4 8B locally
 0sec-labs/pwnkit  #371 + #372  (merged)
 ```
 
@@ -211,7 +211,7 @@ Then a verdict card lands with a green stroke: `CWE-89 · CONFIRMED · sql-injec
 
 **Burned-in caption (bottom, sticky 15s):**
 ```
-Gemma 4 27B  via  Ollama   ·   live tool-calls
+Gemma 4 8B  via  Ollama   ·   live tool-calls
 click-to-highlight  lead → investigation provenance
 ```
 
@@ -260,7 +260,7 @@ Real run.  Today.  On a laptop.
 
 ```
 ┌──────────┐    ┌──────────┐    ┌──────────────────┐
-│  E2B 2B  │ →  │  E4B 4B  │ →  │  Gemma 4 27B     │
+│  E2B 2B  │ →  │  E4B 4B  │ →  │  Gemma 4 8B     │
 │  probe   │    │  probe+  │    │  agentic verifier│
 │  laptop  │    │  workstn │    │  workstation     │
 └──────────┘    └──────────┘    └──────────────────┘

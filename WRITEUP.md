@@ -108,7 +108,9 @@ Tractable with time and data, not blockers on the technique.
 ## What we'd build next
 
 - **Per-CWE heads.** Multi-head output (CWE-89 vs CWE-22 vs CWE-78 …) so the UI names the bug class.
-- **LoRA-augmented probes.** Obeso et al. §3 reports clear AUC gains from a small joint adapter.
+- **Token-level training data at scale.** SVEN (ETH SRI, char-level vuln spans) + CyberSecEval (line-level, 8 languages) integrated; we built the loaders. Need a full per-token training run with the span-max loss from Obeso §3 to close the AUC gap toward 0.9.
+- **LoRA-augmented Gemma.** Obeso §3 reports the same LoRA used to train a hallucination probe also makes the model *more cautious* on its own — generations become "more conservative in making specific factual claims." The cybersecurity analogue is "model writes safer code by default." We have the training script wired (see `scripts/train_lora.py`) and partial results in the repo.
+- **W&B telemetry on training runs.** Probe and LoRA training would log per-step loss/AUC to wandb so reruns are auditable.
 - **VS Code extension.** The streaming layer is already SSE; an editor plugin is a week of polish.
 - **Hook into pwnkit.** Doruk's pentest framework drives Gemma 4 through CVE-hunting workflows. Adding the probe as a confidence filter — "Gemma claims this is SQLi *and* the activations match the SQLi training pattern" — closes the loop.
 

@@ -302,7 +302,7 @@ node-forge · plus ~10 more in npm packages totalling 200M+ DL/mo.
    GemmaForge — Two Gemmas, one laptop.
 
    Repo:    github.com/peaktwilight/gemmaforge
-   Live:    huggingface.co/spaces/peaktwilight/gemma4ge
+   Live:    huggingface.co/spaces/peaktwilight/gemmaforge
    pwnkit:  github.com/0sec-labs/pwnkit  (PR #371, #372)
 
    Tracks:  Main · Safety & Trust · Ollama
@@ -352,7 +352,7 @@ node-forge · plus ~10 more in npm packages totalling 200M+ DL/mo.
 | 08 | E2B / E4B decoder-stack diagram (L17 → L10) | Render new — Keynote/Figma, two columns of blocks + red arrow |
 | 09 | T3 before/after + sparkline | Render new from `data/adversarial_full_suite.json` |
 | 11 | Terminal: scan + pwnkit review | Record in iTerm, clean prompt (`PS1='$ '`), font ≥ 18pt |
-| 12 | 4-panel dashboard, live | `huggingface.co/spaces/peaktwilight/gemma4ge` (Docker SDK build) |
+| 12 | 4-panel dashboard, live | `huggingface.co/spaces/peaktwilight/gemmaforge` (Docker SDK build) |
 | 13 | Terminal: real E2E output | Replay `/tmp/e2e-ollama.log` from today's run |
 | 14 | Three-tile model-family diagram | Render new — Keynote/Figma |
 | 15 | GHSA advisory reel | Pull from Doruk's GitHub security advisory list |

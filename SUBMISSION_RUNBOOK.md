@@ -7,7 +7,7 @@ Operational drill-down for submission day. `SUBMISSION.md` is the high-level che
 | Surface | Purpose | Notes |
 |---|---|---|
 | **GitHub** `peaktwilight/gemmaforge` | code repo, all artifacts | private until submission |
-| **HuggingFace Space** `peaktwilight/gemma4ge` | live demo for judges | CPU-basic (free tier). The probe-only path is fast enough on CPU; the demo plays the streamed-token UI |
+| **HuggingFace Space** `peaktwilight/gemmaforge` | live demo for judges | CPU-basic (free tier). The probe-only path is fast enough on CPU; the demo plays the streamed-token UI |
 | **Kaggle** | training + competition submission | DPO LoRA via `notebooks/kaggle_train_lora_dpo.py`, future span-max + 26B-A4B replication go here too |
 
 ## T-30 min — pre-flight
@@ -19,7 +19,7 @@ Operational drill-down for submission day. `SUBMISSION.md` is the high-level che
    ```
 2. **HF Space is RUNNING.**
    ```bash
-   curl -sL https://huggingface.co/api/spaces/peaktwilight/gemma4ge | jq '.runtime.stage'
+   curl -sL https://huggingface.co/api/spaces/peaktwilight/gemmaforge | jq '.runtime.stage'
    ```
    Expect `"RUNNING"`. Anything else (`BUILDING`, `BUILD_ERROR`, `STOPPED`) → see Failure modes below.
 3. **Local streaming server boots cleanly.**
@@ -53,7 +53,7 @@ The visibility field must read `"PUBLIC"`. Hackathon rules require it.
    - Cover image: `web/cover.svg` (PNG fallback if Kaggle rejects SVG: `web/screenshot-demo.png`)
    - Code repo URL: `https://github.com/peaktwilight/gemmaforge` (must be public — runbook flips it at T-15 min)
    - Video URL: YouTube link (unlisted-to-public on submission day). Placeholder until ready: `https://youtube.com/watch?v=TODO`.
-   - Live demo URL: `https://huggingface.co/spaces/peaktwilight/gemma4ge`
+   - Live demo URL: `https://huggingface.co/spaces/peaktwilight/gemmaforge`
 
 ## T-5 min — hit Submit on Kaggle
 

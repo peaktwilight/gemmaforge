@@ -8,7 +8,7 @@
 - [ ] **Kaggle Writeup** (≤1500 words) — `WRITEUP.md` content pasted into a new Kaggle Writeup. Tracks: **Main Track** · **Impact: Safety & Trust** · **Special Tech: Ollama**.
 - [ ] **Public Code Repository** — pushed to `https://github.com/peaktwilight/gemmaforge` (flip to public at T-15 min, see runbook)
 - [ ] **Public Video** (≤3 min, YouTube, no login required) — unlisted → public on submission day, link pasted into writeup. Placeholder: `https://youtube.com/watch?v=TODO` — replace before clicking Submit.
-- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemma4ge` (CPU-basic, must read `RUNNING` at T-30 min)
+- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemmaforge` (CPU-basic, must read `RUNNING` at T-30 min)
 - [ ] **Cover image + media gallery** — primary: `web/cover.svg`; PNG fallback if Kaggle rejects SVG: `web/screenshot-demo.png` (or `web/auc-ladder.png`, `web/demo-grid.png`)
 
 ## Order of operations on submission day

@@ -20,7 +20,7 @@ Technical Depth would not earn full marks as written. The probe work is real, un
 | Claim a judge might challenge | Where evidenced | Verdict |
 |---|---|---|
 | "Live demo: https://gemmaforge.doruk.ch" | `WRITEUP.md`; `curl -I -L https://gemmaforge.doruk.ch` failed DNS from this environment. | unverified / high-risk |
-| HF Space `peaktwilight/gemma4ge` works | `README.md`; HTTP 200 from `https://huggingface.co/spaces/peaktwilight/gemma4ge`. | verified |
+| HF Space `peaktwilight/gemmaforge` works | `README.md`; HTTP 200 from `https://huggingface.co/spaces/peaktwilight/gemmaforge`. | verified |
 | Doruk has "10+ CVE-grade vulnerabilities" and "200M+ combined monthly downloads" | `WRITEUP.md`, `README.md`; not evidenced in repo except repeated prose. | unverified unless external proof is linked |
 | `CVE-2026-33896` in `node-forge`, 33M weekly downloads | `WRITEUP.md`, `README.md`, `LINKEDIN.md`; advisory link is generic and no local proof of npm download count. | weak |
 | "AI coding assistants ship ~100M lines of code per day" | `WRITEUP.md`; no citation. | unverified |

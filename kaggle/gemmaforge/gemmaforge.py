@@ -32,7 +32,7 @@
 #
 # - Repo: https://github.com/peaktwilight/gemmaforge
 # - Writeup: https://www.kaggle.com/competitions/gemma-4-good-hackathon/writeups
-# - Dashboard: https://huggingface.co/spaces/peaktwilight/gemma4ge
+# - Dashboard: https://huggingface.co/spaces/peaktwilight/gemmaforge
 # - Pwnkit (Tier 3 verifier): https://github.com/0sec-labs/pwnkit
 
 # %%
@@ -288,7 +288,7 @@ print("See https://github.com/peaktwilight/gemmaforge/blob/main/data/eval/strong
 #   --runtime ollama` (see https://github.com/0sec-labs/pwnkit/pull/371)
 #   picks up the JSONL as a worklist and runs the Gemma 4 27B agent
 #   locally via Ollama — fully off-cloud audit.
-# - **Live dashboard** — https://huggingface.co/spaces/peaktwilight/gemma4ge
+# - **Live dashboard** — https://huggingface.co/spaces/peaktwilight/gemmaforge
 #   shows all three lanes streaming the canned demo data.
 print("Done. Next steps documented in docs/pipeline-contract.md.")
 

@@ -23,4 +23,4 @@ findings/
 *.tsbuildinfo
 .vercel
 .venv-jupytext/
-kaggle/gemma4ge/gemma4ge.ipynb
+kaggle/gemmaforge/gemmaforge.ipynb

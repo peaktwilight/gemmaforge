@@ -1,7 +1,7 @@
 {
-  "id": "peaktwilight/gemma4ge",
-  "title": "Gemma4ge",
-  "code_file": "gemma4ge.ipynb",
+  "id": "peaktwilight/gemmaforge",
+  "title": "GemmaForge",
+  "code_file": "gemmaforge.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": false,

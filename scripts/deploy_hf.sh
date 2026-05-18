@@ -5,12 +5,12 @@
 # Run after the probe has been trained (data/probe.npz must exist).
 #
 # Usage:
-#   bash scripts/deploy_hf.sh                  # creates peaktwilight/gemma4ge
+#   bash scripts/deploy_hf.sh                  # creates peaktwilight/gemmaforge
 #   HF_USER=youruser bash scripts/deploy_hf.sh  # override the namespace
 set -euo pipefail
 
 HF_USER="${HF_USER:-peaktwilight}"
-SPACE_NAME="${SPACE_NAME:-gemma4ge}"
+SPACE_NAME="${SPACE_NAME:-gemmaforge}"
 SDK="${SDK:-docker}"
 
 if ! command -v hf >/dev/null 2>&1; then

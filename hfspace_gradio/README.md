@@ -46,7 +46,7 @@ and run `python -m src.scan` locally — the same probe, same schema, no caps.
 - Tier 2 verifier — [`pwnkit`](https://github.com/0sec-labs/pwnkit) consumes the
   same `gemmaforge.leads/v1` JSONL via `--seed-findings`, drives Gemma 4 27B as an
   agent that reads files and corroborates each lead.
-- Dashboard Space — [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge)
+- Dashboard Space — [`peaktwilight/gemmaforge`](https://huggingface.co/spaces/peaktwilight/gemmaforge)
   shows the four-panel pipeline view (probe stream / scan progress / leads / pwnkit handoff).
 
 Built for the [Gemma 4 Good Hackathon](https://kaggle.com/competitions/gemma-4-good-hackathon)

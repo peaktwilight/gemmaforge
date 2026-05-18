@@ -8,7 +8,7 @@
    GemmaForge — Two Gemmas, one laptop.
 
    Repo:    github.com/peaktwilight/gemmaforge
-   Live:    huggingface.co/spaces/peaktwilight/gemma4ge
+   Live:    huggingface.co/spaces/peaktwilight/gemmaforge
    pwnkit:  github.com/0sec-labs/pwnkit  (PR #371, #372)
 
    Tracks:  Main · Safety & Trust · Ollama

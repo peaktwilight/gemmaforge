@@ -82,12 +82,10 @@ This project can't be built on a closed model:
 
 ## Limitations (honest)
 
-- **Probes classify representation, not ground truth.** A high score means *"this looks, on the inside, like code I was trained on as vulnerable,"* not *"this is exploitable."* Expect false positives on lookalike-but-safe patterns.
-- **Train-inference distribution gap on streaming.** The probe was trained on the last-token activation of *complete* snippets but at inference reads every *intermediate* position. We mitigate with an 8-token sliding-window mean; a proper fix needs per-token labels — a real project, not a hackathon weekend.
-- **Per-size retraining.** A probe trained on E2B does not drop into 26B-A4B unchanged. ~10 min of compute per size.
-- **Uneven cross-language coverage.** Python and JS are well represented. C/C++ less so. Rust and Zig score noisily until we collect targeted pairs.
-
-Tractable with time and data, not blockers on the technique.
+- **Probes classify representation, not ground truth.** A high score means *"looks like code I was trained on as vulnerable,"* not *"is exploitable."*
+- **Train-inference distribution gap.** Probe trained on last-token of *complete* snippets; at inference reads every *intermediate* position. Mitigated with 8-token sliding-window mean; proper fix needs per-token labels.
+- **Lexical shortcut on identifier names.** Empirically on 20 sampled positives, inserting a benign comment + 2-space reindent drops the mean score by **8.7 pts** under last-token aggregation. The probe is partially keying on superficial formatting and identifier names rather than taint flow — consistent with [Bailey et al. (ICLR 2026)](https://arxiv.org/abs/2412.09565) and [SLODA (FSE 2025)](https://dl.acm.org/doi/10.1145/3729403). Mitigation we found: **max-pool over per-token probe scores** (per [RL-Obfuscation, 2025](https://arxiv.org/abs/2506.14261)) collapses the same drop to −0.004 pts (a 22× robustness gain) with no measurable cost on clean AUC.
+- **Per-size retraining + uneven cross-language coverage.** Python/JS well-covered; C/C++ less; Rust/Zig noisy until targeted pairs.
 
 ## Bonus: LoRA-augmented safe-code generation
 

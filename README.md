@@ -35,6 +35,8 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 - **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
 - **Live demo:** [HuggingFace Space](https://huggingface.co/spaces/peaktwilight/gemmaforge) (ZeroGPU). All weights and data in this repo.
 
+**Two probe paths.** Every number above is from the **sample-level** path — one label per snippet, linear probe on the last-token hidden state (`src/extract_activations.py` + `src/train_probe.py`). That is what ships in the demo today. In parallel we are training a **token-level** path — per-token spans (`evidence` / `sink` / `source` / `sanitizer`), value head on every position, BCE + span-max loss — via `notebooks/colab_train_gemma4_probe.py` and `scripts/train_value_head.py`. The intent is for token-level to *replace* sample-level once we have evaluated the two head-to-head; for now it is a candidate, not the shipped probe.
+
 See [`docs/coverage.md`](docs/coverage.md) for per-language analysis, [`RESULTS.md`](RESULTS.md) for the full metrics dashboard, and [`SUBMISSION.md`](SUBMISSION.md) for the hackathon submission checklist.
 
 ![GemmaForge demo grid](web/demo-grid.png)

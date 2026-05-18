@@ -27,6 +27,8 @@ Yes. We built it.
 
 ## The technique
 
+**Two paths.** The numbers below are from the **sample-level** path — one label per snippet, linear probe on the last-token hidden state — which is what ships in the demo. In parallel we train a **token-level** value-head probe with per-token spans (BCE + span-max loss) as the intended drop-in replacement once we have evaluated the two head-to-head. Both paths read the same Gemma 4 hidden states; they differ in label granularity and aggregation.
+
 We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.03531) (arXiv 2509.03531) from *fabricated entities* to *vulnerable code patterns*. A single linear classifier sits on Gemma 4's last-token hidden state at an intermediate decoder layer. The binary label is *"the code emitted so far is the vulnerable side of a known patch pair."*
 
 The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
@@ -98,7 +100,7 @@ Obeso §3 reports the LoRA that trains the probe also makes the model itself mor
 ## What we'd build next
 
 Tracked as 13 open GitHub issues. Highlights:
-- **Token-level span-max training** — SVEN + CyberSecEval data integrated; trainer written; per-token run pending.
+- **Token-level probe → head-to-head vs. sample-level.** Both trainers are live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces the shipped sample-level probe.
 - **Full DPO LoRA on dedicated GPU.** The script supports it (`--max_steps 500`); we need a clean MPS slot or a single CUDA box. Stretch goal: re-train the probe *jointly* with the LoRA, the way Obeso §3 does — probe gradient gets a stop-grad on the base, the LoRA gradient flows.
 - **VS Code extension** + **pwnkit confidence-filter** + **W&B telemetry**.
 

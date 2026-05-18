@@ -14,6 +14,8 @@ Generated from the following artefacts in this repo (all read-only for this doc)
 
 The numbers below are pulled directly from those files. If you re-train you may see floating-point drift in the 4th decimal place; everything to 3 decimals should match exactly.
 
+> **Scope note — two probe paths.** Every number in this document is from the **sample-level** probe (one label per snippet, last-token hidden state). A **token-level** value-head probe (per-token spans, BCE + span-max loss) is being trained in parallel via `notebooks/colab_train_gemma4_probe.py` and `scripts/train_value_head.py` as the intended replacement; its head-to-head eval against the sample-level numbers will land in a future revision of this doc.
+
 ---
 
 ## 1. Headline numbers

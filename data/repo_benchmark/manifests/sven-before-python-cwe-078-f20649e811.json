@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-f20649e811",
+  "repo_path": "repos/sven-before-python-cwe-078-f20649e811",
+  "source": "dataset_microrepo",
+  "source_row": 1183,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::parlai/core/params.py::add_extra_args",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_params.py",
+      "role": "vulnerable",
+      "source_row": 1183,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_params.py",
+      "role": "fixed_counterpart",
+      "source_row": 646,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_database.py",
+      "role": "safe_decoy",
+      "source_row": 678,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_forumdb.py",
+      "role": "safe_decoy",
+      "source_row": 284,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_submit.py",
+      "role": "safe_decoy",
+      "source_row": 778,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_params.py",
+      "start_char": 106,
+      "end_char": 167,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_params.py",
+      "start_line": 1,
+      "end_line": 28,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_database.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_forumdb.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_submit.py",
+      "start_line": 1,
+      "end_line": 47,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

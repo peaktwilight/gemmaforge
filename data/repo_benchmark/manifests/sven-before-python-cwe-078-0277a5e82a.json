@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-0277a5e82a",
+  "repo_path": "repos/sven-before-python-cwe-078-0277a5e82a",
+  "source": "dataset_microrepo",
+  "source_row": 935,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/util.py::get_title_from_youtube_url",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_util.py",
+      "role": "vulnerable",
+      "source_row": 935,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_util.py",
+      "role": "fixed_counterpart",
+      "source_row": 1256,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_poll_rdp.py",
+      "role": "safe_decoy",
+      "source_row": 144,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_goals.py",
+      "role": "safe_decoy",
+      "source_row": 69,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_bot.py",
+      "role": "safe_decoy",
+      "source_row": 1310,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_util.py",
+      "start_char": 115,
+      "end_char": 117,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_util.py",
+      "start_char": 132,
+      "end_char": 164,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_util.py",
+      "start_char": 212,
+      "end_char": 213,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_util.py",
+      "start_char": 214,
+      "end_char": 218,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_util.py",
+      "start_line": 1,
+      "end_line": 11,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_poll_rdp.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_goals.py",
+      "start_line": 1,
+      "end_line": 58,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_bot.py",
+      "start_line": 1,
+      "end_line": 18,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

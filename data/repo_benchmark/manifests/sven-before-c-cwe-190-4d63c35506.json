@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-4d63c35506",
+  "repo_path": "repos/sven-before-c-cwe-190-4d63c35506",
+  "source": "dataset_microrepo",
+  "source_row": 1008,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libvncserver/scale.c::rfbScaledScreenUpdateRect",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_scale.c",
+      "role": "vulnerable",
+      "source_row": 1008,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_scale.c",
+      "role": "fixed_counterpart",
+      "source_row": 1370,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_cmscgats.c",
+      "role": "safe_decoy",
+      "source_row": 1209,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_mempolicy.c",
+      "role": "safe_decoy",
+      "source_row": 226,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_jp2_dec.c",
+      "role": "safe_decoy",
+      "source_row": 107,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_scale.c",
+      "start_char": 3001,
+      "end_char": 3058,
+      "start_line": 79,
+      "end_line": 79,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_scale.c",
+      "start_line": 1,
+      "end_line": 122,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_cmscgats.c",
+      "start_line": 1,
+      "end_line": 22,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_mempolicy.c",
+      "start_line": 1,
+      "end_line": 120,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_jp2_dec.c",
+      "start_line": 1,
+      "end_line": 385,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

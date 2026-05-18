@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-787-8da9b1caea",
+  "repo_path": "repos/sven-before-c-cwe-787-8da9b1caea",
+  "source": "dataset_microrepo",
+  "source_row": 1189,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/regparse.c::next_state_class",
+  "language": "c",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_regparse.c",
+      "role": "vulnerable",
+      "source_row": 1189,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_regparse.c",
+      "role": "fixed_counterpart",
+      "source_row": 68,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_bmp.c",
+      "role": "safe_decoy",
+      "source_row": 938,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_big_key.c",
+      "role": "safe_decoy",
+      "source_row": 782,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_card.c",
+      "role": "safe_decoy",
+      "source_row": 1059,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_regparse.c",
+      "start_char": 456,
+      "end_char": 478,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_regparse.c",
+      "start_line": 1,
+      "end_line": 23,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_bmp.c",
+      "start_line": 1,
+      "end_line": 651,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_big_key.c",
+      "start_line": 1,
+      "end_line": 45,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_card.c",
+      "start_line": 1,
+      "end_line": 127,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

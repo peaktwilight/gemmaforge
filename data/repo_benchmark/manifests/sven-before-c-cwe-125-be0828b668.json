@@ -1,0 +1,289 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-be0828b668",
+  "repo_path": "repos/sven-before-c-cwe-125-be0828b668",
+  "source": "dataset_microrepo",
+  "source_row": 151,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::mrbgems/mruby-fiber/src/fiber.c::fiber_switch",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_fiber.c",
+      "role": "vulnerable",
+      "source_row": 151,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_fiber.c",
+      "role": "fixed_counterpart",
+      "source_row": 636,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_rfbproto.c",
+      "role": "safe_decoy",
+      "source_row": 1364,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_box_code_base.c",
+      "role": "safe_decoy",
+      "source_row": 258,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_lua_struct.c",
+      "role": "safe_decoy",
+      "source_row": 1259,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 267,
+      "end_char": 270,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 380,
+      "end_char": 383,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 414,
+      "end_char": 417,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 516,
+      "end_char": 519,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 617,
+      "end_char": 622,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 757,
+      "end_char": 760,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 818,
+      "end_char": 843,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 848,
+      "end_char": 861,
+      "start_line": 22,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 862,
+      "end_char": 866,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 873,
+      "end_char": 887,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 888,
+      "end_char": 891,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 893,
+      "end_char": 897,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 899,
+      "end_char": 904,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 905,
+      "end_char": 907,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 908,
+      "end_char": 909,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 910,
+      "end_char": 912,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 913,
+      "end_char": 917,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 918,
+      "end_char": 920,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 921,
+      "end_char": 923,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 924,
+      "end_char": 925,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_fiber.c",
+      "start_char": 1156,
+      "end_char": 1188,
+      "start_line": 35,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_fiber.c",
+      "start_line": 1,
+      "end_line": 47,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_rfbproto.c",
+      "start_line": 1,
+      "end_line": 647,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_box_code_base.c",
+      "start_line": 1,
+      "end_line": 78,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_lua_struct.c",
+      "start_line": 1,
+      "end_line": 71,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

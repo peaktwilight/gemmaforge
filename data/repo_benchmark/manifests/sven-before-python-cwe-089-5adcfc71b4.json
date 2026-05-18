@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-5adcfc71b4",
+  "repo_path": "repos/sven-before-python-cwe-089-5adcfc71b4",
+  "source": "dataset_microrepo",
+  "source_row": 96,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::bar.py::delete_crawl",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_bar.py",
+      "role": "vulnerable",
+      "source_row": 96,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_bar.py",
+      "role": "fixed_counterpart",
+      "source_row": 158,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_fckdialog.py",
+      "role": "safe_decoy",
+      "source_row": 313,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 382,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_impl.py",
+      "role": "safe_decoy",
+      "source_row": 803,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_bar.py",
+      "start_char": 303,
+      "end_char": 305,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_bar.py",
+      "start_line": 1,
+      "end_line": 23,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_fckdialog.py",
+      "start_line": 1,
+      "end_line": 160,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 40,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_impl.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-022-f18f44838c",
+  "repo_path": "repos/sven-before-python-cwe-022-f18f44838c",
+  "source": "dataset_microrepo",
+  "source_row": 1019,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::impl.py::deleteKey",
+  "language": "python",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_impl.py",
+      "role": "vulnerable",
+      "source_row": 1019,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_impl.py",
+      "role": "fixed_counterpart",
+      "source_row": 225,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_users.py",
+      "role": "safe_decoy",
+      "source_row": 296,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_repack_rust.py",
+      "role": "safe_decoy",
+      "source_row": 102,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_dbopts.py",
+      "role": "safe_decoy",
+      "source_row": 573,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_impl.py",
+      "start_char": 110,
+      "end_char": 130,
+      "start_line": 5,
+      "end_line": 6,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 165,
+      "end_char": 166,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 272,
+      "end_char": 273,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 275,
+      "end_char": 278,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 279,
+      "end_char": 281,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 283,
+      "end_char": 286,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 287,
+      "end_char": 303,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_impl.py",
+      "start_char": 320,
+      "end_char": 380,
+      "start_line": 13,
+      "end_line": 14,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_impl.py",
+      "start_line": 1,
+      "end_line": 17,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_users.py",
+      "start_line": 1,
+      "end_line": 5,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_repack_rust.py",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_dbopts.py",
+      "start_line": 1,
+      "end_line": 19,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

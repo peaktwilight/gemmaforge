@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-49b1d5ba12",
+  "repo_path": "repos/sven-before-python-cwe-089-49b1d5ba12",
+  "source": "dataset_microrepo",
+  "source_row": 44,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::photogpsbot/users.py::set_language",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_users.py",
+      "role": "vulnerable",
+      "source_row": 44,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_users.py",
+      "role": "fixed_counterpart",
+      "source_row": 537,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 168,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_post.py",
+      "role": "safe_decoy",
+      "source_row": 405,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_query_lastfm.py",
+      "role": "safe_decoy",
+      "source_row": 337,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_users.py",
+      "start_char": 415,
+      "end_char": 417,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 418,
+      "end_char": 432,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 468,
+      "end_char": 470,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 482,
+      "end_char": 487,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_users.py",
+      "start_line": 1,
+      "end_line": 22,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_post.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_query_lastfm.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

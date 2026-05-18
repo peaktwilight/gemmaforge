@@ -1,0 +1,169 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-be01c3aebc",
+  "repo_path": "repos/sven-before-c-cwe-125-be01c3aebc",
+  "source": "dataset_microrepo",
+  "source_row": 74,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::coders/sun.c::ReadSUNImage",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_sun.c",
+      "role": "vulnerable",
+      "source_row": 74,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_sun.c",
+      "role": "fixed_counterpart",
+      "source_row": 323,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_gifload.c",
+      "role": "safe_decoy",
+      "source_row": 425,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_anal_java.c",
+      "role": "safe_decoy",
+      "source_row": 1206,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_input.c",
+      "role": "safe_decoy",
+      "source_row": 860,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_sun.c",
+      "start_char": 6284,
+      "end_char": 6286,
+      "start_line": 201,
+      "end_line": 201,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 6289,
+      "end_char": 6295,
+      "start_line": 201,
+      "end_line": 201,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 6296,
+      "end_char": 6304,
+      "start_line": 201,
+      "end_line": 201,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7248,
+      "end_char": 7250,
+      "start_line": 217,
+      "end_line": 217,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7253,
+      "end_char": 7259,
+      "start_line": 217,
+      "end_line": 217,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7260,
+      "end_char": 7268,
+      "start_line": 217,
+      "end_line": 217,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7438,
+      "end_char": 7440,
+      "start_line": 221,
+      "end_line": 221,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7443,
+      "end_char": 7449,
+      "start_line": 221,
+      "end_line": 221,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sun.c",
+      "start_char": 7450,
+      "end_char": 7458,
+      "start_line": 221,
+      "end_line": 221,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_sun.c",
+      "start_line": 1,
+      "end_line": 408,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_gifload.c",
+      "start_line": 1,
+      "end_line": 52,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_anal_java.c",
+      "start_line": 1,
+      "end_line": 40,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_input.c",
+      "start_line": 1,
+      "end_line": 85,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

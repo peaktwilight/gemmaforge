@@ -1,0 +1,149 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-841f05ca52",
+  "repo_path": "repos/sven-before-c-cwe-476-841f05ca52",
+  "source": "dataset_microrepo",
+  "source_row": 976,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libavcodec/dnxhd_parser.c::dnxhd_find_frame_end",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_dnxhd_parser.c",
+      "role": "vulnerable",
+      "source_row": 976,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_dnxhd_parser.c",
+      "role": "fixed_counterpart",
+      "source_row": 1030,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_window.c",
+      "role": "safe_decoy",
+      "source_row": 662,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_algif_hash.c",
+      "role": "safe_decoy",
+      "source_row": 794,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_blosc2.c",
+      "role": "safe_decoy",
+      "source_row": 842,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1216,
+      "end_char": 1222,
+      "start_line": 39,
+      "end_line": 39,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1288,
+      "end_char": 1294,
+      "start_line": 40,
+      "end_line": 40,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1332,
+      "end_char": 1338,
+      "start_line": 41,
+      "end_line": 41,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1422,
+      "end_char": 1428,
+      "start_line": 42,
+      "end_line": 42,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1468,
+      "end_char": 1476,
+      "start_line": 43,
+      "end_line": 43,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1477,
+      "end_char": 1486,
+      "start_line": 43,
+      "end_line": 43,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_dnxhd_parser.c",
+      "start_char": 1489,
+      "end_char": 1490,
+      "start_line": 43,
+      "end_line": 43,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_dnxhd_parser.c",
+      "start_line": 1,
+      "end_line": 76,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_window.c",
+      "start_line": 1,
+      "end_line": 112,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_algif_hash.c",
+      "start_line": 1,
+      "end_line": 41,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_blosc2.c",
+      "start_line": 1,
+      "end_line": 174,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

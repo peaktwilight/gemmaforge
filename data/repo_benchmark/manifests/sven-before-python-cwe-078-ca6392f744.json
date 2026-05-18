@@ -1,0 +1,169 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-ca6392f744",
+  "repo_path": "repos/sven-before-python-cwe-078-ca6392f744",
+  "source": "dataset_microrepo",
+  "source_row": 218,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/main/python/monitoring_config_generator/MonitoringConfigGenerator.py::write_section",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_monitoringconfiggenerator.py",
+      "role": "vulnerable",
+      "source_row": 218,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_monitoringconfiggenerator.py",
+      "role": "fixed_counterpart",
+      "source_row": 814,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_reservation_actions.py",
+      "role": "safe_decoy",
+      "source_row": 452,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 1255,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_process_data.py",
+      "role": "safe_decoy",
+      "source_row": 1125,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 290,
+      "end_char": 295,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 306,
+      "end_char": 316,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 349,
+      "end_char": 350,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 351,
+      "end_char": 352,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 353,
+      "end_char": 355,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 357,
+      "end_char": 358,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 370,
+      "end_char": 371,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 373,
+      "end_char": 374,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_monitoringconfiggenerator.py",
+      "start_char": 375,
+      "end_char": 378,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_monitoringconfiggenerator.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_reservation_actions.py",
+      "start_line": 1,
+      "end_line": 51,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 42,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_process_data.py",
+      "start_line": 1,
+      "end_line": 67,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

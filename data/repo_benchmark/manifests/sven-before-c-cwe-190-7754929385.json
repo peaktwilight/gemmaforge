@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-7754929385",
+  "repo_path": "repos/sven-before-c-cwe-190-7754929385",
+  "source": "dataset_microrepo",
+  "source_row": 1099,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::Zend/zend_hash.c::_zend_hash_init",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_zend_hash.c",
+      "role": "vulnerable",
+      "source_row": 1099,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_zend_hash.c",
+      "role": "fixed_counterpart",
+      "source_row": 10,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_ioapic.c",
+      "role": "safe_decoy",
+      "source_row": 567,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_rle.c",
+      "role": "safe_decoy",
+      "source_row": 446,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_cx24116.c",
+      "role": "safe_decoy",
+      "source_row": 374,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_zend_hash.c",
+      "start_char": 314,
+      "end_char": 361,
+      "start_line": 6,
+      "end_line": 7,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_zend_hash.c",
+      "start_line": 1,
+      "end_line": 14,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_ioapic.c",
+      "start_line": 1,
+      "end_line": 5,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_rle.c",
+      "start_line": 1,
+      "end_line": 537,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_cx24116.c",
+      "start_line": 1,
+      "end_line": 95,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+    def htmlvalue(self, val):
+        return self.block.render_basic(val)

@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-ed09fe2986",
+  "repo_path": "repos/sven-before-python-cwe-089-ed09fe2986",
+  "source": "dataset_microrepo",
+  "source_row": 525,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::photogpsbot/users.py::compare_and_update",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_users.py",
+      "role": "vulnerable",
+      "source_row": 525,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_users.py",
+      "role": "fixed_counterpart",
+      "source_row": 295,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_repack_rust.py",
+      "role": "safe_decoy",
+      "source_row": 520,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_views.py",
+      "role": "safe_decoy",
+      "source_row": 921,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_tech_track.py",
+      "role": "safe_decoy",
+      "source_row": 1042,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_users.py",
+      "start_char": 1612,
+      "end_char": 1615,
+      "start_line": 41,
+      "end_line": 41,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1616,
+      "end_char": 1631,
+      "start_line": 41,
+      "end_line": 41,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1663,
+      "end_char": 1666,
+      "start_line": 42,
+      "end_line": 42,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1667,
+      "end_char": 1680,
+      "start_line": 42,
+      "end_line": 42,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1713,
+      "end_char": 1722,
+      "start_line": 43,
+      "end_line": 43,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1723,
+      "end_char": 1731,
+      "start_line": 43,
+      "end_line": 43,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1767,
+      "end_char": 1768,
+      "start_line": 44,
+      "end_line": 44,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_users.py",
+      "start_char": 1780,
+      "end_char": 1782,
+      "start_line": 44,
+      "end_line": 44,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_users.py",
+      "start_line": 1,
+      "end_line": 55,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_repack_rust.py",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_views.py",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_tech_track.py",
+      "start_line": 1,
+      "end_line": 17,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-a35c383bdc",
+  "repo_path": "repos/sven-before-c-cwe-190-a35c383bdc",
+  "source": "dataset_microrepo",
+  "source_row": 730,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::drivers/block/floppy.c::set_geometry",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_floppy.c",
+      "role": "vulnerable",
+      "source_row": 730,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_floppy.c",
+      "role": "fixed_counterpart",
+      "source_row": 1309,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_mqueue.c",
+      "role": "safe_decoy",
+      "source_row": 1105,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_wddx.c",
+      "role": "safe_decoy",
+      "source_row": 595,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_memcached.c",
+      "role": "safe_decoy",
+      "source_row": 739,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_floppy.c",
+      "start_char": 177,
+      "end_char": 219,
+      "start_line": 7,
+      "end_line": 8,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_floppy.c",
+      "start_line": 1,
+      "end_line": 73,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_mqueue.c",
+      "start_line": 1,
+      "end_line": 125,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_wddx.c",
+      "start_line": 1,
+      "end_line": 140,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_memcached.c",
+      "start_line": 1,
+      "end_line": 187,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

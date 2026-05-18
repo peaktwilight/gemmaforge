@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-0e8ff5deea",
+  "repo_path": "repos/sven-before-c-cwe-416-0e8ff5deea",
+  "source": "dataset_microrepo",
+  "source_row": 301,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::net/ipx/af_ipx.c::ipxitf_ioctl",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_af_ipx.c",
+      "role": "vulnerable",
+      "source_row": 301,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_af_ipx.c",
+      "role": "fixed_counterpart",
+      "source_row": 769,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_regexec.c",
+      "role": "safe_decoy",
+      "source_row": 1233,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_dbdimp.c",
+      "role": "safe_decoy",
+      "source_row": 1238,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_uvesafb.c",
+      "role": "safe_decoy",
+      "source_row": 338,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_af_ipx.c",
+      "start_char": 1339,
+      "end_char": 1346,
+      "start_line": 55,
+      "end_line": 55,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_af_ipx.c",
+      "start_char": 1395,
+      "end_char": 1396,
+      "start_line": 57,
+      "end_line": 57,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_af_ipx.c",
+      "start_char": 1397,
+      "end_char": 1400,
+      "start_line": 57,
+      "end_line": 57,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_af_ipx.c",
+      "start_char": 1421,
+      "end_char": 1431,
+      "start_line": 58,
+      "end_line": 59,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_af_ipx.c",
+      "start_line": 1,
+      "end_line": 78,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_regexec.c",
+      "start_line": 1,
+      "end_line": 1488,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_dbdimp.c",
+      "start_line": 1,
+      "end_line": 255,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_uvesafb.c",
+      "start_line": 1,
+      "end_line": 38,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-6ffe343b9d",
+  "repo_path": "repos/sven-before-python-cwe-079-6ffe343b9d",
+  "source": "dataset_microrepo",
+  "source_row": 21,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::evennia/server/portal/webclient_ajax.py::mode_init",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_webclient_ajax.py",
+      "role": "vulnerable",
+      "source_row": 21,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_webclient_ajax.py",
+      "role": "fixed_counterpart",
+      "source_row": 963,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 1271,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_make_eb_config.py",
+      "role": "safe_decoy",
+      "source_row": 1231,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_etcdstore.py",
+      "role": "safe_decoy",
+      "source_row": 194,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_webclient_ajax.py",
+      "start_char": 260,
+      "end_char": 265,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_webclient_ajax.py",
+      "start_char": 274,
+      "end_char": 275,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_webclient_ajax.py",
+      "start_line": 1,
+      "end_line": 35,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 45,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_make_eb_config.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_etcdstore.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

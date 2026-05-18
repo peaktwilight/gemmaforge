@@ -1,0 +1,149 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-d09b2f1cd8",
+  "repo_path": "repos/sven-before-python-cwe-089-d09b2f1cd8",
+  "source": "dataset_microrepo",
+  "source_row": 996,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tournament.py::registerPlayer",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_tournament.py",
+      "role": "vulnerable",
+      "source_row": 996,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_tournament.py",
+      "role": "fixed_counterpart",
+      "source_row": 311,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_hooks.py",
+      "role": "safe_decoy",
+      "source_row": 659,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_database.py",
+      "role": "safe_decoy",
+      "source_row": 88,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_djblets_js.py",
+      "role": "safe_decoy",
+      "source_row": 139,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 355,
+      "end_char": 356,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 357,
+      "end_char": 360,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 361,
+      "end_char": 370,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 406,
+      "end_char": 407,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 409,
+      "end_char": 410,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 413,
+      "end_char": 414,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tournament.py",
+      "start_char": 423,
+      "end_char": 424,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_tournament.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_hooks.py",
+      "start_line": 1,
+      "end_line": 41,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_database.py",
+      "start_line": 1,
+      "end_line": 3,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_djblets_js.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

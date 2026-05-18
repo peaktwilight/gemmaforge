@@ -1,0 +1,149 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-079-257ef00906",
+  "repo_path": "repos/sven-before-c-cwe-079-257ef00906",
+  "source": "dataset_microrepo",
+  "source_row": 1257,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/mod_auth_openidc.c::oidc_handle_session_management_iframe_rp",
+  "language": "c",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_mod_auth_openidc.c",
+      "role": "vulnerable",
+      "source_row": 1257,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_mod_auth_openidc.c",
+      "role": "fixed_counterpart",
+      "source_row": 414,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_bmp.c",
+      "role": "safe_decoy",
+      "source_row": 938,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_tuner-xc2028.c",
+      "role": "safe_decoy",
+      "source_row": 1111,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_expr.c",
+      "role": "safe_decoy",
+      "source_row": 1241,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 796,
+      "end_char": 797,
+      "start_line": 21,
+      "end_line": 21,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2275,
+      "end_char": 2276,
+      "start_line": 64,
+      "end_line": 64,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2293,
+      "end_char": 2296,
+      "start_line": 64,
+      "end_line": 64,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2304,
+      "end_char": 2306,
+      "start_line": 65,
+      "end_line": 65,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2323,
+      "end_char": 2324,
+      "start_line": 65,
+      "end_line": 65,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2328,
+      "end_char": 2329,
+      "start_line": 65,
+      "end_line": 65,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_mod_auth_openidc.c",
+      "start_char": 2490,
+      "end_char": 2492,
+      "start_line": 69,
+      "end_line": 69,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_mod_auth_openidc.c",
+      "start_line": 1,
+      "end_line": 74,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_bmp.c",
+      "start_line": 1,
+      "end_line": 651,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_tuner-xc2028.c",
+      "start_line": 1,
+      "end_line": 57,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_expr.c",
+      "start_line": 1,
+      "end_line": 30,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

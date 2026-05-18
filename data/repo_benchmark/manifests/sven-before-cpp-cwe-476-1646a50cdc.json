@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-476-1646a50cdc",
+  "repo_path": "repos/sven-before-cpp-cwe-476-1646a50cdc",
+  "source": "dataset_microrepo",
+  "source_row": 1153,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tensorflow/core/common_runtime/eager/kernel_and_device.cc::tensorflow::KernelAndDeviceOp::Run",
+  "language": "cpp",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_kernel_and_device.cc",
+      "role": "vulnerable",
+      "source_row": 1153,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_kernel_and_device.cc",
+      "role": "fixed_counterpart",
+      "source_row": 665,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_makepreview.cpp",
+      "role": "safe_decoy",
+      "source_row": 1037,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_tarfilereader.cpp",
+      "role": "safe_decoy",
+      "source_row": 787,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_snd_fx.cpp",
+      "role": "safe_decoy",
+      "source_row": 278,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2608,
+      "end_char": 2609,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2610,
+      "end_char": 2614,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2615,
+      "end_char": 2617,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2619,
+      "end_char": 2621,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2623,
+      "end_char": 2624,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_and_device.cc",
+      "start_char": 2631,
+      "end_char": 2633,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_kernel_and_device.cc",
+      "start_line": 1,
+      "end_line": 82,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_makepreview.cpp",
+      "start_line": 1,
+      "end_line": 46,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_tarfilereader.cpp",
+      "start_line": 1,
+      "end_line": 26,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_snd_fx.cpp",
+      "start_line": 1,
+      "end_line": 1080,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

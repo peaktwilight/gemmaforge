@@ -1,0 +1,309 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-e67b405500",
+  "repo_path": "repos/sven-before-python-cwe-078-e67b405500",
+  "source": "dataset_microrepo",
+  "source_row": 355,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/backend/api/utils/rclone_connection.py::copy",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_rclone_connection.py",
+      "role": "vulnerable",
+      "source_row": 355,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_rclone_connection.py",
+      "role": "fixed_counterpart",
+      "source_row": 813,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 1198,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_test_hp3par.py",
+      "role": "safe_decoy",
+      "source_row": 1292,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_api.py",
+      "role": "safe_decoy",
+      "source_row": 526,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 95,
+      "end_char": 97,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 200,
+      "end_char": 204,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 396,
+      "end_char": 400,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 491,
+      "end_char": 492,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 510,
+      "end_char": 511,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 525,
+      "end_char": 526,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 527,
+      "end_char": 528,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 529,
+      "end_char": 539,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 554,
+      "end_char": 561,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 566,
+      "end_char": 567,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 570,
+      "end_char": 571,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 572,
+      "end_char": 573,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 576,
+      "end_char": 579,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 603,
+      "end_char": 604,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 630,
+      "end_char": 631,
+      "start_line": 21,
+      "end_line": 21,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 640,
+      "end_char": 641,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 662,
+      "end_char": 663,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 665,
+      "end_char": 666,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 667,
+      "end_char": 670,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 672,
+      "end_char": 674,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 699,
+      "end_char": 701,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 702,
+      "end_char": 720,
+      "start_line": 24,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 721,
+      "end_char": 727,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_rclone_connection.py",
+      "start_line": 1,
+      "end_line": 45,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_test_hp3par.py",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_api.py",
+      "start_line": 1,
+      "end_line": 32,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

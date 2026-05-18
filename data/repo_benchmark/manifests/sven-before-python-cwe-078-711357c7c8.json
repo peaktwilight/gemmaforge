@@ -1,0 +1,229 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-711357c7c8",
+  "repo_path": "repos/sven-before-python-cwe-078-711357c7c8",
+  "source": "dataset_microrepo",
+  "source_row": 396,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/san/hp/hp_3par_fc.py::_modify_3par_fibrechan_host",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_hp_3par_fc.py",
+      "role": "vulnerable",
+      "source_row": 396,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_hp_3par_fc.py",
+      "role": "fixed_counterpart",
+      "source_row": 843,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_server.py",
+      "role": "safe_decoy",
+      "source_row": 721,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_qutescheme.py",
+      "role": "safe_decoy",
+      "source_row": 601,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_process_image.py",
+      "role": "safe_decoy",
+      "source_row": 643,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 140,
+      "end_char": 151,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 155,
+      "end_char": 156,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 157,
+      "end_char": 167,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 184,
+      "end_char": 188,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 189,
+      "end_char": 190,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 191,
+      "end_char": 194,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 202,
+      "end_char": 204,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 226,
+      "end_char": 230,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 231,
+      "end_char": 232,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 233,
+      "end_char": 238,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 239,
+      "end_char": 240,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 241,
+      "end_char": 242,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 243,
+      "end_char": 244,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 248,
+      "end_char": 256,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_fc.py",
+      "start_char": 258,
+      "end_char": 259,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_hp_3par_fc.py",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_server.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_qutescheme.py",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_process_image.py",
+      "start_line": 1,
+      "end_line": 35,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

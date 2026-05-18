@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-c25cd99f42",
+  "repo_path": "repos/sven-before-c-cwe-125-c25cd99f42",
+  "source": "dataset_microrepo",
+  "source_row": 909,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/gd_interpolation.c::_gdContributionsCalc",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_gd_interpolation.c",
+      "role": "vulnerable",
+      "source_row": 909,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_gd_interpolation.c",
+      "role": "fixed_counterpart",
+      "source_row": 553,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_jpc_dec.c",
+      "role": "safe_decoy",
+      "source_row": 613,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_saa7164-bus.c",
+      "role": "safe_decoy",
+      "source_row": 1284,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_index.c",
+      "role": "safe_decoy",
+      "source_row": 1128,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_gd_interpolation.c",
+      "start_char": 849,
+      "end_char": 922,
+      "start_line": 28,
+      "end_line": 31,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_gd_interpolation.c",
+      "start_line": 1,
+      "end_line": 56,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_jpc_dec.c",
+      "start_line": 1,
+      "end_line": 103,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_saa7164-bus.c",
+      "start_line": 1,
+      "end_line": 162,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_index.c",
+      "start_line": 1,
+      "end_line": 104,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

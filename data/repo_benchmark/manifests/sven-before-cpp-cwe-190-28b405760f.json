@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-190-28b405760f",
+  "repo_path": "repos/sven-before-cpp-cwe-190-28b405760f",
+  "source": "dataset_microrepo",
+  "source_row": 375,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/lepton/jpgcoder.cc::read_ujpg",
+  "language": "cpp",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_jpgcoder.cc",
+      "role": "vulnerable",
+      "source_row": 375,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_jpgcoder.cc",
+      "role": "fixed_counterpart",
+      "source_row": 1021,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_string-util.cpp",
+      "role": "safe_decoy",
+      "source_row": 638,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_webmodules.cpp",
+      "role": "safe_decoy",
+      "source_row": 289,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_kernel_util.cc",
+      "role": "safe_decoy",
+      "source_row": 253,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_jpgcoder.cc",
+      "start_char": 3293,
+      "end_char": 3398,
+      "start_line": 59,
+      "end_line": 59,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_jpgcoder.cc",
+      "start_line": 1,
+      "end_line": 246,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_string-util.cpp",
+      "start_line": 1,
+      "end_line": 39,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_webmodules.cpp",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_kernel_util.cc",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

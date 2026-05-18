@@ -1,0 +1,169 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-2e7cd78374",
+  "repo_path": "repos/sven-before-python-cwe-078-2e7cd78374",
+  "source": "dataset_microrepo",
+  "source_row": 647,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/san/hp/hp_3par_iscsi.py::_modify_3par_iscsi_host",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_hp_3par_iscsi.py",
+      "role": "vulnerable",
+      "source_row": 647,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_hp_3par_iscsi.py",
+      "role": "fixed_counterpart",
+      "source_row": 786,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_dbopts.py",
+      "role": "safe_decoy",
+      "source_row": 962,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_editor2.py",
+      "role": "safe_decoy",
+      "source_row": 616,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_bot.py",
+      "role": "safe_decoy",
+      "source_row": 92,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 142,
+      "end_char": 147,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 151,
+      "end_char": 152,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 153,
+      "end_char": 163,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 186,
+      "end_char": 192,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 193,
+      "end_char": 222,
+      "start_line": 3,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 223,
+      "end_char": 226,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 245,
+      "end_char": 247,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 248,
+      "end_char": 249,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_3par_iscsi.py",
+      "start_char": 251,
+      "end_char": 252,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_hp_3par_iscsi.py",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_dbopts.py",
+      "start_line": 1,
+      "end_line": 32,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_editor2.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_bot.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

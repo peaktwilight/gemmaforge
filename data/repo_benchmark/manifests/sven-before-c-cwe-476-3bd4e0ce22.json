@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-3bd4e0ce22",
+  "repo_path": "repos/sven-before-c-cwe-476-3bd4e0ce22",
+  "source": "dataset_microrepo",
+  "source_row": 903,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libr/bin/format/elf/elf.c::store_versioninfo_gnu_verdef",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_elf.c",
+      "role": "vulnerable",
+      "source_row": 903,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_elf.c",
+      "role": "fixed_counterpart",
+      "source_row": 130,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_gc.c",
+      "role": "safe_decoy",
+      "source_row": 186,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_transform.c",
+      "role": "safe_decoy",
+      "source_row": 34,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_x86mapping.c",
+      "role": "safe_decoy",
+      "source_row": 1057,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_elf.c",
+      "start_char": 1310,
+      "end_char": 1311,
+      "start_line": 39,
+      "end_line": 39,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_elf.c",
+      "start_char": 1313,
+      "end_char": 1319,
+      "start_line": 39,
+      "end_line": 39,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_elf.c",
+      "start_char": 2001,
+      "end_char": 2002,
+      "start_line": 62,
+      "end_line": 62,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_elf.c",
+      "start_char": 2025,
+      "end_char": 2031,
+      "start_line": 62,
+      "end_line": 62,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_elf.c",
+      "start_char": 2812,
+      "end_char": 2813,
+      "start_line": 89,
+      "end_line": 89,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_elf.c",
+      "start_char": 2835,
+      "end_char": 2841,
+      "start_line": 89,
+      "end_line": 89,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_elf.c",
+      "start_line": 1,
+      "end_line": 127,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_gc.c",
+      "start_line": 1,
+      "end_line": 23,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_transform.c",
+      "start_line": 1,
+      "end_line": 327,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_x86mapping.c",
+      "start_line": 1,
+      "end_line": 40,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

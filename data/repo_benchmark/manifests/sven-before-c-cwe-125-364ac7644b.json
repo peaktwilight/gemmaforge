@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-364ac7644b",
+  "repo_path": "repos/sven-before-c-cwe-125-364ac7644b",
+  "source": "dataset_microrepo",
+  "source_row": 1185,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::rdppm.c::start_input_ppm",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_rdppm.c",
+      "role": "vulnerable",
+      "source_row": 1185,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_rdppm.c",
+      "role": "fixed_counterpart",
+      "source_row": 1177,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_cmscgats.c",
+      "role": "safe_decoy",
+      "source_row": 1209,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_jpc_t2cod.c",
+      "role": "safe_decoy",
+      "source_row": 799,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_abrt-dbus.c",
+      "role": "safe_decoy",
+      "source_row": 1130,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_rdppm.c",
+      "start_char": 6187,
+      "end_char": 6252,
+      "start_line": 163,
+      "end_line": 163,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_rdppm.c",
+      "start_line": 1,
+      "end_line": 172,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_cmscgats.c",
+      "start_line": 1,
+      "end_line": 22,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_jpc_t2cod.c",
+      "start_line": 1,
+      "end_line": 86,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_abrt-dbus.c",
+      "start_line": 1,
+      "end_line": 453,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

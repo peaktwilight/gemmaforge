@@ -1,0 +1,189 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-787-78112449bd",
+  "repo_path": "repos/sven-before-c-cwe-787-78112449bd",
+  "source": "dataset_microrepo",
+  "source_row": 292,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libavformat/vividas.c::track_header",
+  "language": "c",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_vividas.c",
+      "role": "vulnerable",
+      "source_row": 292,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_vividas.c",
+      "role": "fixed_counterpart",
+      "source_row": 710,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_utils.c",
+      "role": "safe_decoy",
+      "source_row": 1006,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_spnego_mech.c",
+      "role": "safe_decoy",
+      "source_row": 482,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_card-setcos.c",
+      "role": "safe_decoy",
+      "source_row": 824,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 2951,
+      "end_char": 2952,
+      "start_line": 104,
+      "end_line": 104,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3539,
+      "end_char": 3544,
+      "start_line": 121,
+      "end_line": 121,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3551,
+      "end_char": 3567,
+      "start_line": 121,
+      "end_line": 121,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3826,
+      "end_char": 3829,
+      "start_line": 130,
+      "end_line": 130,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3836,
+      "end_char": 3837,
+      "start_line": 130,
+      "end_line": 130,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3839,
+      "end_char": 3842,
+      "start_line": 130,
+      "end_line": 130,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3843,
+      "end_char": 3844,
+      "start_line": 130,
+      "end_line": 130,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3845,
+      "end_char": 3870,
+      "start_line": 130,
+      "end_line": 131,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3872,
+      "end_char": 3874,
+      "start_line": 131,
+      "end_line": 131,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3876,
+      "end_char": 3899,
+      "start_line": 131,
+      "end_line": 131,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_vividas.c",
+      "start_char": 3900,
+      "end_char": 3918,
+      "start_line": 131,
+      "end_line": 132,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_vividas.c",
+      "start_line": 1,
+      "end_line": 151,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_utils.c",
+      "start_line": 1,
+      "end_line": 518,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_spnego_mech.c",
+      "start_line": 1,
+      "end_line": 67,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_card-setcos.c",
+      "start_line": 1,
+      "end_line": 153,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

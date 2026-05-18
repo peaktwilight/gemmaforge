@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-787-a040cd12fb",
+  "repo_path": "repos/sven-before-c-cwe-787-a040cd12fb",
+  "source": "dataset_microrepo",
+  "source_row": 561,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::coders/psd.c::RemoveICCProfileFromResourceBlock",
+  "language": "c",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_psd.c",
+      "role": "vulnerable",
+      "source_row": 561,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_psd.c",
+      "role": "fixed_counterpart",
+      "source_row": 138,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_rfbproto.c",
+      "role": "safe_decoy",
+      "source_row": 401,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_tuner-xc2028.c",
+      "role": "safe_decoy",
+      "source_row": 1111,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_vc4_gem.c",
+      "role": "safe_decoy",
+      "source_row": 543,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_psd.c",
+      "start_char": 766,
+      "end_char": 948,
+      "start_line": 38,
+      "end_line": 40,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_psd.c",
+      "start_line": 1,
+      "end_line": 50,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_rfbproto.c",
+      "start_line": 1,
+      "end_line": 258,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_tuner-xc2028.c",
+      "start_line": 1,
+      "end_line": 57,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_vc4_gem.c",
+      "start_line": 1,
+      "end_line": 110,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-787-cf527173bf",
+  "repo_path": "repos/sven-before-c-cwe-787-cf527173bf",
+  "source": "dataset_microrepo",
+  "source_row": 952,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libvncclient/rfbproto.c::HandleRFBServerMessage",
+  "language": "c",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_rfbproto.c",
+      "role": "vulnerable",
+      "source_row": 952,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_rfbproto.c",
+      "role": "fixed_counterpart",
+      "source_row": 1364,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_bin_dex.c",
+      "role": "safe_decoy",
+      "source_row": 242,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_wddx.c",
+      "role": "safe_decoy",
+      "source_row": 595,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_sfconvert.c",
+      "role": "safe_decoy",
+      "source_row": 348,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_rfbproto.c",
+      "start_char": 15598,
+      "end_char": 15608,
+      "start_line": 517,
+      "end_line": 517,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_rfbproto.c",
+      "start_line": 1,
+      "end_line": 647,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_bin_dex.c",
+      "start_line": 1,
+      "end_line": 142,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_wddx.c",
+      "start_line": 1,
+      "end_line": 140,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_sfconvert.c",
+      "start_line": 1,
+      "end_line": 48,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

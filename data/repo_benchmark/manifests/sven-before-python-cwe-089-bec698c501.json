@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-bec698c501",
+  "repo_path": "repos/sven-before-python-cwe-089-bec698c501",
+  "source": "dataset_microrepo",
+  "source_row": 385,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::bin/solrcheckup.py::get_old_sourcebyinstitution_number",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_solrcheckup.py",
+      "role": "vulnerable",
+      "source_row": 385,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_solrcheckup.py",
+      "role": "fixed_counterpart",
+      "source_row": 159,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_views.py",
+      "role": "safe_decoy",
+      "source_row": 1104,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_comment.py",
+      "role": "safe_decoy",
+      "source_row": 216,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_android_device.py",
+      "role": "safe_decoy",
+      "source_row": 1191,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_solrcheckup.py",
+      "start_char": 295,
+      "end_char": 299,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_solrcheckup.py",
+      "start_char": 364,
+      "end_char": 386,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_solrcheckup.py",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_views.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_comment.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_android_device.py",
+      "start_line": 1,
+      "end_line": 39,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

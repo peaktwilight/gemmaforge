@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-68d90b0b65",
+  "repo_path": "repos/sven-before-c-cwe-125-68d90b0b65",
+  "source": "dataset_microrepo",
+  "source_row": 177,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::kernel/bpf/verifier.c::adjust_scalar_min_max_vals",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_verifier.c",
+      "role": "vulnerable",
+      "source_row": 177,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_verifier.c",
+      "role": "fixed_counterpart",
+      "source_row": 867,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_common.c",
+      "role": "safe_decoy",
+      "source_row": 709,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_pi.c",
+      "role": "safe_decoy",
+      "source_row": 1291,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_chmd.c",
+      "role": "safe_decoy",
+      "source_row": 314,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_verifier.c",
+      "start_char": 8077,
+      "end_char": 8112,
+      "start_line": 247,
+      "end_line": 248,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_verifier.c",
+      "start_line": 1,
+      "end_line": 262,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_common.c",
+      "start_line": 1,
+      "end_line": 69,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_pi.c",
+      "start_line": 1,
+      "end_line": 119,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_chmd.c",
+      "start_line": 1,
+      "end_line": 260,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

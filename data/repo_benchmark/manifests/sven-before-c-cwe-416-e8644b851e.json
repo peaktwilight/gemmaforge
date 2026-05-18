@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-e8644b851e",
+  "repo_path": "repos/sven-before-c-cwe-416-e8644b851e",
+  "source": "dataset_microrepo",
+  "source_row": 1073,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::coders/mat.c::ReadMATImage",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_mat.c",
+      "role": "vulnerable",
+      "source_row": 1073,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_mat.c",
+      "role": "fixed_counterpart",
+      "source_row": 1062,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_smb2pdu.c",
+      "role": "safe_decoy",
+      "source_row": 1297,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_unicode_unfold_key.c",
+      "role": "safe_decoy",
+      "source_row": 1276,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_meta.c",
+      "role": "safe_decoy",
+      "source_row": 178,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_mat.c",
+      "start_char": 16853,
+      "end_char": 16916,
+      "start_line": 489,
+      "end_line": 491,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_mat.c",
+      "start_line": 1,
+      "end_line": 540,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_smb2pdu.c",
+      "start_line": 1,
+      "end_line": 73,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_unicode_unfold_key.c",
+      "start_line": 1,
+      "end_line": 2785,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_meta.c",
+      "start_line": 1,
+      "end_line": 246,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

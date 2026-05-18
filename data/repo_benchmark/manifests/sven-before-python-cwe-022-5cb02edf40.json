@@ -1,0 +1,109 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-022-5cb02edf40",
+  "repo_path": "repos/sven-before-python-cwe-022-5cb02edf40",
+  "source": "dataset_microrepo",
+  "source_row": 274,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::lib/_sublime.py::_get_settings",
+  "language": "python",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00__sublime.py",
+      "role": "vulnerable",
+      "source_row": 274,
+      "label": 1
+    },
+    {
+      "path": "fixed/00__sublime.py",
+      "role": "fixed_counterpart",
+      "source_row": 652,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_shutil.py",
+      "role": "safe_decoy",
+      "source_row": 305,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_documents.py",
+      "role": "safe_decoy",
+      "source_row": 671,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_book_rides.py",
+      "role": "safe_decoy",
+      "source_row": 430,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00__sublime.py",
+      "start_char": 904,
+      "end_char": 906,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00__sublime.py",
+      "start_char": 907,
+      "end_char": 916,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00__sublime.py",
+      "start_char": 920,
+      "end_char": 925,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00__sublime.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_shutil.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_documents.py",
+      "start_line": 1,
+      "end_line": 19,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_book_rides.py",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

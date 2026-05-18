@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quick browser-based viewer for data/*.jsonl pair datasets.
+"""Quick browser-based viewer for GemmaForge JSONL datasets.
 
 Usage:
     uv run scripts/dataset_viewer.py            # serves on http://127.0.0.1:8765
@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -24,7 +23,7 @@ _cache: dict[str, list[dict]] = {}
 def load(name: str) -> list[dict]:
     if name in _cache:
         return _cache[name]
-    path = DATA_DIR / name
+    path = safe_data_path(name)
     rows: list[dict] = []
     with path.open() as fh:
         for line in fh:
@@ -39,17 +38,32 @@ def load(name: str) -> list[dict]:
 def list_files() -> list[dict]:
     out = []
     seen: set[str] = set()
+    repo_manifest = DATA_DIR / "repo_benchmark" / "manifest.jsonl"
+    if repo_manifest.exists():
+        out.append(file_record(repo_manifest))
+        seen.add("repo_benchmark/manifest.jsonl")
     for pattern in ("dataset*.jsonl", "pairs*.jsonl"):
         for p in sorted(DATA_DIR.glob(pattern)):
-            if p.name in seen:
+            name = p.relative_to(DATA_DIR).as_posix()
+            if name in seen:
                 continue
-            seen.add(p.name)
-            size = p.stat().st_size
-            # count lines without loading whole file into memory
-            with p.open() as fh:
-                n = sum(1 for _ in fh)
-            out.append({"name": p.name, "rows": n, "bytes": size})
+            seen.add(name)
+            out.append(file_record(p))
     return out
+
+
+def file_record(path: Path) -> dict:
+    size = path.stat().st_size
+    with path.open() as fh:
+        n = sum(1 for _ in fh)
+    return {"name": path.relative_to(DATA_DIR).as_posix(), "rows": n, "bytes": size}
+
+
+def safe_data_path(name: str) -> Path:
+    path = (DATA_DIR / name).resolve()
+    if DATA_DIR.resolve() not in path.parents and path != DATA_DIR.resolve():
+        raise ValueError("path escapes data dir")
+    return path
 
 
 INDEX_HTML = r"""<!doctype html>
@@ -140,7 +154,13 @@ async function loadFile(name) {
 function applyFilter() {
   const q = filterEl.value.trim().toLowerCase();
   state.filtered = !q ? state.rows.slice() : state.rows.filter(r => {
-    const hay = [r.label, r.cwe, r.cve, r.lang, r.source, r.vuln_type, r._origin_repo, r._file_name, r._func_name, r.label_confidence, r.is_completion_vulnerable].join(' ').toLowerCase();
+    const fileText = (r.files || []).map(f => f.path + ' ' + f.role).join(' ');
+    const hay = [
+      r.label, r.cwe, r.cve, r.lang, r.language, r.source, r.vuln_type,
+      r._origin_repo, r._file_name, r._func_name, r.label_confidence,
+      r.is_completion_vulnerable, r.repo_id, r.repo_path, r.source_dataset,
+      r.pair_group, fileText
+    ].join(' ').toLowerCase();
     return hay.includes(q);
   });
   state.idx = 0;
@@ -150,6 +170,13 @@ function applyFilter() {
 
 function renderList() {
   listEl.innerHTML = state.filtered.slice(0, 500).map((r, i) => {
+    if (isRepoRow(r)) {
+      return `<div class="row ${i===state.idx?'active':''}" data-i="${i}">
+        <span class="lbl vuln">REPO</span>
+        <span>${r.cwe || '-'}</span>
+        <span class="meta"> · ${r.language || '-'} · ${r.repo_id || '-'}</span>
+      </div>`;
+    }
     const isVuln = r.label === 1 || r.is_completion_vulnerable === true;
     const lbl = isVuln ? 'VULN' : 'SAFE';
     const cls = isVuln ? 'vuln' : 'safe';
@@ -170,6 +197,10 @@ function move(d) {
 }
 
 function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function isRepoRow(r) {
+  return r && (r.schema === 'gemmaforge.repo_benchmark/v1' || r.repo_id || r.vulnerability_traces);
+}
 
 function renderCodeWithTokenLabels(code, tokenLabels) {
   if (!tokenLabels) return escapeHtml(code);
@@ -195,11 +226,15 @@ function renderCodeWithTokenLabels(code, tokenLabels) {
   return out;
 }
 
-function render() {
+async function render() {
   jumpEl.value = state.idx;
   listEl.querySelectorAll('.row').forEach((el, i) => el.classList.toggle('active', i === state.idx));
   const r = state.filtered[state.idx];
   if (!r) { detailEl.innerHTML = '<p class="stat">no rows</p>'; return; }
+  if (isRepoRow(r)) {
+    await renderRepo(r);
+    return;
+  }
   const isVuln = r.label === 1 || r.is_completion_vulnerable === true;
   const meta = [
     ['index', `${state.idx} / ${state.filtered.length-1}`],
@@ -219,6 +254,45 @@ function render() {
     <div class="meta-grid">${meta.map(([k,v]) => `<div class="k">${k}</div><div>${escapeHtml(String(v))}</div>`).join('')}</div>
     ${legend}
     <pre class="${isVuln?'vuln':'safe'}">${renderCodeWithTokenLabels(r.code || '', r.token_labels)}</pre>
+  `;
+}
+
+async function renderRepo(r) {
+  const traces = r.vulnerability_traces || [];
+  const files = r.files || [];
+  const vulnFile = files.find(f => f.role === 'vulnerable') || files[0];
+  let code = '';
+  if (vulnFile) {
+    const url = '/api/repo-file?repo=' + encodeURIComponent(r.repo_path) + '&path=' + encodeURIComponent(vulnFile.path);
+    const resp = await fetch(url);
+    code = resp.ok ? await resp.text() : '';
+  }
+  const meta = [
+    ['index', `${state.idx} / ${state.filtered.length-1}`],
+    ['repo_id', r.repo_id],
+    ['repo_path', r.repo_path],
+    ['cwe', r.cwe],
+    ['language', r.language],
+    ['source_dataset', r.source_dataset],
+    ['source_row', r.source_row],
+    ['pair_group', r.pair_group],
+    ['traces', traces.length],
+    ['files', files.length],
+  ].filter(([_, v]) => v !== undefined && v !== null && v !== '');
+  const fileRows = files.map(f => `${f.role.padEnd(18)} ${f.path}`).join('\n');
+  const traceRows = traces.map(t => `${String(t.start_line).padStart(4)}-${String(t.end_line).padEnd(4)} ${t.cwe || '-'} ${t.file}`).join('\n');
+  detailEl.innerHTML = `
+    <div class="meta-grid">${meta.map(([k,v]) => `<div class="k">${k}</div><div>${escapeHtml(String(v))}</div>`).join('')}</div>
+    <div class="legend">
+      <span class="tok-vuln_line">vulnerable traces</span>
+      <span class="tok-sanitizer">fixed/decoy files</span>
+    </div>
+    <h2 style="font-size:13px;margin:12px 0 6px">files</h2>
+    <pre>${escapeHtml(fileRows || '(none)')}</pre>
+    <h2 style="font-size:13px;margin:12px 0 6px">vulnerability traces</h2>
+    <pre class="vuln">${escapeHtml(traceRows || '(none)')}</pre>
+    <h2 style="font-size:13px;margin:12px 0 6px">${escapeHtml(vulnFile ? vulnFile.path : 'code')}</h2>
+    <pre class="vuln">${escapeHtml(code || '(no preview)')}</pre>
   `;
 }
 
@@ -248,10 +322,32 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/api/rows":
             qs = parse_qs(url.query)
             name = qs.get("file", [""])[0]
-            if not name or not (DATA_DIR / name).exists():
+            try:
+                path = safe_data_path(name) if name else None
+            except ValueError:
+                path = None
+            if path is None or not path.exists():
                 self._send(404, b'{"error":"file not found"}', "application/json")
                 return
             self._send(200, json.dumps(load(name)).encode(), "application/json")
+            return
+        if url.path == "/api/repo-file":
+            qs = parse_qs(url.query)
+            repo = qs.get("repo", [""])[0]
+            rel = qs.get("path", [""])[0]
+            try:
+                repo_path = safe_data_path(repo)
+                file_path = (repo_path / rel).resolve()
+                if repo_path not in file_path.parents and file_path != repo_path:
+                    raise ValueError("path escapes repo")
+            except ValueError:
+                self._send(404, b"not found", "text/plain")
+                return
+            if not file_path.exists() or not file_path.is_file():
+                self._send(404, b"not found", "text/plain")
+                return
+            body = file_path.read_text(encoding="utf-8", errors="replace").encode()
+            self._send(200, body, "text/plain; charset=utf-8")
             return
         self._send(404, b"not found", "text/plain")
 

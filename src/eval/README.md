@@ -33,6 +33,7 @@ tables, not as the headline.
 | `protocol.py` | Sample-level: `evaluate_split`, `full_report`. |
 | `token_data.py` | Token-level dataset: `load_token_dataset`, `parse_spans`, `char_spans_to_token_spans`. |
 | `token_protocol.py` | Token-level: `evaluate_token_split`, `full_token_report` with `all`/`span`/`span_max` aggregations. |
+| `repo_protocol.py` | Repo-level scan metrics: `repo_recall@K`, `trace_recall@K`, `precision@K`, MRR, CWE accuracy on hit leads. |
 | `report.py` | Markdown + JSON renderers for the sample-level path. |
 | `runtime.py` | Per-token probe overhead measurement (model-agnostic). |
 
@@ -102,6 +103,68 @@ keys. They land once the extractor in `src/extract_token_activations.py`
 is fixed ([#17](https://github.com/peaktwilight/gemmaforge/issues/17)).
 The notebook below runs in demo mode against synthetic oracle scores
 while waiting.
+
+### Repo-level generated benchmark
+
+```bash
+uv run python scripts/build_repo_benchmark.py \
+    --input data/dataset.jsonl \
+    --out-root data/repo_benchmark \
+    --max-repos 100 \
+    --decoys-per-repo 3 \
+    --require-fixed-counterpart
+```
+
+This writes scanner-ready micro-repos plus `manifest.jsonl`. Each manifest
+contains file/line/char traces for vulnerable regions and safe regions for
+fixed counterparts/decoys. See `docs/repo-benchmark-schema.md`.
+
+Once scan leads have been written as `<repo_id>.jsonl` files:
+
+```bash
+uv run python scripts/eval_repo_leads.py \
+    --manifest data/repo_benchmark/manifest.jsonl \
+    --leads-dir data/repo_benchmark/leads \
+    --out-json data/eval/repo_scan_report.json
+```
+
+### GPU repo-scan run
+
+The full 687-repo benchmark is slow on laptop CPU/MPS. Use the GPU wrapper
+on a CUDA machine:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 bash scripts/run_repo_scan_gpu.sh
+```
+
+The wrapper is resumable by default and writes:
+
+- leads: `data/repo_benchmark/leads_weak_full/<repo_id>.jsonl`
+- report: `data/eval/repo_scan_report_weak_full.json`
+
+For multiple GPUs or machines, shard the manifest:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 NUM_SHARDS=4 SHARD_INDEX=0 bash scripts/run_repo_scan_gpu.sh
+CUDA_VISIBLE_DEVICES=1 NUM_SHARDS=4 SHARD_INDEX=1 bash scripts/run_repo_scan_gpu.sh
+CUDA_VISIBLE_DEVICES=2 NUM_SHARDS=4 SHARD_INDEX=2 bash scripts/run_repo_scan_gpu.sh
+CUDA_VISIBLE_DEVICES=3 NUM_SHARDS=4 SHARD_INDEX=3 bash scripts/run_repo_scan_gpu.sh
+```
+
+After all shards finish, aggregate over the shared leads directory:
+
+```bash
+uv run python scripts/eval_repo_leads.py \
+    --manifest data/repo_benchmark/manifest.jsonl \
+    --leads-dir data/repo_benchmark/leads_weak_full \
+    --out-json data/eval/repo_scan_report_weak_full.json
+```
+
+For a quick GPU smoke test:
+
+```bash
+MAX_REPOS=5 CUDA_VISIBLE_DEVICES=0 bash scripts/run_repo_scan_gpu.sh
+```
 
 ### Notebooks
 

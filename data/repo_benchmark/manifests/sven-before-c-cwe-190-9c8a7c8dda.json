@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-9c8a7c8dda",
+  "repo_path": "repos/sven-before-c-cwe-190-9c8a7c8dda",
+  "source": "dataset_microrepo",
+  "source_row": 593,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::library/ssl_srv.c::ssl_parse_client_psk_identity",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_ssl_srv.c",
+      "role": "vulnerable",
+      "source_row": 593,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_ssl_srv.c",
+      "role": "fixed_counterpart",
+      "source_row": 878,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_ldo.c",
+      "role": "safe_decoy",
+      "source_row": 234,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_powerpc.c",
+      "role": "safe_decoy",
+      "source_row": 765,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_compat.c",
+      "role": "safe_decoy",
+      "source_row": 1208,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 582,
+      "end_char": 583,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 585,
+      "end_char": 591,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 824,
+      "end_char": 826,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 827,
+      "end_char": 828,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 829,
+      "end_char": 830,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ssl_srv.c",
+      "start_char": 831,
+      "end_char": 832,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_ssl_srv.c",
+      "start_line": 1,
+      "end_line": 60,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_ldo.c",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_powerpc.c",
+      "start_line": 1,
+      "end_line": 165,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_compat.c",
+      "start_line": 1,
+      "end_line": 32,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

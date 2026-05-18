@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-a3930c089c",
+  "repo_path": "repos/sven-before-c-cwe-476-a3930c089c",
+  "source": "dataset_microrepo",
+  "source_row": 967,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::coders/png.c::WriteOnePNGImage",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_png.c",
+      "role": "vulnerable",
+      "source_row": 967,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_png.c",
+      "role": "fixed_counterpart",
+      "source_row": 1319,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_rle.c",
+      "role": "safe_decoy",
+      "source_row": 446,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_evdns.c",
+      "role": "safe_decoy",
+      "source_row": 434,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_tcp.c",
+      "role": "safe_decoy",
+      "source_row": 198,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_png.c",
+      "start_char": 2509,
+      "end_char": 2510,
+      "start_line": 153,
+      "end_line": 153,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_png.c",
+      "start_line": 1,
+      "end_line": 3575,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_rle.c",
+      "start_line": 1,
+      "end_line": 537,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_evdns.c",
+      "start_line": 1,
+      "end_line": 54,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_tcp.c",
+      "start_line": 1,
+      "end_line": 30,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-f80fe3e7b3",
+  "repo_path": "repos/sven-before-c-cwe-125-f80fe3e7b3",
+  "source": "dataset_microrepo",
+  "source_row": 619,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::net/ipv4/ip_sockglue.c::ip_cmsg_recv_checksum",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_ip_sockglue.c",
+      "role": "vulnerable",
+      "source_row": 619,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_ip_sockglue.c",
+      "role": "fixed_counterpart",
+      "source_row": 837,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_map_engine.c",
+      "role": "safe_decoy",
+      "source_row": 279,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_abrt-dbus.c",
+      "role": "safe_decoy",
+      "source_row": 1130,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_cjson.c",
+      "role": "safe_decoy",
+      "source_row": 658,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 205,
+      "end_char": 209,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 212,
+      "end_char": 244,
+      "start_line": 10,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 258,
+      "end_char": 259,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 260,
+      "end_char": 264,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 276,
+      "end_char": 277,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ip_sockglue.c",
+      "start_char": 280,
+      "end_char": 283,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_ip_sockglue.c",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_map_engine.c",
+      "start_line": 1,
+      "end_line": 75,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_abrt-dbus.c",
+      "start_line": 1,
+      "end_line": 453,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_cjson.c",
+      "start_line": 1,
+      "end_line": 71,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

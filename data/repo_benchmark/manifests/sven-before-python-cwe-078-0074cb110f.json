@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-0074cb110f",
+  "repo_path": "repos/sven-before-python-cwe-078-0074cb110f",
+  "source": "dataset_microrepo",
+  "source_row": 435,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/eqlx.py::initialize_connection",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_eqlx.py",
+      "role": "vulnerable",
+      "source_row": 435,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_eqlx.py",
+      "role": "fixed_counterpart",
+      "source_row": 459,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_entry.py",
+      "role": "safe_decoy",
+      "source_row": 983,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_zeromail.py",
+      "role": "safe_decoy",
+      "source_row": 70,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_eddb.py",
+      "role": "safe_decoy",
+      "source_row": 493,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_eqlx.py",
+      "start_char": 292,
+      "end_char": 351,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_eqlx.py",
+      "start_line": 1,
+      "end_line": 18,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_entry.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_zeromail.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_eddb.py",
+      "start_line": 1,
+      "end_line": 14,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

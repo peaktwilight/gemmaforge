@@ -1,0 +1,109 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-6528c1b082",
+  "repo_path": "repos/sven-before-python-cwe-089-6528c1b082",
+  "source": "dataset_microrepo",
+  "source_row": 747,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::bot.py::get_login",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_bot.py",
+      "role": "vulnerable",
+      "source_row": 747,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_bot.py",
+      "role": "fixed_counterpart",
+      "source_row": 92,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_dbopts.py",
+      "role": "safe_decoy",
+      "source_row": 219,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_reviewtags.py",
+      "role": "safe_decoy",
+      "source_row": 764,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_server.py",
+      "role": "safe_decoy",
+      "source_row": 1,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_bot.py",
+      "start_char": 249,
+      "end_char": 250,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_bot.py",
+      "start_char": 251,
+      "end_char": 253,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_bot.py",
+      "start_char": 274,
+      "end_char": 280,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_bot.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_dbopts.py",
+      "start_line": 1,
+      "end_line": 33,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_reviewtags.py",
+      "start_line": 1,
+      "end_line": 46,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_server.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

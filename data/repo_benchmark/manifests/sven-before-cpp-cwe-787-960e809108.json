@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-787-960e809108",
+  "repo_path": "repos/sven-before-cpp-cwe-787-960e809108",
+  "source": "dataset_microrepo",
+  "source_row": 118,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::OpenEXR/IlmImf/ImfMultiPartInputFile.cpp::MultiPartInputFile::Data::chunkOffsetReconstruction",
+  "language": "cpp",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_imfmultipartinputfile.cpp",
+      "role": "vulnerable",
+      "source_row": 118,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_imfmultipartinputfile.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 145,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_logger.cpp",
+      "role": "safe_decoy",
+      "source_row": 979,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_webmodules.cpp",
+      "role": "safe_decoy",
+      "source_row": 289,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_peerlistwidget.cpp",
+      "role": "safe_decoy",
+      "source_row": 1052,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_imfmultipartinputfile.cpp",
+      "start_char": 3326,
+      "end_char": 3401,
+      "start_line": 103,
+      "end_line": 103,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_imfmultipartinputfile.cpp",
+      "start_line": 1,
+      "end_line": 246,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_logger.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_webmodules.cpp",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_peerlistwidget.cpp",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

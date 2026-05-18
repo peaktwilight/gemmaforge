@@ -1,0 +1,609 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-022-75b09253ee",
+  "repo_path": "repos/sven-before-c-cwe-022-75b09253ee",
+  "source": "dataset_microrepo",
+  "source_row": 1260,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::pigz.c::process",
+  "language": "c",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_pigz.c",
+      "role": "vulnerable",
+      "source_row": 1260,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_pigz.c",
+      "role": "fixed_counterpart",
+      "source_row": 1160,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_dcm.c",
+      "role": "safe_decoy",
+      "source_row": 1149,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_abrt-dbus.c",
+      "role": "safe_decoy",
+      "source_row": 1130,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_pi.c",
+      "role": "safe_decoy",
+      "source_row": 617,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8052,
+      "end_char": 8053,
+      "start_line": 224,
+      "end_line": 224,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8055,
+      "end_char": 8056,
+      "start_line": 224,
+      "end_line": 224,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8070,
+      "end_char": 8071,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8076,
+      "end_char": 8078,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8079,
+      "end_char": 8080,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8094,
+      "end_char": 8095,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8096,
+      "end_char": 8098,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8099,
+      "end_char": 8101,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8102,
+      "end_char": 8105,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8107,
+      "end_char": 8109,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8110,
+      "end_char": 8112,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8114,
+      "end_char": 8115,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8116,
+      "end_char": 8117,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8120,
+      "end_char": 8123,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8124,
+      "end_char": 8126,
+      "start_line": 226,
+      "end_line": 226,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8135,
+      "end_char": 8136,
+      "start_line": 227,
+      "end_line": 227,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8138,
+      "end_char": 8139,
+      "start_line": 227,
+      "end_line": 227,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8141,
+      "end_char": 8142,
+      "start_line": 227,
+      "end_line": 227,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8144,
+      "end_char": 8146,
+      "start_line": 227,
+      "end_line": 227,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8159,
+      "end_char": 8171,
+      "start_line": 228,
+      "end_line": 228,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8264,
+      "end_char": 8271,
+      "start_line": 230,
+      "end_line": 230,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8283,
+      "end_char": 8284,
+      "start_line": 231,
+      "end_line": 231,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8304,
+      "end_char": 8316,
+      "start_line": 233,
+      "end_line": 233,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8318,
+      "end_char": 8321,
+      "start_line": 233,
+      "end_line": 233,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8322,
+      "end_char": 8325,
+      "start_line": 233,
+      "end_line": 233,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8326,
+      "end_char": 8328,
+      "start_line": 233,
+      "end_line": 233,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8330,
+      "end_char": 8332,
+      "start_line": 233,
+      "end_line": 233,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8344,
+      "end_char": 8348,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8349,
+      "end_char": 8350,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8351,
+      "end_char": 8354,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8355,
+      "end_char": 8358,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8360,
+      "end_char": 8362,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8388,
+      "end_char": 8389,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8390,
+      "end_char": 8392,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8393,
+      "end_char": 8394,
+      "start_line": 234,
+      "end_line": 234,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8479,
+      "end_char": 8480,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8481,
+      "end_char": 8482,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8485,
+      "end_char": 8500,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8503,
+      "end_char": 8509,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8510,
+      "end_char": 8511,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8519,
+      "end_char": 8521,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8525,
+      "end_char": 8526,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8628,
+      "end_char": 8630,
+      "start_line": 240,
+      "end_line": 240,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8632,
+      "end_char": 8633,
+      "start_line": 240,
+      "end_line": 240,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8634,
+      "end_char": 8635,
+      "start_line": 240,
+      "end_line": 240,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8646,
+      "end_char": 8649,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8665,
+      "end_char": 8666,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8669,
+      "end_char": 8672,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8673,
+      "end_char": 8675,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8676,
+      "end_char": 8677,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8680,
+      "end_char": 8682,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8683,
+      "end_char": 8684,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_pigz.c",
+      "start_char": 8685,
+      "end_char": 8687,
+      "start_line": 241,
+      "end_line": 241,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_pigz.c",
+      "start_line": 1,
+      "end_line": 326,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_dcm.c",
+      "start_line": 1,
+      "end_line": 1384,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_abrt-dbus.c",
+      "start_line": 1,
+      "end_line": 453,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_pi.c",
+      "start_line": 1,
+      "end_line": 203,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

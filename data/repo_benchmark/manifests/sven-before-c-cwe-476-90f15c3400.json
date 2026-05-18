@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-90f15c3400",
+  "repo_path": "repos/sven-before-c-cwe-476-90f15c3400",
+  "source": "dataset_microrepo",
+  "source_row": 1237,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::gsf/gsf-infile-tar.c::tar_directory_for_file",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_gsf-infile-tar.c",
+      "role": "vulnerable",
+      "source_row": 1237,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_gsf-infile-tar.c",
+      "role": "fixed_counterpart",
+      "source_row": 412,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_af_ipx.c",
+      "role": "safe_decoy",
+      "source_row": 769,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_draw.c",
+      "role": "safe_decoy",
+      "source_row": 1362,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_powerpc.c",
+      "role": "safe_decoy",
+      "source_row": 765,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_gsf-infile-tar.c",
+      "start_char": 634,
+      "end_char": 669,
+      "start_line": 33,
+      "end_line": 34,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_gsf-infile-tar.c",
+      "start_line": 1,
+      "end_line": 43,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_af_ipx.c",
+      "start_line": 1,
+      "end_line": 78,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_draw.c",
+      "start_line": 1,
+      "end_line": 135,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_powerpc.c",
+      "start_line": 1,
+      "end_line": 165,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

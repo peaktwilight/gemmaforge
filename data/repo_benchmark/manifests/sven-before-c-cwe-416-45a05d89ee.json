@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-45a05d89ee",
+  "repo_path": "repos/sven-before-c-cwe-416-45a05d89ee",
+  "source": "dataset_microrepo",
+  "source_row": 972,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::mm/mempolicy.c::do_get_mempolicy",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_mempolicy.c",
+      "role": "vulnerable",
+      "source_row": 972,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_mempolicy.c",
+      "role": "fixed_counterpart",
+      "source_row": 634,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_mxfdec.c",
+      "role": "safe_decoy",
+      "source_row": 306,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_scale.c",
+      "role": "safe_decoy",
+      "source_row": 1370,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_bson-iter.c",
+      "role": "safe_decoy",
+      "source_row": 946,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_mempolicy.c",
+      "start_char": 1679,
+      "end_char": 1744,
+      "start_line": 68,
+      "end_line": 73,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_mempolicy.c",
+      "start_line": 1,
+      "end_line": 84,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_mxfdec.c",
+      "start_line": 1,
+      "end_line": 396,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_scale.c",
+      "start_line": 1,
+      "end_line": 122,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_bson-iter.c",
+      "start_line": 1,
+      "end_line": 323,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

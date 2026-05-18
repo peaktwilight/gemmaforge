@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-83af133f2b",
+  "repo_path": "repos/sven-before-c-cwe-476-83af133f2b",
+  "source": "dataset_microrepo",
+  "source_row": 155,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::rpcapd/daemon.c::daemon_AuthUserPwd",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_daemon.c",
+      "role": "vulnerable",
+      "source_row": 155,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_daemon.c",
+      "role": "fixed_counterpart",
+      "source_row": 1143,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_psd.c",
+      "role": "safe_decoy",
+      "source_row": 1265,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_kdc_util.c",
+      "role": "safe_decoy",
+      "source_row": 1048,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_dnxhddec.c",
+      "role": "safe_decoy",
+      "source_row": 1207,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3318,
+      "end_char": 3323,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3326,
+      "end_char": 3327,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3342,
+      "end_char": 3343,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3346,
+      "end_char": 3347,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3350,
+      "end_char": 3351,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3355,
+      "end_char": 3357,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3369,
+      "end_char": 3372,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_daemon.c",
+      "start_char": 3382,
+      "end_char": 3383,
+      "start_line": 98,
+      "end_line": 98,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_daemon.c",
+      "start_line": 1,
+      "end_line": 129,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_psd.c",
+      "start_line": 1,
+      "end_line": 130,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_kdc_util.c",
+      "start_line": 1,
+      "end_line": 121,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_dnxhddec.c",
+      "start_line": 1,
+      "end_line": 164,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-d5b56ab452",
+  "repo_path": "repos/sven-before-c-cwe-125-d5b56ab452",
+  "source": "dataset_microrepo",
+  "source_row": 7,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::gst/asfdemux/gstasfdemux.c::gst_asf_demux_process_ext_content_desc",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_gstasfdemux.c",
+      "role": "vulnerable",
+      "source_row": 7,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_gstasfdemux.c",
+      "role": "fixed_counterpart",
+      "source_row": 63,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_asm_x86_nz.c",
+      "role": "safe_decoy",
+      "source_row": 303,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_mif_cod.c",
+      "role": "safe_decoy",
+      "source_row": 137,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_powerpc.c",
+      "role": "safe_decoy",
+      "source_row": 765,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_gstasfdemux.c",
+      "start_char": 6766,
+      "end_char": 6821,
+      "start_line": 191,
+      "end_line": 191,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gstasfdemux.c",
+      "start_char": 7169,
+      "end_char": 7227,
+      "start_line": 205,
+      "end_line": 205,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_gstasfdemux.c",
+      "start_line": 1,
+      "end_line": 275,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_asm_x86_nz.c",
+      "start_line": 1,
+      "end_line": 476,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_mif_cod.c",
+      "start_line": 1,
+      "end_line": 77,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_powerpc.c",
+      "start_line": 1,
+      "end_line": 165,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

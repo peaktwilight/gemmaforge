@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-69cd028dea",
+  "repo_path": "repos/sven-before-c-cwe-190-69cd028dea",
+  "source": "dataset_microrepo",
+  "source_row": 1273,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/cmscgats.c::AllocateDataSet",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_cmscgats.c",
+      "role": "vulnerable",
+      "source_row": 1273,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_cmscgats.c",
+      "role": "fixed_counterpart",
+      "source_row": 1209,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_lua_struct.c",
+      "role": "safe_decoy",
+      "source_row": 1259,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_mempolicy.c",
+      "role": "safe_decoy",
+      "source_row": 634,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_pictordec.c",
+      "role": "safe_decoy",
+      "source_row": 668,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_cmscgats.c",
+      "start_char": 293,
+      "end_char": 294,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_cmscgats.c",
+      "start_char": 318,
+      "end_char": 319,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_cmscgats.c",
+      "start_char": 356,
+      "end_char": 357,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_cmscgats.c",
+      "start_char": 381,
+      "end_char": 382,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_cmscgats.c",
+      "start_line": 1,
+      "end_line": 22,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_lua_struct.c",
+      "start_line": 1,
+      "end_line": 71,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_mempolicy.c",
+      "start_line": 1,
+      "end_line": 84,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_pictordec.c",
+      "start_line": 1,
+      "end_line": 158,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-476-db529ebf37",
+  "repo_path": "repos/sven-before-cpp-cwe-476-db529ebf37",
+  "source": "dataset_microrepo",
+  "source_row": 922,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::Programs/wavm/wavm.cpp::run",
+  "language": "cpp",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_wavm.cpp",
+      "role": "vulnerable",
+      "source_row": 922,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_wavm.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 931,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_string-util.cpp",
+      "role": "safe_decoy",
+      "source_row": 638,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_kernel_and_device.cc",
+      "role": "safe_decoy",
+      "source_row": 665,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_ext_memcache.cpp",
+      "role": "safe_decoy",
+      "source_row": 693,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3611,
+      "end_char": 3612,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3614,
+      "end_char": 3619,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3620,
+      "end_char": 3623,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3624,
+      "end_char": 3638,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3639,
+      "end_char": 3647,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3648,
+      "end_char": 3654,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3655,
+      "end_char": 3656,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3657,
+      "end_char": 3675,
+      "start_line": 119,
+      "end_line": 119,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_wavm.cpp",
+      "start_char": 3683,
+      "end_char": 3706,
+      "start_line": 119,
+      "end_line": 120,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_wavm.cpp",
+      "start_line": 1,
+      "end_line": 189,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_string-util.cpp",
+      "start_line": 1,
+      "end_line": 39,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_kernel_and_device.cc",
+      "start_line": 1,
+      "end_line": 82,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_ext_memcache.cpp",
+      "start_line": 1,
+      "end_line": 42,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

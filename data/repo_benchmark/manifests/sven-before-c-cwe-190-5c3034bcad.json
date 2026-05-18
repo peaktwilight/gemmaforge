@@ -1,0 +1,129 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-5c3034bcad",
+  "repo_path": "repos/sven-before-c-cwe-190-5c3034bcad",
+  "source": "dataset_microrepo",
+  "source_row": 1009,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/libImaging/TiffDecode.c::ImagingLibTiffDecode",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_tiffdecode.c",
+      "role": "vulnerable",
+      "source_row": 1009,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_tiffdecode.c",
+      "role": "fixed_counterpart",
+      "source_row": 1295,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_chmd.c",
+      "role": "safe_decoy",
+      "source_row": 314,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_smb2pdu.c",
+      "role": "safe_decoy",
+      "source_row": 1297,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_ext4_jbd2.c",
+      "role": "safe_decoy",
+      "source_row": 489,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_tiffdecode.c",
+      "start_char": 3145,
+      "end_char": 3197,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tiffdecode.c",
+      "start_char": 3228,
+      "end_char": 3229,
+      "start_line": 78,
+      "end_line": 78,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tiffdecode.c",
+      "start_char": 3250,
+      "end_char": 3265,
+      "start_line": 79,
+      "end_line": 79,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tiffdecode.c",
+      "start_char": 3273,
+      "end_char": 3274,
+      "start_line": 79,
+      "end_line": 79,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_tiffdecode.c",
+      "start_char": 3275,
+      "end_char": 3276,
+      "start_line": 79,
+      "end_line": 79,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_tiffdecode.c",
+      "start_line": 1,
+      "end_line": 193,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_chmd.c",
+      "start_line": 1,
+      "end_line": 260,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_smb2pdu.c",
+      "start_line": 1,
+      "end_line": 73,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_ext4_jbd2.c",
+      "start_line": 1,
+      "end_line": 26,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

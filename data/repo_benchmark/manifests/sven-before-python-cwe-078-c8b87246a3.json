@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-c8b87246a3",
+  "repo_path": "repos/sven-before-python-cwe-078-c8b87246a3",
+  "source": "dataset_microrepo",
+  "source_row": 503,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::chippyRuxpin.py::talk",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_chippyruxpin.py",
+      "role": "vulnerable",
+      "source_row": 503,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_chippyruxpin.py",
+      "role": "fixed_counterpart",
+      "source_row": 428,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_dbopts.py",
+      "role": "safe_decoy",
+      "source_row": 1088,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_validurls.py",
+      "role": "safe_decoy",
+      "source_row": 162,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_views.py",
+      "role": "safe_decoy",
+      "source_row": 1029,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 447,
+      "end_char": 448,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 449,
+      "end_char": 454,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 455,
+      "end_char": 456,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 477,
+      "end_char": 479,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 480,
+      "end_char": 483,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 490,
+      "end_char": 492,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 494,
+      "end_char": 497,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_chippyruxpin.py",
+      "start_char": 504,
+      "end_char": 505,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_chippyruxpin.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_dbopts.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_validurls.py",
+      "start_line": 1,
+      "end_line": 142,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_views.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

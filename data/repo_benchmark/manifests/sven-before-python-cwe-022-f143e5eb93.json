@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-022-f143e5eb93",
+  "repo_path": "repos/sven-before-python-cwe-022-f143e5eb93",
+  "source": "dataset_microrepo",
+  "source_row": 207,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::plugin/handlers_go/anagonda/context/gometalinter.py::_normalize",
+  "language": "python",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_gometalinter.py",
+      "role": "vulnerable",
+      "source_row": 207,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_gometalinter.py",
+      "role": "fixed_counterpart",
+      "source_row": 600,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_hp_3par_common.py",
+      "role": "safe_decoy",
+      "source_row": 801,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_bot.py",
+      "role": "safe_decoy",
+      "source_row": 92,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_task.py",
+      "role": "safe_decoy",
+      "source_row": 90,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_gometalinter.py",
+      "start_char": 183,
+      "end_char": 242,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_gometalinter.py",
+      "start_line": 1,
+      "end_line": 34,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_hp_3par_common.py",
+      "start_line": 1,
+      "end_line": 11,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_bot.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_task.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

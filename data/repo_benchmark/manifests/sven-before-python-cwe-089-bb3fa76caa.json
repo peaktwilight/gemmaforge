@@ -1,0 +1,179 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-bb3fa76caa",
+  "repo_path": "repos/sven-before-python-cwe-089-bb3fa76caa",
+  "source": "dataset_microrepo",
+  "source_row": 160,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::flaskr/flaskr/views/comment.py::add",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_comment.py",
+      "role": "vulnerable",
+      "source_row": 160,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_comment.py",
+      "role": "fixed_counterpart",
+      "source_row": 216,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_hooks.py",
+      "role": "safe_decoy",
+      "source_row": 1354,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_users.py",
+      "role": "safe_decoy",
+      "source_row": 296,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_goals.py",
+      "role": "safe_decoy",
+      "source_row": 69,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_comment.py",
+      "start_char": 285,
+      "end_char": 290,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 342,
+      "end_char": 365,
+      "start_line": 8,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 373,
+      "end_char": 374,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 376,
+      "end_char": 377,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 378,
+      "end_char": 379,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 381,
+      "end_char": 382,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 383,
+      "end_char": 384,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 386,
+      "end_char": 387,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 390,
+      "end_char": 392,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_comment.py",
+      "start_char": 427,
+      "end_char": 454,
+      "start_line": 9,
+      "end_line": 10,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_comment.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_hooks.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_users.py",
+      "start_line": 1,
+      "end_line": 5,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_goals.py",
+      "start_line": 1,
+      "end_line": 58,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

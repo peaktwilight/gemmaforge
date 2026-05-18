@@ -1,0 +1,259 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-37fdcc696c",
+  "repo_path": "repos/sven-before-python-cwe-078-37fdcc696c",
+  "source": "dataset_microrepo",
+  "source_row": 1040,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tests/post/steps/test_dns.py::resolve_hostname",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_test_dns.py",
+      "role": "vulnerable",
+      "source_row": 1040,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_test_dns.py",
+      "role": "fixed_counterpart",
+      "source_row": 367,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_resultsetstore.py",
+      "role": "safe_decoy",
+      "source_row": 753,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_s3.py",
+      "role": "safe_decoy",
+      "source_row": 888,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_query_lastfm.py",
+      "role": "safe_decoy",
+      "source_row": 552,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 124,
+      "end_char": 128,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 146,
+      "end_char": 150,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 189,
+      "end_char": 201,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 202,
+      "end_char": 203,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 204,
+      "end_char": 205,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 255,
+      "end_char": 265,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 277,
+      "end_char": 283,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 284,
+      "end_char": 285,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 294,
+      "end_char": 297,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 307,
+      "end_char": 310,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 311,
+      "end_char": 319,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 332,
+      "end_char": 352,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 355,
+      "end_char": 360,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 374,
+      "end_char": 394,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 402,
+      "end_char": 404,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 405,
+      "end_char": 406,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 414,
+      "end_char": 444,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_test_dns.py",
+      "start_char": 446,
+      "end_char": 450,
+      "start_line": 10,
+      "end_line": 10,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_test_dns.py",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_resultsetstore.py",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_s3.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_query_lastfm.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

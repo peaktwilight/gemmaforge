@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-3c5fa161d8",
+  "repo_path": "repos/sven-before-c-cwe-476-3c5fa161d8",
+  "source": "dataset_microrepo",
+  "source_row": 1216,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libavformat/m4vdec.c::mpeg4video_probe",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_m4vdec.c",
+      "role": "vulnerable",
+      "source_row": 1216,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_m4vdec.c",
+      "role": "fixed_counterpart",
+      "source_row": 131,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_utils.c",
+      "role": "safe_decoy",
+      "source_row": 427,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_winkernel_mm.c",
+      "role": "safe_decoy",
+      "source_row": 686,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_j2k.c",
+      "role": "safe_decoy",
+      "source_row": 1142,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_m4vdec.c",
+      "start_char": 281,
+      "end_char": 282,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_m4vdec.c",
+      "start_char": 303,
+      "end_char": 304,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_m4vdec.c",
+      "start_char": 308,
+      "end_char": 310,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_m4vdec.c",
+      "start_char": 311,
+      "end_char": 316,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_m4vdec.c",
+      "start_line": 1,
+      "end_line": 30,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_utils.c",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_winkernel_mm.c",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_j2k.c",
+      "start_line": 1,
+      "end_line": 57,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

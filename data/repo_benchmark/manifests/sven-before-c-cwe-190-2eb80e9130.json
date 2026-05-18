@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-2eb80e9130",
+  "repo_path": "repos/sven-before-c-cwe-190-2eb80e9130",
+  "source": "dataset_microrepo",
+  "source_row": 1065,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::kernel/events/core.c::perf_cpu_time_max_percent_handler",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_core.c",
+      "role": "vulnerable",
+      "source_row": 1065,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_core.c",
+      "role": "fixed_counterpart",
+      "source_row": 498,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_mempolicy.c",
+      "role": "safe_decoy",
+      "source_row": 634,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_airpdcap.c",
+      "role": "safe_decoy",
+      "source_row": 1067,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_irc-protocol.c",
+      "role": "safe_decoy",
+      "source_row": 1367,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_core.c",
+      "start_char": 133,
+      "end_char": 193,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_core.c",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_mempolicy.c",
+      "start_line": 1,
+      "end_line": 84,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_airpdcap.c",
+      "start_line": 1,
+      "end_line": 164,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_irc-protocol.c",
+      "start_line": 1,
+      "end_line": 105,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

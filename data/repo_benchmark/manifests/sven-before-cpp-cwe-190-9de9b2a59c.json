@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-190-9de9b2a59c",
+  "repo_path": "repos/sven-before-cpp-cwe-190-9de9b2a59c",
+  "source": "dataset_microrepo",
+  "source_row": 183,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::icu4c/source/common/unistr.cpp::UnicodeString::doAppend",
+  "language": "cpp",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_unistr.cpp",
+      "role": "vulnerable",
+      "source_row": 183,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_unistr.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 98,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_logger.cpp",
+      "role": "safe_decoy",
+      "source_row": 199,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_logger.cpp",
+      "role": "safe_decoy",
+      "source_row": 979,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_snd_fx.cpp",
+      "role": "safe_decoy",
+      "source_row": 278,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_unistr.cpp",
+      "start_char": 507,
+      "end_char": 508,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_unistr.cpp",
+      "start_char": 518,
+      "end_char": 520,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_unistr.cpp",
+      "start_line": 1,
+      "end_line": 55,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_logger.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_logger.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_snd_fx.cpp",
+      "start_line": 1,
+      "end_line": 1080,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

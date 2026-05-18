@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-31cf0512dd",
+  "repo_path": "repos/sven-before-c-cwe-190-31cf0512dd",
+  "source": "dataset_microrepo",
+  "source_row": 516,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tsk/fs/hfs.c::hfs_cat_traverse",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_hfs.c",
+      "role": "vulnerable",
+      "source_row": 516,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_hfs.c",
+      "role": "fixed_counterpart",
+      "source_row": 871,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_cx24116.c",
+      "role": "safe_decoy",
+      "source_row": 374,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_floppy.c",
+      "role": "safe_decoy",
+      "source_row": 1309,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_hdr.c",
+      "role": "safe_decoy",
+      "source_row": 476,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_hfs.c",
+      "start_char": 3543,
+      "end_char": 3544,
+      "start_line": 105,
+      "end_line": 105,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hfs.c",
+      "start_char": 3546,
+      "end_char": 3550,
+      "start_line": 105,
+      "end_line": 105,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hfs.c",
+      "start_char": 7870,
+      "end_char": 7871,
+      "start_line": 210,
+      "end_line": 210,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hfs.c",
+      "start_char": 7873,
+      "end_char": 7877,
+      "start_line": 210,
+      "end_line": 210,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_hfs.c",
+      "start_line": 1,
+      "end_line": 285,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_cx24116.c",
+      "start_line": 1,
+      "end_line": 95,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_floppy.c",
+      "start_line": 1,
+      "end_line": 73,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_hdr.c",
+      "start_line": 1,
+      "end_line": 169,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

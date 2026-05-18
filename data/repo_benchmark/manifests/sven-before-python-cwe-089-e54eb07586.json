@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-e54eb07586",
+  "repo_path": "repos/sven-before-python-cwe-089-e54eb07586",
+  "source": "dataset_microrepo",
+  "source_row": 1266,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::modules/query_lastfm.py::tag_to_tag_num",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_query_lastfm.py",
+      "role": "vulnerable",
+      "source_row": 1266,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_query_lastfm.py",
+      "role": "fixed_counterpart",
+      "source_row": 552,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_reviewtags.py",
+      "role": "safe_decoy",
+      "source_row": 797,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_video_repository.py",
+      "role": "safe_decoy",
+      "source_row": 964,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_poll_rdp.py",
+      "role": "safe_decoy",
+      "source_row": 144,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_query_lastfm.py",
+      "start_char": 127,
+      "end_char": 140,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_query_lastfm.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_reviewtags.py",
+      "start_line": 1,
+      "end_line": 66,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_video_repository.py",
+      "start_line": 1,
+      "end_line": 2,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_poll_rdp.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

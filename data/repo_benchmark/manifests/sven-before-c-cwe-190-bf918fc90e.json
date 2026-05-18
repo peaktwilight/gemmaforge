@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-bf918fc90e",
+  "repo_path": "repos/sven-before-c-cwe-190-bf918fc90e",
+  "source": "dataset_microrepo",
+  "source_row": 1172,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::fs/f2fs/data.c::__get_data_block",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_data.c",
+      "role": "vulnerable",
+      "source_row": 1172,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_data.c",
+      "role": "fixed_counterpart",
+      "source_row": 290,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_cdf.c",
+      "role": "safe_decoy",
+      "source_row": 444,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_utils.c",
+      "role": "safe_decoy",
+      "source_row": 1006,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_file.c",
+      "role": "safe_decoy",
+      "source_row": 14,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_data.c",
+      "start_char": 447,
+      "end_char": 493,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_data.c",
+      "start_line": 1,
+      "end_line": 19,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_cdf.c",
+      "start_line": 1,
+      "end_line": 154,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_utils.c",
+      "start_line": 1,
+      "end_line": 518,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_file.c",
+      "start_line": 1,
+      "end_line": 158,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "n_repos": 687,
+  "by_cwe": {
+    "CWE-089": 204,
+    "CWE-125": 106,
+    "CWE-078": 105,
+    "CWE-476": 57,
+    "CWE-079": 50,
+    "CWE-416": 45,
+    "CWE-022": 44,
+    "CWE-787": 41,
+    "CWE-190": 35
+  },
+  "by_language": {
+    "python": 380,
+    "c": 269,
+    "cpp": 38
+  }
+}

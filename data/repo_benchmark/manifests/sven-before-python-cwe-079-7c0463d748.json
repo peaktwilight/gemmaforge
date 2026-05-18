@@ -1,0 +1,189 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-7c0463d748",
+  "repo_path": "repos/sven-before-python-cwe-079-7c0463d748",
+  "source": "dataset_microrepo",
+  "source_row": 639,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::djblets/gravatars/templatetags/gravatars.py::gravatar",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_gravatars.py",
+      "role": "vulnerable",
+      "source_row": 639,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_gravatars.py",
+      "role": "fixed_counterpart",
+      "source_row": 599,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_process_data.py",
+      "role": "safe_decoy",
+      "source_row": 1125,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_users.py",
+      "role": "safe_decoy",
+      "source_row": 1178,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_djblets_js.py",
+      "role": "safe_decoy",
+      "source_row": 139,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 725,
+      "end_char": 727,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 736,
+      "end_char": 738,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 748,
+      "end_char": 750,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 757,
+      "end_char": 759,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 775,
+      "end_char": 779,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 780,
+      "end_char": 785,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 804,
+      "end_char": 806,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 807,
+      "end_char": 811,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 823,
+      "end_char": 824,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 827,
+      "end_char": 833,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_gravatars.py",
+      "start_char": 878,
+      "end_char": 879,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_gravatars.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_process_data.py",
+      "start_line": 1,
+      "end_line": 67,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_users.py",
+      "start_line": 1,
+      "end_line": 35,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_djblets_js.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

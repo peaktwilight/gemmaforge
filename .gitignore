@@ -9,6 +9,7 @@ data/activations_dataset/
 data/activations_e4b/
 data/token_activations/
 data/token_activations_smoke/
+data/repo_benchmark/leads*/
 .claude/
 .playwright-mcp/
 .DS_Store

@@ -1,0 +1,15 @@
+    def _get_hostvdisk_mappings(self, host_name):
+        """Return the defined storage mappings for a host."""
+
+        return_data = {}
+        ssh_cmd = 'svcinfo lshostvdiskmap -delim ! %s' % host_name
+        out, err = self._run_ssh(ssh_cmd)
+
+        mappings = out.strip().split('\n')
+        if len(mappings):
+            header = mappings.pop(0)
+            for mapping_line in mappings:
+                mapping_data = self._get_hdr_dic(header, mapping_line, '!')
+                return_data[mapping_data['vdisk_name']] = mapping_data
+
+        return return_data

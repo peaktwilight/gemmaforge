@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-d0be3f8653",
+  "repo_path": "repos/sven-before-c-cwe-416-d0be3f8653",
+  "source": "dataset_microrepo",
+  "source_row": 674,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::mm/oom_kill.c::__oom_reap_task_mm",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_oom_kill.c",
+      "role": "vulnerable",
+      "source_row": 674,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_oom_kill.c",
+      "role": "fixed_counterpart",
+      "source_row": 675,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_f_fs.c",
+      "role": "safe_decoy",
+      "source_row": 424,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_lua_struct.c",
+      "role": "safe_decoy",
+      "source_row": 1259,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_tuner-xc2028.c",
+      "role": "safe_decoy",
+      "source_row": 1111,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_oom_kill.c",
+      "start_char": 1998,
+      "end_char": 2032,
+      "start_line": 66,
+      "end_line": 67,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_oom_kill.c",
+      "start_char": 2638,
+      "end_char": 2640,
+      "start_line": 84,
+      "end_line": 84,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_oom_kill.c",
+      "start_char": 2662,
+      "end_char": 2663,
+      "start_line": 85,
+      "end_line": 85,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_oom_kill.c",
+      "start_char": 2666,
+      "end_char": 2667,
+      "start_line": 85,
+      "end_line": 85,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_oom_kill.c",
+      "start_line": 1,
+      "end_line": 98,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_f_fs.c",
+      "start_line": 1,
+      "end_line": 28,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_lua_struct.c",
+      "start_line": 1,
+      "end_line": 71,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_tuner-xc2028.c",
+      "start_line": 1,
+      "end_line": 57,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

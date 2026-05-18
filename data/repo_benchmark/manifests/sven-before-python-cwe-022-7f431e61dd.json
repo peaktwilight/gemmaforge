@@ -1,0 +1,129 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-022-7f431e61dd",
+  "repo_path": "repos/sven-before-python-cwe-022-7f431e61dd",
+  "source": "dataset_microrepo",
+  "source_row": 965,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::custodia/store/etcdstore.py::get",
+  "language": "python",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_etcdstore.py",
+      "role": "vulnerable",
+      "source_row": 965,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_etcdstore.py",
+      "role": "fixed_counterpart",
+      "source_row": 971,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_postgresstore.py",
+      "role": "safe_decoy",
+      "source_row": 60,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_comment.py",
+      "role": "safe_decoy",
+      "source_row": 335,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_rclone_connection.py",
+      "role": "safe_decoy",
+      "source_row": 419,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 72,
+      "end_char": 85,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 90,
+      "end_char": 91,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 92,
+      "end_char": 94,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 95,
+      "end_char": 98,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 99,
+      "end_char": 101,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_etcdstore.py",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_postgresstore.py",
+      "start_line": 1,
+      "end_line": 17,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_comment.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_rclone_connection.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

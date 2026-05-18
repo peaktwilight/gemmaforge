@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-7d4677393c",
+  "repo_path": "repos/sven-before-c-cwe-416-7d4677393c",
+  "source": "dataset_microrepo",
+  "source_row": 1313,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libr/anal/bb.c::r_anal_bb_free",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_bb.c",
+      "role": "vulnerable",
+      "source_row": 1313,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_bb.c",
+      "role": "fixed_counterpart",
+      "source_row": 1275,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_cx24116.c",
+      "role": "safe_decoy",
+      "source_row": 374,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_viff.c",
+      "role": "safe_decoy",
+      "source_row": 690,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_archive_read_support_format_iso9660.c",
+      "role": "safe_decoy",
+      "source_row": 100,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_bb.c",
+      "start_char": 686,
+      "end_char": 700,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_bb.c",
+      "start_line": 1,
+      "end_line": 39,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_cx24116.c",
+      "start_line": 1,
+      "end_line": 95,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_viff.c",
+      "start_line": 1,
+      "end_line": 625,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_archive_read_support_format_iso9660.c",
+      "start_line": 1,
+      "end_line": 86,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

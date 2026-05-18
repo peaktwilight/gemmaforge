@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-2a6beb685f",
+  "repo_path": "repos/sven-before-c-cwe-416-2a6beb685f",
+  "source": "dataset_microrepo",
+  "source_row": 589,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::drivers/usb/serial/console.c::usb_serial_console_disconnect",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_console.c",
+      "role": "vulnerable",
+      "source_row": 589,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_console.c",
+      "role": "fixed_counterpart",
+      "source_row": 32,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_regexec.c",
+      "role": "safe_decoy",
+      "source_row": 1233,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_scale.c",
+      "role": "safe_decoy",
+      "source_row": 1370,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_psd.c",
+      "role": "safe_decoy",
+      "source_row": 655,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_console.c",
+      "start_char": 64,
+      "end_char": 109,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_console.c",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_regexec.c",
+      "start_line": 1,
+      "end_line": 1488,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_scale.c",
+      "start_line": 1,
+      "end_line": 122,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_psd.c",
+      "start_line": 1,
+      "end_line": 129,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

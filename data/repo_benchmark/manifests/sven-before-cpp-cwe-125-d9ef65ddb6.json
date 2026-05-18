@@ -1,0 +1,109 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-125-d9ef65ddb6",
+  "repo_path": "repos/sven-before-cpp-cwe-125-d9ef65ddb6",
+  "source": "dataset_microrepo",
+  "source_row": 630,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tensorflow/lite/kernels/kernel_util.cc::tflite::GetOptionalInputTensor",
+  "language": "cpp",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_kernel_util.cc",
+      "role": "vulnerable",
+      "source_row": 630,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_kernel_util.cc",
+      "role": "fixed_counterpart",
+      "source_row": 253,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_ext_zip.cpp",
+      "role": "safe_decoy",
+      "source_row": 1131,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_ecalls.cc",
+      "role": "safe_decoy",
+      "source_row": 1137,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_json_parser.cpp",
+      "role": "safe_decoy",
+      "source_row": 1311,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_kernel_util.cc",
+      "start_char": 155,
+      "end_char": 311,
+      "start_line": 3,
+      "end_line": 6,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_util.cc",
+      "start_char": 321,
+      "end_char": 328,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_kernel_util.cc",
+      "start_char": 355,
+      "end_char": 377,
+      "start_line": 6,
+      "end_line": 8,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_kernel_util.cc",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_ext_zip.cpp",
+      "start_line": 1,
+      "end_line": 77,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_ecalls.cc",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_json_parser.cpp",
+      "start_line": 1,
+      "end_line": 14,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+@register.filter
+def json_dumps(value, indent=None):
+    if isinstance(value, QuerySet):
+        result = serialize('json', value, indent=indent)
+    else:
+        result = json.dumps(value, indent=indent, cls=DjbletsJSONEncoder)
+
+    return mark_safe(result)

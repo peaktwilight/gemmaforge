@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-6512340600",
+  "repo_path": "repos/sven-before-c-cwe-190-6512340600",
+  "source": "dataset_microrepo",
+  "source_row": 896,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::drivers/video/fbdev/uvesafb.c::uvesafb_setcmap",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_uvesafb.c",
+      "role": "vulnerable",
+      "source_row": 896,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_uvesafb.c",
+      "role": "fixed_counterpart",
+      "source_row": 338,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_bin.c",
+      "role": "safe_decoy",
+      "source_row": 680,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_j2k.c",
+      "role": "safe_decoy",
+      "source_row": 1142,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_rmdec.c",
+      "role": "safe_decoy",
+      "source_row": 28,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_uvesafb.c",
+      "start_char": 357,
+      "end_char": 369,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_uvesafb.c",
+      "start_char": 370,
+      "end_char": 371,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_uvesafb.c",
+      "start_line": 1,
+      "end_line": 38,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_bin.c",
+      "start_line": 1,
+      "end_line": 149,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_j2k.c",
+      "start_line": 1,
+      "end_line": 57,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_rmdec.c",
+      "start_line": 1,
+      "end_line": 40,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

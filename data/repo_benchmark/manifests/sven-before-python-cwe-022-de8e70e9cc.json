@@ -1,0 +1,129 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-022-de8e70e9cc",
+  "repo_path": "repos/sven-before-python-cwe-022-de8e70e9cc",
+  "source": "dataset_microrepo",
+  "source_row": 40,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::custodia/store/etcdstore.py::span",
+  "language": "python",
+  "cwe": "CWE-022",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_etcdstore.py",
+      "role": "vulnerable",
+      "source_row": 40,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_etcdstore.py",
+      "role": "fixed_counterpart",
+      "source_row": 607,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_reservation_actions.py",
+      "role": "safe_decoy",
+      "source_row": 568,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_web.py",
+      "role": "safe_decoy",
+      "source_row": 632,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_user.py",
+      "role": "safe_decoy",
+      "source_row": 1361,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 40,
+      "end_char": 53,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 58,
+      "end_char": 59,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 60,
+      "end_char": 62,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 63,
+      "end_char": 66,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_etcdstore.py",
+      "start_char": 67,
+      "end_char": 69,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-022",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_etcdstore.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_reservation_actions.py",
+      "start_line": 1,
+      "end_line": 50,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_web.py",
+      "start_line": 1,
+      "end_line": 104,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_user.py",
+      "start_line": 1,
+      "end_line": 53,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

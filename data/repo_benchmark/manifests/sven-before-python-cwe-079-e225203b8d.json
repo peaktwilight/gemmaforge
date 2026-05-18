@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-e225203b8d",
+  "repo_path": "repos/sven-before-python-cwe-079-e225203b8d",
+  "source": "dataset_microrepo",
+  "source_row": 1372,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::utils/make_eb_config.py::make_eb_config",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_make_eb_config.py",
+      "role": "vulnerable",
+      "source_row": 1372,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_make_eb_config.py",
+      "role": "fixed_counterpart",
+      "source_row": 1231,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 1351,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_app.py",
+      "role": "safe_decoy",
+      "source_row": 715,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_submit.py",
+      "role": "safe_decoy",
+      "source_row": 778,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_make_eb_config.py",
+      "start_char": 263,
+      "end_char": 324,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_make_eb_config.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 28,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_app.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_submit.py",
+      "start_line": 1,
+      "end_line": 47,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

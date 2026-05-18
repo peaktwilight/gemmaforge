@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-f66108c573",
+  "repo_path": "repos/sven-before-python-cwe-089-f66108c573",
+  "source": "dataset_microrepo",
+  "source_row": 966,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::docker/app.py::sloka",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_app.py",
+      "role": "vulnerable",
+      "source_row": 966,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_app.py",
+      "role": "fixed_counterpart",
+      "source_row": 656,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_db.py",
+      "role": "safe_decoy",
+      "source_row": 991,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_tournament.py",
+      "role": "safe_decoy",
+      "source_row": 75,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_move.py",
+      "role": "safe_decoy",
+      "source_row": 570,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_app.py",
+      "start_char": 559,
+      "end_char": 563,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_app.py",
+      "start_char": 585,
+      "end_char": 587,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_app.py",
+      "start_char": 703,
+      "end_char": 707,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_app.py",
+      "start_char": 721,
+      "end_char": 723,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_app.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_db.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_tournament.py",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_move.py",
+      "start_line": 1,
+      "end_line": 85,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

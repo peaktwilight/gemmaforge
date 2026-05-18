@@ -1,0 +1,229 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-787-3ae0fa49f8",
+  "repo_path": "repos/sven-before-cpp-cwe-787-3ae0fa49f8",
+  "source": "dataset_microrepo",
+  "source_row": 1092,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tensorflow/lite/kernels/segment_sum.cc::tflite::ops::builtin::segment_sum::ResizeOutputTensor",
+  "language": "cpp",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_segment_sum.cc",
+      "role": "vulnerable",
+      "source_row": 1092,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_segment_sum.cc",
+      "role": "fixed_counterpart",
+      "source_row": 694,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_scanner.cc",
+      "role": "safe_decoy",
+      "source_row": 1280,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_host_calls.cc",
+      "role": "safe_decoy",
+      "source_row": 941,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_json_parser.cpp",
+      "role": "safe_decoy",
+      "source_row": 287,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 237,
+      "end_char": 238,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 243,
+      "end_char": 245,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 249,
+      "end_char": 250,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 251,
+      "end_char": 252,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 253,
+      "end_char": 254,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 255,
+      "end_char": 256,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 349,
+      "end_char": 351,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 356,
+      "end_char": 357,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 371,
+      "end_char": 373,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 377,
+      "end_char": 378,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 379,
+      "end_char": 382,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 395,
+      "end_char": 396,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 398,
+      "end_char": 399,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 400,
+      "end_char": 402,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_segment_sum.cc",
+      "start_char": 404,
+      "end_char": 407,
+      "start_line": 9,
+      "end_line": 9,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_segment_sum.cc",
+      "start_line": 1,
+      "end_line": 30,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_scanner.cc",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_host_calls.cc",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_json_parser.cpp",
+      "start_line": 1,
+      "end_line": 43,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

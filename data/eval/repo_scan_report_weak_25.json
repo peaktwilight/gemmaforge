@@ -1,0 +1,811 @@
+{
+  "n_repos": 25,
+  "k_values": [
+    1,
+    5,
+    10,
+    25
+  ],
+  "mean_reciprocal_rank": 0.3380100250626566,
+  "repo_recall_at_k": {
+    "@1": 0.16,
+    "@5": 0.6,
+    "@10": 0.76,
+    "@25": 0.88
+  },
+  "trace_recall_at_k": {
+    "@1": 0.16,
+    "@5": 0.5666666666666667,
+    "@10": 0.76,
+    "@25": 0.8742857142857143
+  },
+  "precision_at_k": {
+    "@1": 0.16,
+    "@5": 0.12,
+    "@10": 0.13755555555555557,
+    "@25": 0.13975182884748102
+  },
+  "cwe_top1_on_hits_at_k": {
+    "@1": 0.0,
+    "@5": 0.0,
+    "@10": 0.0,
+    "@25": 0.0
+  },
+  "repos": [
+    {
+      "repo_id": "sven-before-python-cwe-079-48249adef2",
+      "n_traces": 2,
+      "n_leads": 10,
+      "first_hit_rank": 4,
+      "reciprocal_rank": 0.25,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.5,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.3,
+        "@25": 0.3
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-9f184c3af3",
+      "n_traces": 5,
+      "n_leads": 5,
+      "first_hit_rank": 2,
+      "reciprocal_rank": 0.5,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-c42a8f2e88",
+      "n_traces": 2,
+      "n_leads": 6,
+      "first_hit_rank": 4,
+      "reciprocal_rank": 0.25,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.16666666666666666,
+        "@25": 0.16666666666666666
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-125-8b4d277389",
+      "n_traces": 1,
+      "n_leads": 25,
+      "first_hit_rank": 6,
+      "reciprocal_rank": 0.16666666666666666,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.1,
+        "@25": 0.04
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-e67b405500",
+      "n_traces": 23,
+      "n_leads": 8,
+      "first_hit_rank": 1,
+      "reciprocal_rank": 1.0,
+      "repo_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 1.0,
+        "@5": 0.2,
+        "@10": 0.25,
+        "@25": 0.25
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-416-e50e76e59c",
+      "n_traces": 3,
+      "n_leads": 14,
+      "first_hit_rank": 6,
+      "reciprocal_rank": 0.16666666666666666,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.1,
+        "@25": 0.07142857142857142
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-6f1980bdca",
+      "n_traces": 2,
+      "n_leads": 9,
+      "first_hit_rank": 4,
+      "reciprocal_rank": 0.25,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.1111111111111111,
+        "@25": 0.1111111111111111
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-125-313e7c61e0",
+      "n_traces": 1,
+      "n_leads": 25,
+      "first_hit_rank": 19,
+      "reciprocal_rank": 0.05263157894736842,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.08
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-476-90f15c3400",
+      "n_traces": 1,
+      "n_leads": 23,
+      "first_hit_rank": 14,
+      "reciprocal_rank": 0.07142857142857142,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.043478260869565216
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-416-0e8ff5deea",
+      "n_traces": 4,
+      "n_leads": 25,
+      "first_hit_rank": null,
+      "reciprocal_rank": 0.0,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": NaN
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-079-076ca93d37",
+      "n_traces": 2,
+      "n_leads": 9,
+      "first_hit_rank": 5,
+      "reciprocal_rank": 0.2,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2222222222222222,
+        "@25": 0.2222222222222222
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-416-5662d8074a",
+      "n_traces": 1,
+      "n_leads": 25,
+      "first_hit_rank": 7,
+      "reciprocal_rank": 0.14285714285714285,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.1,
+        "@25": 0.04
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-ff6e729126",
+      "n_traces": 3,
+      "n_leads": 5,
+      "first_hit_rank": 5,
+      "reciprocal_rank": 0.2,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-59bb044d17",
+      "n_traces": 8,
+      "n_leads": 5,
+      "first_hit_rank": 4,
+      "reciprocal_rank": 0.25,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-c-cwe-125-031b98ddec",
+      "n_traces": 7,
+      "n_leads": 25,
+      "first_hit_rank": 12,
+      "reciprocal_rank": 0.08333333333333333,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.8571428571428571
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.08
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-c6cb835bee",
+      "n_traces": 2,
+      "n_leads": 5,
+      "first_hit_rank": 1,
+      "reciprocal_rank": 1.0,
+      "repo_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 1.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-b1b8c8087c",
+      "n_traces": 9,
+      "n_leads": 9,
+      "first_hit_rank": 5,
+      "reciprocal_rank": 0.2,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.6666666666666666,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2222222222222222,
+        "@25": 0.2222222222222222
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-d315a0546a",
+      "n_traces": 18,
+      "n_leads": 10,
+      "first_hit_rank": 2,
+      "reciprocal_rank": 0.5,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.1,
+        "@25": 0.1
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-2e0153749e",
+      "n_traces": 2,
+      "n_leads": 5,
+      "first_hit_rank": 1,
+      "reciprocal_rank": 1.0,
+      "repo_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 1.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-089-923c561ec8",
+      "n_traces": 2,
+      "n_leads": 5,
+      "first_hit_rank": 2,
+      "reciprocal_rank": 0.5,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-1426a3883e",
+      "n_traces": 3,
+      "n_leads": 5,
+      "first_hit_rank": 2,
+      "reciprocal_rank": 0.5,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-0a9cfd0887",
+      "n_traces": 6,
+      "n_leads": 5,
+      "first_hit_rank": 1,
+      "reciprocal_rank": 1.0,
+      "repo_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 1.0,
+        "@5": 1.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 1.0,
+        "@5": 0.2,
+        "@10": 0.2,
+        "@25": 0.2
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-079-0ab5d046f8",
+      "n_traces": 3,
+      "n_leads": 6,
+      "first_hit_rank": 6,
+      "reciprocal_rank": 0.16666666666666666,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 1.0,
+        "@25": 1.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.16666666666666666,
+        "@25": 0.16666666666666666
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": 0.0,
+        "@25": 0.0
+      }
+    },
+    {
+      "repo_id": "sven-before-cpp-cwe-476-1646a50cdc",
+      "n_traces": 6,
+      "n_leads": 25,
+      "first_hit_rank": null,
+      "reciprocal_rank": 0.0,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": NaN
+      }
+    },
+    {
+      "repo_id": "sven-before-python-cwe-078-711357c7c8",
+      "n_traces": 15,
+      "n_leads": 5,
+      "first_hit_rank": null,
+      "reciprocal_rank": 0.0,
+      "repo_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "trace_recall_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "precision_at_k": {
+        "@1": 0.0,
+        "@5": 0.0,
+        "@10": 0.0,
+        "@25": 0.0
+      },
+      "cwe_top1_on_hits_at_k": {
+        "@1": NaN,
+        "@5": NaN,
+        "@10": NaN,
+        "@25": NaN
+      }
+    }
+  ]
+}

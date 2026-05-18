@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-c5dbb8dde1",
+  "repo_path": "repos/sven-before-c-cwe-476-c5dbb8dde1",
+  "source": "dataset_microrepo",
+  "source_row": 455,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::net/bluetooth/rfcomm/sock.c::rfcomm_sock_bind",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_sock.c",
+      "role": "vulnerable",
+      "source_row": 455,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_sock.c",
+      "role": "fixed_counterpart",
+      "source_row": 919,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_psd.c",
+      "role": "safe_decoy",
+      "source_row": 497,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_verifier.c",
+      "role": "safe_decoy",
+      "source_row": 867,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_ofp-actions.c",
+      "role": "safe_decoy",
+      "source_row": 179,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_sock.c",
+      "start_char": 108,
+      "end_char": 109,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 111,
+      "end_char": 141,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 177,
+      "end_char": 197,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 198,
+      "end_char": 202,
+      "start_line": 5,
+      "end_line": 6,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 203,
+      "end_char": 204,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 216,
+      "end_char": 260,
+      "start_line": 8,
+      "end_line": 10,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 568,
+      "end_char": 570,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_sock.c",
+      "start_char": 675,
+      "end_char": 677,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_sock.c",
+      "start_line": 1,
+      "end_line": 45,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_psd.c",
+      "start_line": 1,
+      "end_line": 115,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_verifier.c",
+      "start_line": 1,
+      "end_line": 262,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_ofp-actions.c",
+      "start_line": 1,
+      "end_line": 81,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

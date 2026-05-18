@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-23f902edfa",
+  "repo_path": "repos/sven-before-python-cwe-078-23f902edfa",
+  "source": "dataset_microrepo",
+  "source_row": 1041,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/san/hp_lefthand.py::_cliq_run",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_hp_lefthand.py",
+      "role": "vulnerable",
+      "source_row": 1041,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_hp_lefthand.py",
+      "role": "fixed_counterpart",
+      "source_row": 736,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_video_repository.py",
+      "role": "safe_decoy",
+      "source_row": 171,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_check_comics.py",
+      "role": "safe_decoy",
+      "source_row": 648,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 783,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 152,
+      "end_char": 158,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 160,
+      "end_char": 165,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 225,
+      "end_char": 231,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 233,
+      "end_char": 238,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 247,
+      "end_char": 248,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hp_lefthand.py",
+      "start_char": 265,
+      "end_char": 312,
+      "start_line": 6,
+      "end_line": 6,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_hp_lefthand.py",
+      "start_line": 1,
+      "end_line": 7,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_video_repository.py",
+      "start_line": 1,
+      "end_line": 5,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_check_comics.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 11,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

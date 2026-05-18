@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-787-65630a8b0a",
+  "repo_path": "repos/sven-before-c-cwe-787-65630a8b0a",
+  "source": "dataset_microrepo",
+  "source_row": 1223,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libtiff/tif_next.c::NeXTDecode",
+  "language": "c",
+  "cwe": "CWE-787",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_tif_next.c",
+      "role": "vulnerable",
+      "source_row": 1223,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_tif_next.c",
+      "role": "fixed_counterpart",
+      "source_row": 41,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_common.c",
+      "role": "safe_decoy",
+      "source_row": 709,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_asm_x86_nz.c",
+      "role": "safe_decoy",
+      "source_row": 303,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_rle.c",
+      "role": "safe_decoy",
+      "source_row": 446,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_tif_next.c",
+      "start_char": 1882,
+      "end_char": 1926,
+      "start_line": 77,
+      "end_line": 77,
+      "cwe": "CWE-787",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_tif_next.c",
+      "start_line": 1,
+      "end_line": 102,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_common.c",
+      "start_line": 1,
+      "end_line": 69,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_asm_x86_nz.c",
+      "start_line": 1,
+      "end_line": 476,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_rle.c",
+      "start_line": 1,
+      "end_line": 537,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

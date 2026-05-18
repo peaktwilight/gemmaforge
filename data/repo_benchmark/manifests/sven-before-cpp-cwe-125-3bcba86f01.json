@@ -1,0 +1,339 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-125-3bcba86f01",
+  "repo_path": "repos/sven-before-cpp-cwe-125-3bcba86f01",
+  "source": "dataset_microrepo",
+  "source_row": 109,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::hphp/runtime/ext/memcache/ext_memcache.cpp::HPHP::HHVM_METHOD",
+  "language": "cpp",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_ext_memcache.cpp",
+      "role": "vulnerable",
+      "source_row": 109,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_ext_memcache.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 693,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_ap4atomsampletable.cpp",
+      "role": "safe_decoy",
+      "source_row": 1328,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_makepreview.cpp",
+      "role": "safe_decoy",
+      "source_row": 1037,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_pb_controller.cpp",
+      "role": "safe_decoy",
+      "source_row": 1101,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 611,
+      "end_char": 662,
+      "start_line": 19,
+      "end_line": 22,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1064,
+      "end_char": 1071,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1072,
+      "end_char": 1075,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1078,
+      "end_char": 1080,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1081,
+      "end_char": 1083,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1085,
+      "end_char": 1086,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1088,
+      "end_char": 1094,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1096,
+      "end_char": 1100,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1101,
+      "end_char": 1102,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1106,
+      "end_char": 1107,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1110,
+      "end_char": 1112,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1113,
+      "end_char": 1121,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1130,
+      "end_char": 1131,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1139,
+      "end_char": 1140,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1144,
+      "end_char": 1145,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1147,
+      "end_char": 1148,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1151,
+      "end_char": 1153,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1154,
+      "end_char": 1155,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1157,
+      "end_char": 1159,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1165,
+      "end_char": 1166,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1169,
+      "end_char": 1172,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1175,
+      "end_char": 1176,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1181,
+      "end_char": 1185,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1186,
+      "end_char": 1191,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1193,
+      "end_char": 1194,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ext_memcache.cpp",
+      "start_char": 1195,
+      "end_char": 1197,
+      "start_line": 36,
+      "end_line": 36,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_ext_memcache.cpp",
+      "start_line": 1,
+      "end_line": 42,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_ap4atomsampletable.cpp",
+      "start_line": 1,
+      "end_line": 100,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_makepreview.cpp",
+      "start_line": 1,
+      "end_line": 46,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_pb_controller.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

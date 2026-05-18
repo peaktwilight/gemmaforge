@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-5adb611c34",
+  "repo_path": "repos/sven-before-c-cwe-476-5adb611c34",
+  "source": "dataset_microrepo",
+  "source_row": 850,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::libavcodec/utils.c::avcodec_open2",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_utils.c",
+      "role": "vulnerable",
+      "source_row": 850,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_utils.c",
+      "role": "fixed_counterpart",
+      "source_row": 1006,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_j2k.c",
+      "role": "safe_decoy",
+      "source_row": 899,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_pngdec.c",
+      "role": "safe_decoy",
+      "source_row": 536,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_memcached.c",
+      "role": "safe_decoy",
+      "source_row": 474,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_utils.c",
+      "start_char": 20499,
+      "end_char": 20523,
+      "start_line": 486,
+      "end_line": 486,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_utils.c",
+      "start_line": 1,
+      "end_line": 518,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_j2k.c",
+      "start_line": 1,
+      "end_line": 147,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_pngdec.c",
+      "start_line": 1,
+      "end_line": 43,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_memcached.c",
+      "start_line": 1,
+      "end_line": 71,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-125-c797537789",
+  "repo_path": "repos/sven-before-c-cwe-125-c797537789",
+  "source": "dataset_microrepo",
+  "source_row": 999,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::drivers/usb/storage/uas.c::uas_switch_interface",
+  "language": "c",
+  "cwe": "CWE-125",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_uas.c",
+      "role": "vulnerable",
+      "source_row": 999,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_uas.c",
+      "role": "fixed_counterpart",
+      "source_row": 376,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_constitute.c",
+      "role": "safe_decoy",
+      "source_row": 384,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_gd_interpolation.c",
+      "role": "safe_decoy",
+      "source_row": 553,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_config.c",
+      "role": "safe_decoy",
+      "source_row": 973,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_uas.c",
+      "start_char": 149,
+      "end_char": 153,
+      "start_line": 7,
+      "end_line": 7,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_uas.c",
+      "start_char": 164,
+      "end_char": 167,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_uas.c",
+      "start_char": 201,
+      "end_char": 211,
+      "start_line": 10,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_uas.c",
+      "start_char": 214,
+      "end_char": 225,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_uas.c",
+      "start_char": 247,
+      "end_char": 248,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-125",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_uas.c",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_constitute.c",
+      "start_line": 1,
+      "end_line": 99,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_gd_interpolation.c",
+      "start_line": 1,
+      "end_line": 56,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_config.c",
+      "start_line": 1,
+      "end_line": 101,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

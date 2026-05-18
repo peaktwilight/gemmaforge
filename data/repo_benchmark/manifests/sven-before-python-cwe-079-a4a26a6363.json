@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-a4a26a6363",
+  "repo_path": "repos/sven-before-python-cwe-079-a4a26a6363",
+  "source": "dataset_microrepo",
+  "source_row": 457,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::MoinMoin/action/fckdialog.py::link_dialog",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_fckdialog.py",
+      "role": "vulnerable",
+      "source_row": 457,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_fckdialog.py",
+      "role": "fixed_counterpart",
+      "source_row": 313,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_app.py",
+      "role": "safe_decoy",
+      "source_row": 656,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_commands.py",
+      "role": "safe_decoy",
+      "source_row": 848,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_createuserbase.py",
+      "role": "safe_decoy",
+      "source_row": 321,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_fckdialog.py",
+      "start_char": 3711,
+      "end_char": 3789,
+      "start_line": 100,
+      "end_line": 100,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_fckdialog.py",
+      "start_line": 1,
+      "end_line": 160,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_app.py",
+      "start_line": 1,
+      "end_line": 27,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_commands.py",
+      "start_line": 1,
+      "end_line": 34,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_createuserbase.py",
+      "start_line": 1,
+      "end_line": 65,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-7de48c692f",
+  "repo_path": "repos/sven-before-python-cwe-079-7de48c692f",
+  "source": "dataset_microrepo",
+  "source_row": 695,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::apps/oozie/src/oozie/views/editor2.py::edit_workflow",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_editor2.py",
+      "role": "vulnerable",
+      "source_row": 695,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_editor2.py",
+      "role": "fixed_counterpart",
+      "source_row": 1333,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_validurls.py",
+      "role": "safe_decoy",
+      "source_row": 391,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_export.py",
+      "role": "safe_decoy",
+      "source_row": 633,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_chippyruxpin.py",
+      "role": "safe_decoy",
+      "source_row": 428,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_editor2.py",
+      "start_char": 743,
+      "end_char": 1005,
+      "start_line": 30,
+      "end_line": 33,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_editor2.py",
+      "start_char": 1055,
+      "end_char": 1124,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_editor2.py",
+      "start_line": 1,
+      "end_line": 37,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_validurls.py",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_export.py",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_chippyruxpin.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-c1fefb4d51",
+  "repo_path": "repos/sven-before-python-cwe-078-c1fefb4d51",
+  "source": "dataset_microrepo",
+  "source_row": 56,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::isort/hooks.py::get_output",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_hooks.py",
+      "role": "vulnerable",
+      "source_row": 56,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_hooks.py",
+      "role": "fixed_counterpart",
+      "source_row": 1354,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_database.py",
+      "role": "safe_decoy",
+      "source_row": 627,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_database.py",
+      "role": "safe_decoy",
+      "source_row": 750,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_test_hp3par.py",
+      "role": "safe_decoy",
+      "source_row": 58,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 32,
+      "end_char": 36,
+      "start_line": 1,
+      "end_line": 1,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 213,
+      "end_char": 215,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 217,
+      "end_char": 218,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 220,
+      "end_char": 221,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 223,
+      "end_char": 227,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 228,
+      "end_char": 234,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_hooks.py",
+      "start_char": 236,
+      "end_char": 237,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_hooks.py",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_database.py",
+      "start_line": 1,
+      "end_line": 31,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_database.py",
+      "start_line": 1,
+      "end_line": 18,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_test_hp3par.py",
+      "start_line": 1,
+      "end_line": 28,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

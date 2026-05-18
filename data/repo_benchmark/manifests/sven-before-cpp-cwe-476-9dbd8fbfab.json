@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-476-9dbd8fbfab",
+  "repo_path": "repos/sven-before-cpp-cwe-476-9dbd8fbfab",
+  "source": "dataset_microrepo",
+  "source_row": 772,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::Source/C++/Core/Ap4HdlrAtom.cpp::AP4_HdlrAtom::AP4_HdlrAtom",
+  "language": "cpp",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_ap4hdlratom.cpp",
+      "role": "vulnerable",
+      "source_row": 772,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_ap4hdlratom.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 1298,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_logger.cpp",
+      "role": "safe_decoy",
+      "source_row": 199,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_webmodules.cpp",
+      "role": "safe_decoy",
+      "source_row": 289,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_ext_memcache.cpp",
+      "role": "safe_decoy",
+      "source_row": 693,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 514,
+      "end_char": 516,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 517,
+      "end_char": 522,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 527,
+      "end_char": 528,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 529,
+      "end_char": 535,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 570,
+      "end_char": 572,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 573,
+      "end_char": 574,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 585,
+      "end_char": 586,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4hdlratom.cpp",
+      "start_char": 589,
+      "end_char": 596,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_ap4hdlratom.cpp",
+      "start_line": 1,
+      "end_line": 30,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_logger.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_webmodules.cpp",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_ext_memcache.cpp",
+      "start_line": 1,
+      "end_line": 42,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

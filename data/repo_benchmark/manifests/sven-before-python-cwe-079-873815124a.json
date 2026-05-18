@@ -1,0 +1,899 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-873815124a",
+  "repo_path": "repos/sven-before-python-cwe-079-873815124a",
+  "source": "dataset_microrepo",
+  "source_row": 760,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::django/utils/http.py::is_safe_url",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_http.py",
+      "role": "vulnerable",
+      "source_row": 760,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_http.py",
+      "role": "fixed_counterpart",
+      "source_row": 463,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_impl.py",
+      "role": "safe_decoy",
+      "source_row": 868,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_hp_3par_common.py",
+      "role": "safe_decoy",
+      "source_row": 1245,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_hp_3par_common.py",
+      "role": "safe_decoy",
+      "source_row": 1194,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_http.py",
+      "start_char": 345,
+      "end_char": 346,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 347,
+      "end_char": 396,
+      "start_line": 13,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 397,
+      "end_char": 403,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 404,
+      "end_char": 405,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 406,
+      "end_char": 422,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 423,
+      "end_char": 425,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 426,
+      "end_char": 433,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 434,
+      "end_char": 435,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 436,
+      "end_char": 439,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 441,
+      "end_char": 448,
+      "start_line": 14,
+      "end_line": 14,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 450,
+      "end_char": 471,
+      "start_line": 14,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 473,
+      "end_char": 477,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 479,
+      "end_char": 480,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 481,
+      "end_char": 502,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 503,
+      "end_char": 504,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 505,
+      "end_char": 510,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 511,
+      "end_char": 514,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 515,
+      "end_char": 536,
+      "start_line": 15,
+      "end_line": 15,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 537,
+      "end_char": 549,
+      "start_line": 16,
+      "end_line": 16,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 552,
+      "end_char": 568,
+      "start_line": 16,
+      "end_line": 17,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 569,
+      "end_char": 598,
+      "start_line": 17,
+      "end_line": 18,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 599,
+      "end_char": 601,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 602,
+      "end_char": 608,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 610,
+      "end_char": 615,
+      "start_line": 18,
+      "end_line": 18,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 622,
+      "end_char": 625,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 626,
+      "end_char": 649,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 650,
+      "end_char": 668,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 669,
+      "end_char": 681,
+      "start_line": 19,
+      "end_line": 19,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 682,
+      "end_char": 727,
+      "start_line": 19,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 728,
+      "end_char": 730,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 731,
+      "end_char": 747,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 748,
+      "end_char": 752,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 754,
+      "end_char": 761,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 764,
+      "end_char": 780,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 781,
+      "end_char": 794,
+      "start_line": 20,
+      "end_line": 21,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 795,
+      "end_char": 812,
+      "start_line": 21,
+      "end_line": 21,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 814,
+      "end_char": 842,
+      "start_line": 21,
+      "end_line": 21,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 843,
+      "end_char": 857,
+      "start_line": 21,
+      "end_line": 21,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 858,
+      "end_char": 877,
+      "start_line": 21,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 878,
+      "end_char": 884,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 885,
+      "end_char": 901,
+      "start_line": 22,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 902,
+      "end_char": 928,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 929,
+      "end_char": 936,
+      "start_line": 23,
+      "end_line": 23,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 937,
+      "end_char": 954,
+      "start_line": 24,
+      "end_line": 24,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 955,
+      "end_char": 964,
+      "start_line": 24,
+      "end_line": 25,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 965,
+      "end_char": 985,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 987,
+      "end_char": 1006,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1007,
+      "end_char": 1010,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1011,
+      "end_char": 1047,
+      "start_line": 25,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1048,
+      "end_char": 1050,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1051,
+      "end_char": 1056,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1058,
+      "end_char": 1067,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1068,
+      "end_char": 1069,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1070,
+      "end_char": 1071,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1074,
+      "end_char": 1079,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1080,
+      "end_char": 1110,
+      "start_line": 26,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1111,
+      "end_char": 1122,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1123,
+      "end_char": 1130,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1132,
+      "end_char": 1133,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1137,
+      "end_char": 1139,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1140,
+      "end_char": 1156,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1162,
+      "end_char": 1213,
+      "start_line": 28,
+      "end_line": 29,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1220,
+      "end_char": 1246,
+      "start_line": 29,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1248,
+      "end_char": 1249,
+      "start_line": 30,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1250,
+      "end_char": 1253,
+      "start_line": 30,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1254,
+      "end_char": 1262,
+      "start_line": 30,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1265,
+      "end_char": 1274,
+      "start_line": 30,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1275,
+      "end_char": 1280,
+      "start_line": 30,
+      "end_line": 30,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1290,
+      "end_char": 1296,
+      "start_line": 30,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1297,
+      "end_char": 1311,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1313,
+      "end_char": 1317,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1318,
+      "end_char": 1320,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1321,
+      "end_char": 1325,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1326,
+      "end_char": 1327,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1330,
+      "end_char": 1335,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1336,
+      "end_char": 1339,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1340,
+      "end_char": 1341,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1343,
+      "end_char": 1347,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1348,
+      "end_char": 1352,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1355,
+      "end_char": 1356,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1357,
+      "end_char": 1360,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_http.py",
+      "start_char": 1361,
+      "end_char": 1364,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_http.py",
+      "start_line": 1,
+      "end_line": 14,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_impl.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_hp_3par_common.py",
+      "start_line": 1,
+      "end_line": 2,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_hp_3par_common.py",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

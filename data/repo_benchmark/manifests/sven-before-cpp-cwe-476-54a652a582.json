@@ -1,0 +1,99 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-476-54a652a582",
+  "repo_path": "repos/sven-before-cpp-cwe-476-54a652a582",
+  "source": "dataset_microrepo",
+  "source_row": 1144,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::Source/C++/Core/Ap4AtomFactory.cpp::AP4_AtomFactory::CreateAtomFromStream",
+  "language": "cpp",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_ap4atomfactory.cpp",
+      "role": "vulnerable",
+      "source_row": 1144,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_ap4atomfactory.cpp",
+      "role": "fixed_counterpart",
+      "source_row": 682,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_logger.cpp",
+      "role": "safe_decoy",
+      "source_row": 199,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_kernel_and_device.cc",
+      "role": "safe_decoy",
+      "source_row": 665,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_webpimage.cpp",
+      "role": "safe_decoy",
+      "source_row": 793,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_ap4atomfactory.cpp",
+      "start_char": 8331,
+      "end_char": 8378,
+      "start_line": 237,
+      "end_line": 237,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_ap4atomfactory.cpp",
+      "start_char": 8555,
+      "end_char": 8602,
+      "start_line": 243,
+      "end_line": 243,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_ap4atomfactory.cpp",
+      "start_line": 1,
+      "end_line": 539,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_logger.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_kernel_and_device.cc",
+      "start_line": 1,
+      "end_line": 82,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_webpimage.cpp",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

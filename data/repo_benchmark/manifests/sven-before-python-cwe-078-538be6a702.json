@@ -1,0 +1,159 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-538be6a702",
+  "repo_path": "repos/sven-before-python-cwe-078-538be6a702",
+  "source": "dataset_microrepo",
+  "source_row": 1282,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::hubblestack/extmods/grains/custom_grains_pillar.py::populate_custom_grains_and_pillar",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_custom_grains_pillar.py",
+      "role": "vulnerable",
+      "source_row": 1282,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_custom_grains_pillar.py",
+      "role": "fixed_counterpart",
+      "source_row": 386,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_webclient_ajax.py",
+      "role": "safe_decoy",
+      "source_row": 43,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_httphandler.py",
+      "role": "safe_decoy",
+      "source_row": 250,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_postgresstore.py",
+      "role": "safe_decoy",
+      "source_row": 982,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 763,
+      "end_char": 810,
+      "start_line": 24,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 860,
+      "end_char": 872,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 882,
+      "end_char": 883,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 908,
+      "end_char": 912,
+      "start_line": 26,
+      "end_line": 26,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 1094,
+      "end_char": 1142,
+      "start_line": 30,
+      "end_line": 31,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 1192,
+      "end_char": 1204,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 1215,
+      "end_char": 1216,
+      "start_line": 31,
+      "end_line": 31,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_custom_grains_pillar.py",
+      "start_char": 1241,
+      "end_char": 1245,
+      "start_line": 32,
+      "end_line": 32,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_custom_grains_pillar.py",
+      "start_line": 1,
+      "end_line": 32,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_webclient_ajax.py",
+      "start_line": 1,
+      "end_line": 22,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_httphandler.py",
+      "start_line": 1,
+      "end_line": 23,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_postgresstore.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

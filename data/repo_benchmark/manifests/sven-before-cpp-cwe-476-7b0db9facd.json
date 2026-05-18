@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-cpp-cwe-476-7b0db9facd",
+  "repo_path": "repos/sven-before-cpp-cwe-476-7b0db9facd",
+  "source": "dataset_microrepo",
+  "source_row": 1103,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::tensorflow/core/kernels/session_ops.cc::tensorflow::GetSessionHandleOp::Compute",
+  "language": "cpp",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_session_ops.cc",
+      "role": "vulnerable",
+      "source_row": 1103,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_session_ops.cc",
+      "role": "fixed_counterpart",
+      "source_row": 26,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_host_calls.cc",
+      "role": "safe_decoy",
+      "source_row": 1205,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_command_line_args.cc",
+      "role": "safe_decoy",
+      "source_row": 271,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_host_calls.cc",
+      "role": "safe_decoy",
+      "source_row": 941,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_session_ops.cc",
+      "start_char": 94,
+      "end_char": 99,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_session_ops.cc",
+      "start_line": 1,
+      "end_line": 24,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_host_calls.cc",
+      "start_line": 1,
+      "end_line": 39,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_command_line_args.cc",
+      "start_line": 1,
+      "end_line": 31,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_host_calls.cc",
+      "start_line": 1,
+      "end_line": 9,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

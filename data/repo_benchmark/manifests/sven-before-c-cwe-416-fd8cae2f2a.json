@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-fd8cae2f2a",
+  "repo_path": "repos/sven-before-c-cwe-416-fd8cae2f2a",
+  "source": "dataset_microrepo",
+  "source_row": 1049,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::coders/pwp.c::ReadPWPImage",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_pwp.c",
+      "role": "vulnerable",
+      "source_row": 1049,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_pwp.c",
+      "role": "fixed_counterpart",
+      "source_row": 346,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_repodata.c",
+      "role": "safe_decoy",
+      "source_row": 437,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_pcpserver.c",
+      "role": "safe_decoy",
+      "source_row": 611,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_ib_srpt.c",
+      "role": "safe_decoy",
+      "source_row": 1097,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_pwp.c",
+      "start_char": 3577,
+      "end_char": 3645,
+      "start_line": 129,
+      "end_line": 131,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_pwp.c",
+      "start_line": 1,
+      "end_line": 141,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_repodata.c",
+      "start_line": 1,
+      "end_line": 54,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_pcpserver.c",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_ib_srpt.c",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-476-e9ae8cb8aa",
+  "repo_path": "repos/sven-before-c-cwe-476-e9ae8cb8aa",
+  "source": "dataset_microrepo",
+  "source_row": 1082,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::arch/powerpc/kvm/powerpc.c::kvm_vm_ioctl_check_extension",
+  "language": "c",
+  "cwe": "CWE-476",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_powerpc.c",
+      "role": "vulnerable",
+      "source_row": 1082,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_powerpc.c",
+      "role": "fixed_counterpart",
+      "source_row": 765,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_dbdimp.c",
+      "role": "safe_decoy",
+      "source_row": 1238,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_tiffdecode.c",
+      "role": "safe_decoy",
+      "source_row": 1295,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_emulate.c",
+      "role": "safe_decoy",
+      "source_row": 1317,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_powerpc.c",
+      "start_char": 3556,
+      "end_char": 3559,
+      "start_line": 157,
+      "end_line": 158,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_powerpc.c",
+      "start_char": 3560,
+      "end_char": 3573,
+      "start_line": 158,
+      "end_line": 158,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_powerpc.c",
+      "start_char": 3583,
+      "end_char": 3588,
+      "start_line": 158,
+      "end_line": 158,
+      "cwe": "CWE-476",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_powerpc.c",
+      "start_line": 1,
+      "end_line": 165,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_dbdimp.c",
+      "start_line": 1,
+      "end_line": 255,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_tiffdecode.c",
+      "start_line": 1,
+      "end_line": 193,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_emulate.c",
+      "start_line": 1,
+      "end_line": 268,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

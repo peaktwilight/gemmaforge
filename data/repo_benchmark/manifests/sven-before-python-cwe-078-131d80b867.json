@@ -1,0 +1,519 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-131d80b867",
+  "repo_path": "repos/sven-before-python-cwe-078-131d80b867",
+  "source": "dataset_microrepo",
+  "source_row": 892,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::mobly/controllers/android_device_lib/adb.py::_exec_cmd",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_adb.py",
+      "role": "vulnerable",
+      "source_row": 892,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_adb.py",
+      "role": "fixed_counterpart",
+      "source_row": 1108,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_database.py",
+      "role": "safe_decoy",
+      "source_row": 915,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_adb.py",
+      "role": "safe_decoy",
+      "source_row": 372,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_deposit.py",
+      "role": "safe_decoy",
+      "source_row": 1249,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_adb.py",
+      "start_char": 24,
+      "end_char": 27,
+      "start_line": 1,
+      "end_line": 1,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 63,
+      "end_char": 65,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 66,
+      "end_char": 67,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 68,
+      "end_char": 71,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 73,
+      "end_char": 79,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 88,
+      "end_char": 92,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 93,
+      "end_char": 94,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 97,
+      "end_char": 102,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 103,
+      "end_char": 104,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 108,
+      "end_char": 113,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 119,
+      "end_char": 121,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 122,
+      "end_char": 125,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 127,
+      "end_char": 133,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 134,
+      "end_char": 135,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 136,
+      "end_char": 138,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 139,
+      "end_char": 145,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 147,
+      "end_char": 150,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 151,
+      "end_char": 152,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 153,
+      "end_char": 158,
+      "start_line": 4,
+      "end_line": 4,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 166,
+      "end_char": 175,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 176,
+      "end_char": 178,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 179,
+      "end_char": 182,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 184,
+      "end_char": 185,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 186,
+      "end_char": 187,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 188,
+      "end_char": 190,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 193,
+      "end_char": 194,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 197,
+      "end_char": 199,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 200,
+      "end_char": 201,
+      "start_line": 5,
+      "end_line": 5,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 210,
+      "end_char": 218,
+      "start_line": 7,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 231,
+      "end_char": 233,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 234,
+      "end_char": 237,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 239,
+      "end_char": 241,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 245,
+      "end_char": 247,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 248,
+      "end_char": 249,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 250,
+      "end_char": 251,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 255,
+      "end_char": 258,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 259,
+      "end_char": 263,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 264,
+      "end_char": 266,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 271,
+      "end_char": 272,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 274,
+      "end_char": 275,
+      "start_line": 8,
+      "end_line": 8,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 506,
+      "end_char": 509,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 565,
+      "end_char": 568,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 707,
+      "end_char": 710,
+      "start_line": 20,
+      "end_line": 20,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_adb.py",
+      "start_char": 838,
+      "end_char": 841,
+      "start_line": 25,
+      "end_line": 25,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_adb.py",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_database.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_adb.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_deposit.py",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

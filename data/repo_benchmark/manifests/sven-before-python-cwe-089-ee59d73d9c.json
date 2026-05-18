@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-ee59d73d9c",
+  "repo_path": "repos/sven-before-python-cwe-089-ee59d73d9c",
+  "source": "dataset_microrepo",
+  "source_row": 422,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::video/video_repository.py::retrieve_videos_from_playlist",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_video_repository.py",
+      "role": "vulnerable",
+      "source_row": 422,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_video_repository.py",
+      "role": "fixed_counterpart",
+      "source_row": 11,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_impl.py",
+      "role": "safe_decoy",
+      "source_row": 803,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_verify.py",
+      "role": "safe_decoy",
+      "source_row": 132,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_repack_rust.py",
+      "role": "safe_decoy",
+      "source_row": 1212,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_video_repository.py",
+      "start_char": 135,
+      "end_char": 142,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_video_repository.py",
+      "start_char": 143,
+      "end_char": 148,
+      "start_line": 2,
+      "end_line": 2,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_video_repository.py",
+      "start_char": 172,
+      "end_char": 186,
+      "start_line": 2,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_video_repository.py",
+      "start_char": 187,
+      "end_char": 201,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_video_repository.py",
+      "start_line": 1,
+      "end_line": 4,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_impl.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_verify.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_repack_rust.py",
+      "start_line": 1,
+      "end_line": 14,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

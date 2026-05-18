@@ -1,0 +1,149 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-416-6b46f0fbf6",
+  "repo_path": "repos/sven-before-c-cwe-416-6b46f0fbf6",
+  "source": "dataset_microrepo",
+  "source_row": 201,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::ext/standard/var.c::PHP_FUNCTION",
+  "language": "c",
+  "cwe": "CWE-416",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_var.c",
+      "role": "vulnerable",
+      "source_row": 201,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_var.c",
+      "role": "fixed_counterpart",
+      "source_row": 450,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_bmp.c",
+      "role": "safe_decoy",
+      "source_row": 938,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_mpegvideodsp.c",
+      "role": "safe_decoy",
+      "source_row": 395,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_psd.c",
+      "role": "safe_decoy",
+      "source_row": 546,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_var.c",
+      "start_char": 1172,
+      "end_char": 1176,
+      "start_line": 39,
+      "end_line": 39,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1179,
+      "end_char": 1181,
+      "start_line": 39,
+      "end_line": 39,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1356,
+      "end_char": 1387,
+      "start_line": 45,
+      "end_line": 45,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1564,
+      "end_char": 1598,
+      "start_line": 52,
+      "end_line": 52,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1610,
+      "end_char": 1709,
+      "start_line": 52,
+      "end_line": 54,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1714,
+      "end_char": 1718,
+      "start_line": 54,
+      "end_line": 54,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_var.c",
+      "start_char": 1721,
+      "end_char": 1723,
+      "start_line": 54,
+      "end_line": 54,
+      "cwe": "CWE-416",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_var.c",
+      "start_line": 1,
+      "end_line": 61,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_bmp.c",
+      "start_line": 1,
+      "end_line": 651,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_mpegvideodsp.c",
+      "start_line": 1,
+      "end_line": 122,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_psd.c",
+      "start_line": 1,
+      "end_line": 149,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

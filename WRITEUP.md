@@ -42,7 +42,7 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 | Held-out CWE | 0.92–0.96 | 83–91% | unseen vuln class |
 | **Cross-language (Py→JS)** | **0.907** | **81.9%** | **honest headline** |
 
-Best layer: **17 of 35** (mid-network). **0.907 cross-language** is the honest headline. Ablations: 4-layer ensemble → **0.976** (+0.013); MLP head → 0.919 cross-lang (closes ~30% of gap). The other 70% lives in the representation.
+Best layer: **17 of 35** (mid-network). Honest cross-language headline: **0.907**. Stacked improvements: 4-layer LogReg ensemble → 0.976 random / unchanged cross-lang; MLP head alone → 0.919 cross-lang; **MLP × 4-layer ensemble → 0.940 Py→JS** (+0.033) and 0.978 random. Two improvements compound on the OOD axis.
 
 ![AUC ladder](web/auc-ladder.png)
 

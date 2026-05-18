@@ -1,0 +1,18 @@
+{
+  "n_pairs_kept": 230,
+  "n_per_lang": {
+    "javascript": 95,
+    "python": 135
+  },
+  "probe_auc": 0.9026465028355387,
+  "length_baseline_auc": 0.6143667296786389,
+  "delta": 0.2882797731568998,
+  "py_to_js_probe_auc": 0.8425484764542936,
+  "py_to_js_length_auc": 0.5138504155124654,
+  "py_to_js_delta": 0.3286980609418283,
+  "layer": 17,
+  "n_train_within_matched": 368,
+  "n_test_within_matched": 92,
+  "source_activations": "data/activations_v2/activations_layer17.npz",
+  "source_matched_pairs": "data/pairs_length_matched.jsonl"
+}

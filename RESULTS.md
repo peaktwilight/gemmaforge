@@ -87,6 +87,20 @@ Regex-graded vulnerable-pattern count across the 5 demo prompts in `scripts/eval
 
 The full per-prompt output is in `data/lora_eval.json` and re-summarised in §5 below.
 
+### 1.4b Ensemble of per-layer probes (uniform mean wins)
+
+`data/probe_ensemble.json` — train 4 independent `LogisticRegression(C=1.0)` probes (one per captured layer), evaluate combinations on the same held-out split:
+
+| Method | AUC | ACC | ΔAUC vs L17 |
+|---|---:|---:|---:|
+| single_best_L17 (baseline) | 0.9633 | 0.9208 | (baseline) |
+| **uniform_mean** | **0.9764** | 0.9083 | **+0.0131** |
+| auc_weighted | 0.9764 | 0.9083 | +0.0131 |
+| max | 0.9563 | 0.8583 | −0.0071 |
+| soft_vote | 0.9643 | 0.9042 | +0.0010 |
+
+Layer diversity buys ~1.3 AUC points; clever weighting does nothing (all per-layer probes saturate train-AUC ≈ 1.0 so AUC-weighting collapses to uniform). ACC drops 1.25pp at threshold 0.5 because mean-of-probas shrinks toward 0.5 — recalibration needed before deployment. Saved as `data/probe_ensemble.npz` for the streaming server to optionally load.
+
 ### 1.5 Aggregation tradeoff (last-token vs max-pool)
 
 `data/eval_maxpool_full.json` — full held-out (n=240) re-forwarded through Gemma 4:

@@ -6,8 +6,8 @@
 
 ## Line
 
-> "Cross-language AUC nine-oh-seven. Honest number — train on Python, test on JavaScript."
+> "[caption-in: AUC 0.907 — Python → JavaScript] Cross-language AUC [slow] nine-oh-seven. [beat] Honest number [pause] — train on Python, test on JavaScript."
 
-## Pacing
+## Tone
 
-*Say "nine-oh-seven" as three syllables — not "zero point nine zero seven" or "ninety percent." The point is precision, not magnitude. Half-beat after "Honest number" before the qualifier — that pause is what tells judges this is the OOD number, not the in-distribution one.*
+Say "nine-oh-seven" as three syllables — never "zero point nine zero seven" or "ninety percent." Precision, not magnitude. The half-beat after "Honest number" is the signal to judges that this is OOD, not in-distribution.

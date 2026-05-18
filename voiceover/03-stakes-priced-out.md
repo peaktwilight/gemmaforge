@@ -6,8 +6,8 @@
 
 ## Line
 
-> "The standard answer is to scan in the cloud, after the fact. A lot of devs can't afford it. A lot of orgs can't legally use it."
+> "The standard answer is to scan in the cloud, [pause] after the fact. [beat] A lot of devs can't afford it. [pause] A lot of orgs can't legally use it. [caption-in: Cloud-bound · subscription-gated · runs after the fact. Solo maintainers + air-gapped enterprises priced out.]"
 
-## Pacing
+## Tone
 
-*Three beats — "in the cloud" / "can't afford it" / "can't legally use it" — each gets a small breath. The triplet structure is doing the work; don't rush through it.*
+The triplet structure ("after the fact / can't afford it / can't legally use it") is doing the work — don't rush.

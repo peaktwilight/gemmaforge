@@ -6,8 +6,8 @@
 
 ## Line
 
-> "Full T1 through T5 adversarial suite. Max-pool aggregation flattens the worst attack twenty-two times over."
+> "Full T-one through T-five adversarial suite. [pause] [sparkline-draw] Max-pool aggregation flattens the worst attack [stress] twenty-two times over."
 
-## Pacing
+## Tone
 
-*"T-one through T-five" not "T1 through T5" (letters + numbers don't read on mic). Hit "twenty-two times over" as the close — this is the headline robustness number. Don't trail off.*
+"T-one through T-five" — never "T1 through T5" (letters-plus-digits don't read clean on mic). Hit "twenty-two times over" as the headline; don't trail off.

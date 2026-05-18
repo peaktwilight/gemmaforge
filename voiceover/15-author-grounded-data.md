@@ -6,8 +6,8 @@
 
 ## Line
 
-> "The probe was trained partly on bugs we ourselves found and disclosed. That's why it knows what danger smells like."
+> "The probe was trained partly on bugs we [stress] ourselves found and disclosed. [beat] [badge-land: 200M+ monthly downloads] That's why it knows what danger smells like."
 
-## Pacing
+## Tone
 
-*"Bugs we ourselves found" — emphasis on "ourselves." "Knows what danger smells like" is a confident close; do not over-deliver, let the visual reel of CVE titles do the heavy lifting.*
+"Ourselves" is the stressed word — pride without bragging. The close ("knows what danger smells like") is confident, not boastful — let the visual CVE reel do the heavy lifting.

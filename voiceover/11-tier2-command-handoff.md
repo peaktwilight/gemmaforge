@@ -21,8 +21,8 @@ Right-side caption sticks for all 15s: *"Ollama · /api/chat · native function-
 
 ## Line
 
-> "Two commands. The probe walks the repo and writes the leads. Pwnkit picks them up and drives a local Gemma 4 27B through tool-calls — read files, grep call sites, verify."
+> "[stress] Two commands. [beat — first command finishes typing on screen] The probe walks the repo and writes the leads. [type-in: `pwnkit-cli review repo/ ...`] [pause] Pwnkit picks them up and drives a local Gemma 4 27B through tool-calls — [pause] read files, [pause] grep call sites, [pause] verify."
 
-## Pacing
+## Tone
 
-*This is the dense one — three concrete things in the second half of the line ("read files, grep call sites, verify") and the viewer's eye is also tracking commands on screen. Read deliberately. "Two commands" is the opening hook — pause briefly after it so the first command finishes typing. The list at the end ("read files, grep call sites, verify") gets a small beat between each.*
+Densest line of the video — viewer's eye is also reading commands on screen. Pace yourself with the on-screen typing; don't outrun the keystrokes. The closing list ("read files / grep call sites / verify") gets a small beat between each item.

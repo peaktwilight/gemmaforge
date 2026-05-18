@@ -6,8 +6,8 @@
 
 ## Line
 
-> "And you watch it happen — probe firings on the left, the agent's tool-calls on the right, click any lead and it lights up the matching investigation."
+> "And you watch it happen — [pause] probe firings on the left, the agent's tool-calls on the right. [beat] [cursor-click on top lead] Click any lead [pause] [highlight-hunt-card] and it lights up the matching investigation."
 
-## Pacing
+## Tone
 
-*Pace the read against the on-screen cursor — your "click any lead" should land at the same time as the on-screen mouse-click. If the editor has trouble, this is the scene to tighten by shortening "and it lights up the matching investigation" → "and the agent shows you why."*
+Sync target: "Click any lead" should land *with* the on-screen mouse-click. If editor needs to tighten, shorten the tail to "and the agent shows you why."

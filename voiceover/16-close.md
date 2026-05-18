@@ -16,8 +16,8 @@
 
 ## Line
 
-> "Local. Open. Verifiable."
+> "[slow] [stress] Local. [pause] [stress] Open. [pause] [stress] Verifiable. [hold-1s for room tone]"
 
-## Pacing
+## Tone
 
-*Three words. Hit each one. Don't rush. Eye-line into the camera, not at each other. The editor will sync — record several takes and let the editor pick the tightest synchronisation. Pause after "Verifiable" for at least 1 second of room tone before you stop talking, so the editor has clean tail audio.*
+Three words. Hit each one. Don't rush. Eye-line into the camera, not at each other. Record several takes — editor picks the tightest unison. Leave at least 1 second of room tone after "Verifiable" before you stop talking.

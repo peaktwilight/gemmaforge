@@ -6,8 +6,8 @@
 
 ## Line
 
-> "Two months ago I disclosed a critical bug in `node-forge` — a crypto library used across the JavaScript stack."
+> "[slow] Two months ago I disclosed a critical bug in `node-forge` [pause] [zoom-in on Critical badge] — a crypto library used across the JavaScript stack."
 
-## Pacing
+## Tone
 
-*Lead-in tone is "matter-of-fact, not bragging." Pause briefly after "node-forge" so the badge on screen lands.*
+Matter-of-fact, not bragging. Lead-in is the calmest line of the whole video.

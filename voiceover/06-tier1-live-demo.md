@@ -6,8 +6,8 @@
 
 ## Line
 
-> "Every token Gemma generates, the probe reads its hidden state and emits a risk score. Sub-millisecond overhead. On a laptop."
+> "Every token Gemma generates, [pause] the probe reads its hidden state and emits a risk score. [beat] [stress] Sub-millisecond overhead. [beat] [red-cluster-flare on ${req.params.id}] [stress] On a laptop."
 
-## Pacing
+## Tone
 
-*Three sentences, three beats. The last two ("Sub-millisecond overhead." / "On a laptop.") should each land hard — short, definitive, almost like punctuation marks on the screen-recording. Slow the read between sentences 2 and 3 so "on a laptop" coincides with the red cluster flaring on screen.*
+Last two sentences land hard — short, definitive, almost punctuation marks on the screen-recording. The "on a laptop" beat should coincide with the red flare in the streaming demo.

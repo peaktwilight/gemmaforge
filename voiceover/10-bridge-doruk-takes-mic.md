@@ -6,8 +6,8 @@
 
 ## Line
 
-> "The probe tells you *where* to look. But you still want to *prove* it. That's where the bigger Gemma comes in."
+> "The probe tells you [stress] where to look. [beat] But you still want to [stress] prove it. [pause] That's where the bigger Gemma comes in."
 
-## Pacing
+## Tone
 
-*Italicised words ("where" / "prove") get a small lift in stress — that's the rhetorical lever. Beat of silence between sentence 1 and 2 so "but you still want to prove it" lands as a counterpoint. Eye-line into the lens.*
+Eye-line into the lens — this is the rhetorical pivot of the whole video. The beat between sentence 1 and 2 is what makes "prove it" land as a counterpoint, not a continuation.

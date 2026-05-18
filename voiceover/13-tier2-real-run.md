@@ -18,8 +18,8 @@ Top caption: *"6 leads → 6 attacks · ~5 minutes · local · zero network. Rea
 
 ## Line
 
-> "This isn't a render. Six seeded leads, six investigations, five minutes of local Gemma 4 inference. Nothing left the machine."
+> "[flat] This isn't a render. [beat] [yellow-highlight: loaded 6 seed lead(s)] Six seeded leads, [pause] [yellow-highlight: totalAttacks: 6] six investigations, [pause] [yellow-highlight: durationMs: 289969] five minutes of local Gemma 4 inference. [beat] [stress] Nothing left the machine."
 
-## Pacing
+## Tone
 
-*Open with "This isn't a render" as a flat, almost defensive statement — it's the line that converts the demo from "looks cool" to "is real." Numbers as words: "Six seeded leads, six investigations, five minutes." Land "Nothing left the machine" hard.*
+"This isn't a render" delivered flat, almost defensive — it's the line that converts the demo from "looks cool" to "is real." Numbers as words: *six*, *six*, *five*. Land "Nothing left the machine" hard.

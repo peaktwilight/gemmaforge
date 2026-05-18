@@ -6,8 +6,8 @@
 
 ## Line
 
-> "An AI assistant could have written that exact pattern this morning. Nobody would have caught it before it shipped."
+> "An AI assistant could have written that exact pattern [stress] this morning. [caption-in: AI tools now ship ~100M lines of code per day. Almost none of it is audited before it ships.] [beat] Nobody would have caught it before it shipped."
 
-## Pacing
+## Tone
 
-*Slight stress on "this morning" — the now-ness of the threat is the point. Land "before it shipped" cleanly; don't trail off.*
+Don't trail off on "before it shipped" — land it clean as a closing beat.

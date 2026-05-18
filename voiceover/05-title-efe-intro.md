@@ -6,8 +6,8 @@
 
 ## Line
 
-> "We trained a fifteen-hundred-weight linear probe on Gemma 4's hidden states. It tells you which tokens the model is about to write look like the inside of a known CVE."
+> "[caption-in: GemmaForge — Small Gemma finds. Big Gemma hunts.] We trained a fifteen-hundred-weight linear probe on Gemma 4's hidden states [pause] — it tells you which tokens the model is about to write [pause] look like the inside of a [stress] known CVE."
 
-## Pacing
+## Tone
 
-*Eye-line into the lens, not the monitor. The two sentences should feel like one breath; tiny micro-pause after "hidden states" but no full stop in the read. "Fifteen-hundred-weight" — say it as "fifteen-hundred-weight," not "1,536-weight" (numerals don't read on mic).*
+Eye-line into the lens, not the monitor. Two sentences should feel like one breath — no full stop in the read at the dash. Say "fifteen-hundred-weight" as words, never "1,536".

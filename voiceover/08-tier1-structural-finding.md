@@ -6,8 +6,8 @@
 
 ## Line
 
-> "When we re-trained on the bigger Gemma, the best layer moved from mid-network down into the bottom quarter. Bigger models know what's risky sooner."
+> "When we re-trained on the bigger Gemma, [pause] [arrow-drop L17→L10] the best layer moved from [slow] mid-network down into the [stress] bottom quarter. [beat] Bigger models know what's risky [stress] sooner."
 
-## Pacing
+## Tone
 
-*"Mid-network" / "bottom quarter" are the words the diagram is referencing — say them slowly enough that the viewer's eye can ping-pong between left and right column. The second sentence is the takeaway; deliver it as a confident statement, not a hedge.*
+"Mid-network" / "bottom quarter" should be said slowly enough that the viewer can ping-pong between the two columns on screen. The second sentence is the takeaway — deliver it as a confident statement, not a hedge.

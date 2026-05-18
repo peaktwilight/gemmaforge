@@ -8,7 +8,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.19.1
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -63,10 +63,7 @@ INSTALL_TRANSFORMERS_FROM_GIT = False
 # %% [markdown]
 # ## Install
 #
-# Installs `torch`, `torchvision`, and `torchaudio` from the same PyTorch
-# nightly CUDA 12.1 wheel index so compiled torchvision ops match torch. If
-# torch or torchvision were already imported in this runtime, restart Colab
-# once after this cell finishes, then rerun from the top.
+# Installs `torch`, `torchvision`, and `torchaudio` from the same PyTorch nightly CUDA 13.0 wheel index so compiled torchvision ops match torch. If torch or torchvision were already imported in this runtime, restart Colab once after this cell finishes, then rerun from the top.
 
 # %%
 import importlib
@@ -81,7 +78,7 @@ def run(cmd, cwd=None, env=None, display_cmd=None):
     return subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
 
-PYTORCH_INDEX_URL = "https://download.pytorch.org/whl/nightly/cu121"
+PYTORCH_INDEX_URL = "https://download.pytorch.org/whl/nightly/cu128"
 torch_stack_already_loaded = any(
     name == "torch" or name.startswith(("torch.", "torchvision", "torchaudio"))
     for name in sys.modules

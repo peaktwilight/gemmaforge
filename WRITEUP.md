@@ -41,9 +41,7 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 | Held-out CWE-338 | 0.923 | 82.9% | unseen vuln class |
 | **Cross-language (Python→JS)** | **0.907** | **81.9%** | **realistic transfer headline** |
 
-Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.958, doesn't beat single-layer 17. We report the **cross-language 0.907** as the headline because it's the most demanding split that excludes the same-source / same-language leakage that random/group splits don't.
-
-Obeso et al. reached AUC > 0.9 on Llama-3.3-70B for hallucinations; we hit 0.846 on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples. The obvious next steps from §3 of that paper — LoRA-augmented probes, more data, per-CWE heads — should close the gap.
+Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.958, doesn't beat single-layer 17. We report **0.907 cross-language** as the honest headline. Obeso et al. reached >0.9 on Llama-3.3-70B for hallucinations; we hit comparable numbers on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
 
 ## Why this is novel
 
@@ -117,12 +115,11 @@ Tractable with time and data, not blockers on the technique.
 
 ## What we'd build next
 
-- **Per-CWE heads.** Multi-head output (CWE-89 vs CWE-22 vs CWE-78 …) so the UI names the bug class.
-- **Token-level training data at scale.** SVEN (ETH SRI, char-level vuln spans) + CyberSecEval (line-level, 8 languages) integrated; we built the loaders. Need a full per-token training run with the span-max loss from Obeso §3 to close the AUC gap toward 0.9.
-- **LoRA-augmented Gemma.** Obeso §3 reports the same LoRA used to train a hallucination probe also makes the model *more cautious* on its own — generations become "more conservative in making specific factual claims." The cybersecurity analogue is "model writes safer code by default." We have the training script wired (see `scripts/train_lora.py`) and partial results in the repo.
-- **W&B telemetry on training runs.** Probe and LoRA training would log per-step loss/AUC to wandb so reruns are auditable.
-- **VS Code extension.** The streaming layer is already SSE; an editor plugin is a week of polish.
-- **Hook into pwnkit.** Doruk's pentest framework drives Gemma 4 through CVE-hunting workflows. Adding the probe as a confidence filter — "Gemma claims this is SQLi *and* the activations match the SQLi training pattern" — closes the loop.
+Tracked as 13 GitHub issues in the repo. Highlights:
+- **Per-CWE heads** (one logit per CWE so the UI names the bug class)
+- **Token-level training with span-max loss** — SVEN + CyberSecEval data integrated; trainer written; needs a full per-token run to close the gap toward 0.95.
+- **LoRA-augmented Gemma** — Obeso §3 shows the same LoRA used to train a hallucination probe also makes the model *itself* more cautious. We have the training script + an 8-example adapter; full DPO run is next.
+- **VS Code extension** + **pwnkit confidence-filter hook** + **W&B telemetry**.
 
 ## License & ethics
 

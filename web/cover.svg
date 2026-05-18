@@ -1,55 +1,175 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="GemmaForge cover">
   <defs>
+    <linearGradient id="bgGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0c1218"/>
+      <stop offset="60%" stop-color="#080b10"/>
+      <stop offset="100%" stop-color="#05070a"/>
+    </linearGradient>
+    <radialGradient id="redHalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#e74c3c" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#e74c3c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cfd6df"/>
+    </linearGradient>
     <linearGradient id="risk" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#2ecc71"/>
       <stop offset="50%" stop-color="#f4d03f"/>
       <stop offset="100%" stop-color="#e74c3c"/>
     </linearGradient>
-    <linearGradient id="bgGlow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0c1218"/>
-      <stop offset="100%" stop-color="#07090c"/>
-    </linearGradient>
-    <linearGradient id="wordmark" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#cfd6df"/>
-    </linearGradient>
     <style>
       .sans { font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
       .mono { font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace; }
-      .wordmark { font-weight: 600; letter-spacing: -2px; }
+      .wordmark { font-weight: 600; letter-spacing: -2.5px; }
       .tagline { font-weight: 400; letter-spacing: -0.2px; }
-      .label { font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+      .label { font-weight: 500; letter-spacing: 2.4px; text-transform: uppercase; }
       .footer { font-weight: 400; letter-spacing: 0.2px; }
+      .tok { font-weight: 500; }
+      .kpi-num { font-weight: 600; }
+      .kpi-lbl { font-weight: 400; letter-spacing: 0.3px; }
     </style>
   </defs>
 
+  <!-- background -->
   <rect width="1200" height="630" fill="url(#bgGlow)"/>
 
-  <g opacity="0.06" stroke="#7a8694" stroke-width="1">
+  <!-- subtle red halo behind the vulnerable cluster -->
+  <ellipse cx="900" cy="345" rx="260" ry="120" fill="url(#redHalo)"/>
+
+  <!-- top + bottom hairlines -->
+  <g opacity="0.08" stroke="#7a8694" stroke-width="1">
     <line x1="0" y1="120" x2="1200" y2="120"/>
     <line x1="0" y1="510" x2="1200" y2="510"/>
   </g>
 
+  <!-- WORDMARK + tagline -->
   <g transform="translate(96, 150)">
-    <text class="sans label" x="0" y="0" fill="#6b7785" font-size="14">Gemma 4 Good Hackathon</text>
-
-    <text class="sans wordmark" x="0" y="120" fill="url(#wordmark)" font-size="124">GemmaForge</text>
-
-    <text class="sans tagline" x="0" y="200" fill="#aab3bf" font-size="30">Real-time vulnerability detection inside Gemma 4</text>
+    <text class="sans label" x="0" y="0" fill="#6b7785" font-size="13">Gemma 4 Good Hackathon  ·  Main / Safety &amp; Trust / Ollama</text>
+    <text class="sans wordmark" x="0" y="98" fill="url(#wordmark)" font-size="112">GemmaForge</text>
+    <text class="sans tagline" x="0" y="146" fill="#aab3bf" font-size="26">Real-time vulnerability detection inside Gemma 4</text>
   </g>
 
-  <g transform="translate(96, 430)">
-    <text class="sans label" x="0" y="0" fill="#6b7785" font-size="12">Probe risk</text>
-    <rect x="0" y="14" width="1008" height="10" rx="5" fill="#11161d"/>
-    <rect x="0" y="14" width="1008" height="10" rx="5" fill="url(#risk)"/>
-    <g class="mono" fill="#6b7785" font-size="11">
-      <text x="0" y="48">safe</text>
-      <text x="500" y="48" text-anchor="middle">suspicious</text>
-      <text x="1008" y="48" text-anchor="end">vulnerable</text>
+  <!-- TOKEN STREAM -->
+  <!-- Caret indicator + label above the stream -->
+  <g transform="translate(96, 320)">
+    <text class="sans label" x="0" y="0" fill="#6b7785" font-size="11">Probe stream  ·  layer 17  ·  per-token risk</text>
+  </g>
+
+  <!--
+    Each token = rounded rect + monospace glyphs.
+    Green tokens (safe): #1d3a2a fill, #2ecc71 text
+    Yellow tokens (suspicious): #3a341a fill, #f4d03f text
+    Red tokens (vulnerable): #3a1d1d fill, #ff6b5a text
+  -->
+  <g transform="translate(96, 340)" class="mono tok" font-size="22">
+    <!-- token 1: const -->
+    <g transform="translate(0,0)">
+      <rect width="80" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="40" y="26" text-anchor="middle" fill="#2ecc71">const</text>
+    </g>
+    <!-- token 2: q -->
+    <g transform="translate(88,0)">
+      <rect width="36" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="18" y="26" text-anchor="middle" fill="#2ecc71">q</text>
+    </g>
+    <!-- token 3: = -->
+    <g transform="translate(132,0)">
+      <rect width="36" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="18" y="26" text-anchor="middle" fill="#2ecc71">=</text>
+    </g>
+    <!-- token 4: `SELECT -->
+    <g transform="translate(176,0)">
+      <rect width="110" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="55" y="26" text-anchor="middle" fill="#2ecc71">`SELECT</text>
+    </g>
+    <!-- token 5: * -->
+    <g transform="translate(294,0)">
+      <rect width="36" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="18" y="26" text-anchor="middle" fill="#2ecc71">*</text>
+    </g>
+    <!-- token 6: FROM -->
+    <g transform="translate(338,0)">
+      <rect width="80" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="40" y="26" text-anchor="middle" fill="#2ecc71">FROM</text>
+    </g>
+    <!-- token 7: users -->
+    <g transform="translate(426,0)">
+      <rect width="80" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="40" y="26" text-anchor="middle" fill="#2ecc71">users</text>
+    </g>
+    <!-- token 8: WHERE -->
+    <g transform="translate(514,0)">
+      <rect width="90" height="40" rx="6" fill="#1d3a2a" stroke="#234534" stroke-width="1"/>
+      <text x="45" y="26" text-anchor="middle" fill="#2ecc71">WHERE</text>
+    </g>
+    <!-- token 9: id (yellow, suspicious) -->
+    <g transform="translate(612,0)">
+      <rect width="44" height="40" rx="6" fill="#3a341a" stroke="#4a4220" stroke-width="1"/>
+      <text x="22" y="26" text-anchor="middle" fill="#f4d03f">id</text>
+    </g>
+    <!-- token 10: = (yellow) -->
+    <g transform="translate(664,0)">
+      <rect width="36" height="40" rx="6" fill="#3a341a" stroke="#4a4220" stroke-width="1"/>
+      <text x="18" y="26" text-anchor="middle" fill="#f4d03f">=</text>
+    </g>
+    <!-- token 11: ${ (red, start of vulnerable cluster) -->
+    <g transform="translate(708,0)">
+      <rect width="44" height="40" rx="6" fill="#3a1d1d" stroke="#5a2a2a" stroke-width="1"/>
+      <text x="22" y="26" text-anchor="middle" fill="#ff6b5a">${</text>
+    </g>
+    <!-- token 12: req (red) -->
+    <g transform="translate(760,0)">
+      <rect width="60" height="40" rx="6" fill="#3a1d1d" stroke="#5a2a2a" stroke-width="1"/>
+      <text x="30" y="26" text-anchor="middle" fill="#ff6b5a">req</text>
+    </g>
+    <!-- token 13: .params (red) -->
+    <g transform="translate(828,0)">
+      <rect width="100" height="40" rx="6" fill="#3a1d1d" stroke="#5a2a2a" stroke-width="1"/>
+      <text x="50" y="26" text-anchor="middle" fill="#ff6b5a">.params</text>
+    </g>
+    <!-- token 14: .id (red) -->
+    <g transform="translate(936,0)">
+      <rect width="50" height="40" rx="6" fill="#3a1d1d" stroke="#5a2a2a" stroke-width="1"/>
+      <text x="25" y="26" text-anchor="middle" fill="#ff6b5a">.id</text>
+    </g>
+    <!-- token 15: }` (red) -->
+    <g transform="translate(994,0)">
+      <rect width="44" height="40" rx="6" fill="#3a1d1d" stroke="#5a2a2a" stroke-width="1"/>
+      <text x="22" y="26" text-anchor="middle" fill="#ff6b5a">}`</text>
     </g>
   </g>
 
-  <g transform="translate(96, 560)">
+  <!-- risk-band underline below the stream, mirrors the per-token gradient -->
+  <g transform="translate(96, 396)">
+    <rect x="0" y="0" width="1038" height="3" rx="1.5" fill="url(#risk)" opacity="0.55"/>
+  </g>
+
+  <!-- caret + annotation: marks the moment the probe fires -->
+  <g transform="translate(708, 388)">
+    <path d="M 0 0 L 8 -8 L 16 0 Z" fill="#ff6b5a" opacity="0.95"/>
+    <text class="sans" x="8" y="20" text-anchor="middle" fill="#ff6b5a" font-size="11" font-weight="500" letter-spacing="0.6">probe fires</text>
+  </g>
+
+  <!-- BOTTOM LEFT: authors / license -->
+  <g transform="translate(96, 575)">
     <text class="sans footer" x="0" y="0" fill="#5b6470" font-size="14">Doruk Tan Ozturk  ·  Mehmet Efe Akça  ·  Apache-2.0</text>
+  </g>
+
+  <!-- BOTTOM RIGHT: three KPIs -->
+  <g transform="translate(1104, 552)" text-anchor="end">
+    <!-- KPI 1 -->
+    <text class="sans kpi-num" x="0" y="0" fill="#e6ebf2" font-size="18">AUC 0.907</text>
+    <text class="sans kpi-lbl" x="0" y="16" fill="#6b7785" font-size="11">cross-language (Py to JS)</text>
+    <!-- separator -->
+    <line x1="-220" y1="-10" x2="-220" y2="14" stroke="#2a313b" stroke-width="1"/>
+    <!-- KPI 2 -->
+    <text class="sans kpi-num" x="-240" y="0" fill="#e6ebf2" font-size="18">AUC 0.9726</text>
+    <text class="sans kpi-lbl" x="-240" y="16" fill="#6b7785" font-size="11">per-CWE macro (5 heads)</text>
+    <!-- separator -->
+    <line x1="-470" y1="-10" x2="-470" y2="14" stroke="#2a313b" stroke-width="1"/>
+    <!-- KPI 3 -->
+    <text class="sans kpi-num" x="-490" y="0" fill="#e6ebf2" font-size="18">1k+ pairs</text>
+    <text class="sans kpi-lbl" x="-490" y="16" fill="#6b7785" font-size="11">CVE-derived training set</text>
   </g>
 </svg>

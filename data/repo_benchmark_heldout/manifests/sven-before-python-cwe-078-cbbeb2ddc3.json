@@ -1,0 +1,119 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-cbbeb2ddc3",
+  "repo_path": "repos/sven-before-python-cwe-078-cbbeb2ddc3",
+  "source": "dataset_microrepo",
+  "source_row": 255,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/storwize_svc.py::terminate_connection",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_storwize_svc.py",
+      "role": "vulnerable",
+      "source_row": 255,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_storwize_svc.py",
+      "role": "fixed_counterpart",
+      "source_row": 6,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_checkandpostforseriessubmissions.py",
+      "role": "safe_decoy",
+      "source_row": 194,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_dbopts.py",
+      "role": "safe_decoy",
+      "source_row": 222,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_routing.py",
+      "role": "safe_decoy",
+      "source_row": 164,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_storwize_svc.py",
+      "start_char": 1329,
+      "end_char": 1330,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_storwize_svc.py",
+      "start_char": 1332,
+      "end_char": 1340,
+      "start_line": 27,
+      "end_line": 27,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_storwize_svc.py",
+      "start_char": 1356,
+      "end_char": 1367,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_storwize_svc.py",
+      "start_char": 1376,
+      "end_char": 1377,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 46,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_checkandpostforseriessubmissions.py",
+      "start_line": 1,
+      "end_line": 5,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_dbopts.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_routing.py",
+      "start_line": 1,
+      "end_line": 33,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

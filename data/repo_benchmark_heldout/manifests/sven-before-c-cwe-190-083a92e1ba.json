@@ -1,0 +1,469 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-c-cwe-190-083a92e1ba",
+  "repo_path": "repos/sven-before-c-cwe-190-083a92e1ba",
+  "source": "dataset_microrepo",
+  "source_row": 87,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/index.c::read_entry",
+  "language": "c",
+  "cwe": "CWE-190",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_index.c",
+      "role": "vulnerable",
+      "source_row": 87,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_index.c",
+      "role": "fixed_counterpart",
+      "source_row": 227,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_tls_openssl.c",
+      "role": "safe_decoy",
+      "source_row": 209,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_core.c",
+      "role": "safe_decoy",
+      "source_row": 86,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_box_code_base.c",
+      "role": "safe_decoy",
+      "source_row": 46,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_index.c",
+      "start_char": 2027,
+      "end_char": 2028,
+      "start_line": 68,
+      "end_line": 68,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2029,
+      "end_char": 2031,
+      "start_line": 68,
+      "end_line": 68,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2096,
+      "end_char": 2107,
+      "start_line": 68,
+      "end_line": 69,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2124,
+      "end_char": 2131,
+      "start_line": 70,
+      "end_line": 70,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2158,
+      "end_char": 2159,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2160,
+      "end_char": 2164,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2165,
+      "end_char": 2166,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2167,
+      "end_char": 2169,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2170,
+      "end_char": 2171,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2187,
+      "end_char": 2188,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2198,
+      "end_char": 2199,
+      "start_line": 71,
+      "end_line": 71,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2202,
+      "end_char": 2205,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2206,
+      "end_char": 2207,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2209,
+      "end_char": 2213,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2218,
+      "end_char": 2219,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2220,
+      "end_char": 2221,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2222,
+      "end_char": 2225,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2228,
+      "end_char": 2231,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2233,
+      "end_char": 2234,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2235,
+      "end_char": 2236,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2238,
+      "end_char": 2239,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2240,
+      "end_char": 2241,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2242,
+      "end_char": 2245,
+      "start_line": 72,
+      "end_line": 72,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2250,
+      "end_char": 2255,
+      "start_line": 72,
+      "end_line": 73,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2257,
+      "end_char": 2262,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2263,
+      "end_char": 2266,
+      "start_line": 73,
+      "end_line": 73,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2272,
+      "end_char": 2273,
+      "start_line": 74,
+      "end_line": 74,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2275,
+      "end_char": 2276,
+      "start_line": 75,
+      "end_line": 75,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2277,
+      "end_char": 2282,
+      "start_line": 75,
+      "end_line": 75,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2283,
+      "end_char": 2285,
+      "start_line": 75,
+      "end_line": 75,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2291,
+      "end_char": 2292,
+      "start_line": 75,
+      "end_line": 75,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2293,
+      "end_char": 2299,
+      "start_line": 75,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2302,
+      "end_char": 2311,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2312,
+      "end_char": 2314,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2315,
+      "end_char": 2320,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2322,
+      "end_char": 2327,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2329,
+      "end_char": 2335,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2336,
+      "end_char": 2344,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_index.c",
+      "start_char": 2347,
+      "end_char": 2351,
+      "start_line": 76,
+      "end_line": 76,
+      "cwe": "CWE-190",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_index.c",
+      "start_line": 1,
+      "end_line": 104,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_tls_openssl.c",
+      "start_line": 1,
+      "end_line": 119,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_core.c",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_box_code_base.c",
+      "start_line": 1,
+      "end_line": 78,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

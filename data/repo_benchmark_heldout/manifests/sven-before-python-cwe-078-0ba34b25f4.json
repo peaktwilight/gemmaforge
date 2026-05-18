@@ -1,0 +1,239 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-0ba34b25f4",
+  "repo_path": "repos/sven-before-python-cwe-078-0ba34b25f4",
+  "source": "dataset_microrepo",
+  "source_row": 157,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::repack_rust.py::repack",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_repack_rust.py",
+      "role": "vulnerable",
+      "source_row": 157,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_repack_rust.py",
+      "role": "fixed_counterpart",
+      "source_row": 93,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_server.py",
+      "role": "safe_decoy",
+      "source_row": 193,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_database.py",
+      "role": "safe_decoy",
+      "source_row": 219,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_app.py",
+      "role": "safe_decoy",
+      "source_row": 59,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1166,
+      "end_char": 1170,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1171,
+      "end_char": 1172,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1180,
+      "end_char": 1183,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1184,
+      "end_char": 1186,
+      "start_line": 28,
+      "end_line": 28,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1426,
+      "end_char": 1427,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1428,
+      "end_char": 1429,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1430,
+      "end_char": 1431,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1432,
+      "end_char": 1433,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1434,
+      "end_char": 1435,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1444,
+      "end_char": 1460,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1462,
+      "end_char": 1465,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1490,
+      "end_char": 1491,
+      "start_line": 34,
+      "end_line": 34,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1498,
+      "end_char": 1502,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1503,
+      "end_char": 1504,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1512,
+      "end_char": 1515,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_repack_rust.py",
+      "start_char": 1516,
+      "end_char": 1518,
+      "start_line": 35,
+      "end_line": 35,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_repack_rust.py",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_server.py",
+      "start_line": 1,
+      "end_line": 25,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_database.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_app.py",
+      "start_line": 1,
+      "end_line": 16,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

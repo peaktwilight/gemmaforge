@@ -1,0 +1,139 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-089-24555ae64a",
+  "repo_path": "repos/sven-before-python-cwe-089-24555ae64a",
+  "source": "dataset_microrepo",
+  "source_row": 69,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::playlist/playlist_repository.py::update_playlist",
+  "language": "python",
+  "cwe": "CWE-089",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_playlist_repository.py",
+      "role": "vulnerable",
+      "source_row": 69,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_playlist_repository.py",
+      "role": "fixed_counterpart",
+      "source_row": 5,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_routing.py",
+      "role": "safe_decoy",
+      "source_row": 164,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_qutescheme.py",
+      "role": "safe_decoy",
+      "source_row": 107,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_forumdb.py",
+      "role": "safe_decoy",
+      "source_row": 51,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 50,
+      "end_char": 59,
+      "start_line": 2,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 85,
+      "end_char": 93,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 103,
+      "end_char": 107,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 109,
+      "end_char": 116,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 121,
+      "end_char": 126,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_playlist_repository.py",
+      "start_char": 130,
+      "end_char": 133,
+      "start_line": 3,
+      "end_line": 3,
+      "cwe": "CWE-089",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_playlist_repository.py",
+      "start_line": 1,
+      "end_line": 2,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_routing.py",
+      "start_line": 1,
+      "end_line": 33,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_qutescheme.py",
+      "start_line": 1,
+      "end_line": 20,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_forumdb.py",
+      "start_line": 1,
+      "end_line": 8,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

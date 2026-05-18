@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-d97d164ca0",
+  "repo_path": "repos/sven-before-python-cwe-079-d97d164ca0",
+  "source": "dataset_microrepo",
+  "source_row": 10,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::askbot/views/commands.py::subscribe_for_tags",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_commands.py",
+      "role": "vulnerable",
+      "source_row": 10,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_commands.py",
+      "role": "fixed_counterpart",
+      "source_row": 159,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_helpers.py",
+      "role": "safe_decoy",
+      "source_row": 115,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_post.py",
+      "role": "safe_decoy",
+      "source_row": 72,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_chippyruxpin.py",
+      "role": "safe_decoy",
+      "source_row": 78,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_commands.py",
+      "start_char": 905,
+      "end_char": 984,
+      "start_line": 22,
+      "end_line": 22,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_commands.py",
+      "start_line": 1,
+      "end_line": 34,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_helpers.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_post.py",
+      "start_line": 1,
+      "end_line": 6,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_chippyruxpin.py",
+      "start_line": 1,
+      "end_line": 15,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

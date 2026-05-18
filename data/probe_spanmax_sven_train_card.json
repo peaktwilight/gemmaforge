@@ -1,0 +1,31 @@
+{
+  "loss": "span-max (Obeso, Arditi et al. 2025)",
+  "best_layer": 26,
+  "best_token_auc": 0.7598689508419966,
+  "best_example_auc": 0.6691803278688524,
+  "all_layers": [
+    {
+      "layer": 8,
+      "token_auc": 0.7155644974786634,
+      "example_auc": 0.6508196721311477
+    },
+    {
+      "layer": 17,
+      "token_auc": 0.7644640097960357,
+      "example_auc": 0.5642622950819672
+    },
+    {
+      "layer": 26,
+      "token_auc": 0.7598689508419966,
+      "example_auc": 0.6691803278688524
+    },
+    {
+      "layer": 34,
+      "token_auc": 0.7276661419448521,
+      "example_auc": 0.6409836065573771
+    }
+  ],
+  "split": "80% of pair_group_keys (sven_split_meta.json seed=42); 20% groups held out",
+  "n_train_examples": 1102,
+  "dataset": "dataset.jsonl (SVEN-before + SVEN-after), filtered to train groups"
+}

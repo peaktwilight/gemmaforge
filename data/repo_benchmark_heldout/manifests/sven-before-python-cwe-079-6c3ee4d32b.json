@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-079-6c3ee4d32b",
+  "repo_path": "repos/sven-before-python-cwe-079-6c3ee4d32b",
+  "source": "dataset_microrepo",
+  "source_row": 181,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::ajenti/routing.py::respond_error",
+  "language": "python",
+  "cwe": "CWE-079",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_routing.py",
+      "role": "vulnerable",
+      "source_row": 181,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_routing.py",
+      "role": "fixed_counterpart",
+      "source_row": 164,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_zmsitem.py",
+      "role": "safe_decoy",
+      "source_row": 146,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_shutil.py",
+      "role": "safe_decoy",
+      "source_row": 55,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_repack_rust.py",
+      "role": "safe_decoy",
+      "source_row": 93,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_routing.py",
+      "start_char": 871,
+      "end_char": 890,
+      "start_line": 33,
+      "end_line": 33,
+      "cwe": "CWE-079",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_routing.py",
+      "start_line": 1,
+      "end_line": 33,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_zmsitem.py",
+      "start_line": 1,
+      "end_line": 32,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_shutil.py",
+      "start_line": 1,
+      "end_line": 21,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_repack_rust.py",
+      "start_line": 1,
+      "end_line": 36,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

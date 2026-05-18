@@ -1,0 +1,7 @@
+# sven-before-cpp-cwe-079-c7d9684292
+
+Synthetic repo-level fixture generated from token-labelled examples.
+CWE: CWE-079
+Language: cpp
+
+Ground-truth traces live in the adjacent manifest JSON.

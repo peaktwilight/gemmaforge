@@ -1,0 +1,89 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-d0c64e4ae7",
+  "repo_path": "repos/sven-before-python-cwe-078-d0c64e4ae7",
+  "source": "dataset_microrepo",
+  "source_row": 170,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::cinder/volume/drivers/storwize_svc.py::_get_host_from_connector",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_storwize_svc.py",
+      "role": "vulnerable",
+      "source_row": 170,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_storwize_svc.py",
+      "role": "fixed_counterpart",
+      "source_row": 65,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_endpoints.py",
+      "role": "safe_decoy",
+      "source_row": 4,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_storwize_svc.py",
+      "role": "safe_decoy",
+      "source_row": 37,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_process_data.py",
+      "role": "safe_decoy",
+      "source_row": 226,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_storwize_svc.py",
+      "start_char": 421,
+      "end_char": 465,
+      "start_line": 13,
+      "end_line": 13,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 40,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_endpoints.py",
+      "start_line": 1,
+      "end_line": 13,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_storwize_svc.py",
+      "start_line": 1,
+      "end_line": 58,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_process_data.py",
+      "start_line": 1,
+      "end_line": 67,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

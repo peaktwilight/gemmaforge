@@ -1,0 +1,169 @@
+{
+  "schema": "gemmaforge.repo_benchmark/v1",
+  "repo_id": "sven-before-python-cwe-078-6541f5e5f4",
+  "repo_path": "repos/sven-before-python-cwe-078-6541f5e5f4",
+  "source": "dataset_microrepo",
+  "source_row": 129,
+  "source_dataset": "SVEN-before",
+  "pair_group": "func::src/backend/api/utils/rclone_connection.py::_formatCredentials",
+  "language": "python",
+  "cwe": "CWE-078",
+  "label_confidence": "diff_oracle",
+  "files": [
+    {
+      "path": "src/00_rclone_connection.py",
+      "role": "vulnerable",
+      "source_row": 129,
+      "label": 1
+    },
+    {
+      "path": "fixed/00_rclone_connection.py",
+      "role": "fixed_counterpart",
+      "source_row": 198,
+      "label": 0
+    },
+    {
+      "path": "decoys/01_tech_track.py",
+      "role": "safe_decoy",
+      "source_row": 207,
+      "label": 0
+    },
+    {
+      "path": "decoys/02_hp_3par_common.py",
+      "role": "safe_decoy",
+      "source_row": 156,
+      "label": 0
+    },
+    {
+      "path": "decoys/03_sql_manager.py",
+      "role": "safe_decoy",
+      "source_row": 22,
+      "label": 0
+    }
+  ],
+  "vulnerability_traces": [
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 305,
+      "end_char": 307,
+      "start_line": 11,
+      "end_line": 11,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 327,
+      "end_char": 332,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 339,
+      "end_char": 340,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 341,
+      "end_char": 346,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 360,
+      "end_char": 361,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 371,
+      "end_char": 372,
+      "start_line": 12,
+      "end_line": 12,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 545,
+      "end_char": 567,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 574,
+      "end_char": 575,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    },
+    {
+      "file": "src/00_rclone_connection.py",
+      "start_char": 581,
+      "end_char": 582,
+      "start_line": 17,
+      "end_line": 17,
+      "cwe": "CWE-078",
+      "role": "evidence",
+      "label_source": "diff_oracle"
+    }
+  ],
+  "negative_regions": [
+    {
+      "file": "fixed/00_rclone_connection.py",
+      "start_line": 1,
+      "end_line": 97,
+      "role": "fixed_counterpart"
+    },
+    {
+      "file": "decoys/01_tech_track.py",
+      "start_line": 1,
+      "end_line": 17,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/02_hp_3par_common.py",
+      "start_line": 1,
+      "end_line": 10,
+      "role": "safe_decoy"
+    },
+    {
+      "file": "decoys/03_sql_manager.py",
+      "start_line": 1,
+      "end_line": 12,
+      "role": "safe_decoy"
+    }
+  ],
+  "functional_tests": [],
+  "security_oracles": [
+    {
+      "kind": "diff_trace",
+      "description": "Trace comes from token_labels.evidence/vulnerable_line in the source row."
+    }
+  ]
+}

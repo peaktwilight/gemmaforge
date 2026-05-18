@@ -39,6 +39,20 @@ def _load_probe(probe_path: Path) -> tuple[np.ndarray, float, int]:
     return npz["w"].astype(np.float32), float(npz["b"]), int(npz["layer"])
 
 
+def _load_per_cwe_probe(probe_path: Path) -> tuple[np.ndarray, np.ndarray, list[str], int]:
+    """Load the multi-head per-CWE probe.
+
+    Returns (W, b, cwes, layer) where W has shape (n_heads, hidden_dim),
+    b has shape (n_heads,), and cwes is a list of CWE labels (one per head).
+    """
+    npz = np.load(probe_path, allow_pickle=False)
+    W = npz["W"].astype(np.float32)
+    b = npz["b"].astype(np.float32)
+    cwes = [str(c) for c in npz["cwes"].tolist()]
+    layer = int(npz["layer"])
+    return W, b, cwes, layer
+
+
 def _sigmoid(x: float) -> float:
     if x >= 0:
         return 1.0 / (1.0 + float(np.exp(-x)))
@@ -75,10 +89,22 @@ def stream(
     prompt: str,
     max_new_tokens: int = 200,
     temperature: float = 0.7,
+    per_cwe_probe_path: Path | None = None,
 ) -> Iterator[dict]:
     model, tokenizer, device = _ensure_model(model_id)
     w, b, layer = _load_probe(probe_path)
     print(f"[stream] probe layer={layer} dim={len(w)} b={b:.3f}", file=sys.stderr)
+
+    pc_W: np.ndarray | None = None
+    pc_b: np.ndarray | None = None
+    pc_cwes: list[str] = []
+    pc_layer: int = layer
+    if per_cwe_probe_path is not None:
+        pc_W, pc_b, pc_cwes, pc_layer = _load_per_cwe_probe(per_cwe_probe_path)
+        print(
+            f"[stream] per-cwe probe layer={pc_layer} heads={len(pc_cwes)} cwes={pc_cwes}",
+            file=sys.stderr,
+        )
 
     try:
         messages = [{"role": "user", "content": prompt}]
@@ -121,17 +147,36 @@ def stream(
                 window.pop(0)
             smooth_risk = sum(window) / len(window)
 
+            top_cwe: str | None = None
+            top_cwe_score: float | None = None
+            if pc_W is not None and pc_b is not None:
+                # If the per-CWE probe was trained on a different layer, fetch
+                # the activation at that layer instead. hidden_states is
+                # (embed, layer_1, …, layer_N), so layer L is index L+1.
+                if pc_layer == layer:
+                    h_pc = h
+                else:
+                    h_pc = hs[pc_layer + 1][0, -1, :].detach().to("cpu").float().numpy()
+                logits_pc = pc_W @ h_pc + pc_b
+                top_idx = int(np.argmax(logits_pc))
+                top_cwe = pc_cwes[top_idx]
+                top_cwe_score = _sigmoid(float(logits_pc[top_idx]))
+
             try:
                 tok_text = tokenizer.decode([next_id])
             except Exception:
                 tok_text = "?"
 
             # `risk` is what the UI uses for color; `risk_raw` is per-token.
+            # `top_cwe` / `top_cwe_score` are populated only when the
+            # per-CWE multi-head probe is loaded; otherwise they're None.
             yield {
                 "event": "token",
                 "token": tok_text,
                 "risk": smooth_risk,
                 "risk_raw": raw_risk,
+                "top_cwe": top_cwe,
+                "top_cwe_score": top_cwe_score,
                 "step": step,
             }
 
@@ -157,6 +202,12 @@ def main_cli() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="google/gemma-4-E2B-it")
     ap.add_argument("--probe", default="data/probe.npz")
+    ap.add_argument(
+        "--per-cwe-probe",
+        default=None,
+        help="Optional path to data/probe_per_cwe.npz; when set, every token "
+        "event also includes top_cwe / top_cwe_score from the multi-head probe.",
+    )
     ap.add_argument("--prompt", required=False)
     ap.add_argument("--max-tokens", type=int, default=150)
     ap.add_argument("--temperature", type=float, default=0.6)
@@ -171,7 +222,15 @@ def main_cli() -> None:
         print("--prompt required (or use --serve)", file=sys.stderr)
         sys.exit(2)
 
-    for event in stream(args.model, Path(args.probe), args.prompt, args.max_tokens, args.temperature):
+    pc_path = Path(args.per_cwe_probe) if args.per_cwe_probe else None
+    for event in stream(
+        args.model,
+        Path(args.probe),
+        args.prompt,
+        args.max_tokens,
+        args.temperature,
+        per_cwe_probe_path=pc_path,
+    ):
         if event.get("event") == "token":
             risk = event["risk"]
             colour = "\033[31m" if risk > 0.7 else "\033[33m" if risk > 0.4 else "\033[32m"
@@ -234,8 +293,16 @@ def run_server(args) -> None:
             self.send_header("Cache-Control", "no-cache")
             self._cors()
             self.end_headers()
+            pc_path = Path(args.per_cwe_probe) if args.per_cwe_probe else None
             try:
-                for event in stream(args.model, Path(args.probe), prompt, max_tokens, args.temperature):
+                for event in stream(
+                    args.model,
+                    Path(args.probe),
+                    prompt,
+                    max_tokens,
+                    args.temperature,
+                    per_cwe_probe_path=pc_path,
+                ):
                     self.wfile.write(f"data: {json.dumps(event)}\n\n".encode())
                     self.wfile.flush()
             except Exception as e:

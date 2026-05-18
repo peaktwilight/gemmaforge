@@ -161,6 +161,16 @@
     transition: background-color 0.08s ease-in;
     cursor: help;
   }
+  .tok .cwe-tag {
+    font-size: 8px;
+    color: var(--accent);
+    text-decoration: none;
+    margin-left: 1px;
+    vertical-align: sub;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+  }
   .legend {
     display: flex; gap: 18px; margin-top: 14px;
     font-size: 12px; color: var(--muted);
@@ -171,13 +181,15 @@
   }
   .stats {
     margin-top: 12px;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
   }
   .stat {
     background: #060a10; border: 1px solid var(--border);
     border-radius: 7px; padding: 9px 11px;
   }
   .stat .v { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .v.cwe { font-size: 15px; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--accent); }
+  .stat .v.cwe .count { color: var(--muted); font-size: 11px; font-weight: 500; margin-left: 4px; }
   .stat .l { font-size: 10.5px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.1em; margin-top: 2px; }
   footer {
     padding: 14px 36px;
@@ -278,6 +290,7 @@
       <div class="stat"><div class="v" id="stat-tokens">0</div><div class="l">tokens streamed</div></div>
       <div class="stat"><div class="v" id="stat-peak">0%</div><div class="l">peak risk</div></div>
       <div class="stat"><div class="v" id="stat-avg">0%</div><div class="l">mean risk</div></div>
+      <div class="stat"><div class="v cwe" id="stat-top-cwe">—</div><div class="l">top cwe</div></div>
     </div>
   </section>
 </main>
@@ -301,16 +314,17 @@
   }
 
   let evt = null;
-  let stats = { n: 0, peak: 0, sum: 0 };
+  let stats = { n: 0, peak: 0, sum: 0, cweCounts: {} };
 
   function startRun(prompt) {
     if (evt) { try { evt.close(); } catch(_) {} evt = null; }
     out.innerHTML = "";
     out.classList.remove("empty");
-    stats = { n: 0, peak: 0, sum: 0 };
+    stats = { n: 0, peak: 0, sum: 0, cweCounts: {} };
     $("stat-tokens").textContent = "0";
     $("stat-peak").textContent = "0%";
     $("stat-avg").textContent = "0%";
+    $("stat-top-cwe").innerHTML = "&mdash;";
 
     const url = `http://localhost:8787/stream?prompt=${encodeURIComponent(prompt)}&max_tokens=250`;
     evt = new EventSource(url);
@@ -328,14 +342,38 @@
           $("stat-avg").textContent = ((stats.sum / stats.n) * 100).toFixed(0) + "%";
           needle.style.left = (e.risk * 100).toFixed(1) + "%";
 
+          // Track per-CWE argmax across the run (only when probe attached).
+          if (typeof e.top_cwe === "string") {
+            stats.cweCounts[e.top_cwe] = (stats.cweCounts[e.top_cwe] || 0) + 1;
+            let bestC = null, bestN = 0;
+            for (const k in stats.cweCounts) {
+              if (stats.cweCounts[k] > bestN) { bestN = stats.cweCounts[k]; bestC = k; }
+            }
+            if (bestC) {
+              $("stat-top-cwe").innerHTML = `${bestC}<span class="count">×${bestN}</span>`;
+            }
+          }
+
           const span = document.createElement("span");
           span.className = "tok";
           span.style.backgroundColor = riskColor(e.risk);
           const rawPct = (typeof e.risk_raw === "number")
             ? (e.risk_raw * 100).toFixed(1) + "%"
             : "—";
-          span.title = `smoothed ${(e.risk * 100).toFixed(1)}%  ·  raw ${rawPct}`;
+          const cweHint = (typeof e.top_cwe === "string" && typeof e.top_cwe_score === "number")
+            ? `  ·  ${e.top_cwe} ${(e.top_cwe_score * 100).toFixed(0)}%`
+            : "";
+          span.title = `smoothed ${(e.risk * 100).toFixed(1)}%  ·  raw ${rawPct}${cweHint}`;
           span.textContent = e.token;
+          // Tiny subscript CWE tag when the per-CWE head fires confidently.
+          if (typeof e.top_cwe === "string"
+              && typeof e.top_cwe_score === "number"
+              && e.top_cwe_score > 0.6) {
+            const tag = document.createElement("sub");
+            tag.className = "cwe-tag";
+            tag.textContent = e.top_cwe;
+            span.appendChild(tag);
+          }
           out.appendChild(span);
           out.scrollTop = out.scrollHeight;
         } else if (e.event === "done") {

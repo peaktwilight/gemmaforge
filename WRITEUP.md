@@ -35,11 +35,10 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 
 | Eval split | AUC | accuracy | what it tests |
 |---|---:|---:|---|
-| Random stratified | 0.963 | 92.1% | in-distribution, baseline (paired-leakage warning ↓) |
-| Group-by-repo | 0.958 | 91.6% | no shared repo across train/test — leakage was real but only 0.005 |
-| Held-out CWE-78 | 0.924 | 84.8% | unseen vuln class |
-| Held-out CWE-338 | 0.923 | 82.9% | unseen vuln class |
-| **Cross-language (Python→JS)** | **0.907** | **81.9%** | **realistic transfer headline** |
+| Random stratified | 0.963 | 92.1% | in-distribution baseline |
+| Group-by-repo | 0.958 | 91.6% | no shared repo (leakage only 0.005) |
+| Held-out CWE | 0.92–0.96 | 83–91% | unseen vuln class |
+| **Cross-language (Py→JS)** | **0.907** | **81.9%** | **honest headline** |
 
 Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.958, doesn't beat single-layer 17. We report **0.907 cross-language** as the honest headline. Obeso et al. reached >0.9 on Llama-3.3-70B for hallucinations; we hit comparable numbers on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
 

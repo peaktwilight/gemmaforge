@@ -3,7 +3,8 @@
 **Tracks:** Main Track · Impact: Safety & Trust · Special Tech: Ollama
 
 **Repo:** https://github.com/peaktwilight/gemmaforge
-**Live demo:** https://huggingface.co/spaces/peaktwilight/gemmaforge
+**Live demo:** https://huggingface.co/spaces/mmtf/gemma4ge  (ZeroGPU H200 · interactive scan + live token stream + Tier 2 pwnkit, all real)
+**Pipeline replay:** https://huggingface.co/spaces/peaktwilight/gemma4ge  (4-panel narrative — captured runs replayed for the writeup walk-through)
 **Video:** https://youtube.com/watch?v=TODO
 
 ## Team — security meets interpretability

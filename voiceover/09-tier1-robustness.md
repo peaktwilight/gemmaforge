@@ -6,8 +6,4 @@
 
 ## Line
 
-> "Full T-one through T-five adversarial suite. [pause] [sparkline-draw] Max-pool aggregation flattens the worst attack [stress] twenty-two times over."
-
-## Tone
-
-"T-one through T-five" — never "T1 through T5" (letters-plus-digits don't read clean on mic). Hit "twenty-two times over" as the headline; don't trail off.
+> "And we tried to break it. Renamed variables. Scrambled comments. Reshuffled indentation. It holds — way better than you'd expect from a single tiny linear layer."

@@ -6,8 +6,4 @@
 
 ## Line
 
-> "An AI assistant could have written that exact pattern [stress] this morning. [caption-in: AI tools now ship ~100M lines of code per day. Almost none of it is audited before it ships.] [beat] Nobody would have caught it before it shipped."
-
-## Tone
-
-Don't trail off on "before it shipped" — land it clean as a closing beat.
+> "And here's the thing — an AI assistant just wrote that exact bug this morning. Somewhere. In some repo. Already shipping."

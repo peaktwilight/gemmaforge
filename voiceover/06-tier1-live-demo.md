@@ -6,8 +6,4 @@
 
 ## Line
 
-> "Every token Gemma generates, [pause] the probe reads its hidden state and emits a risk score. [beat] [stress] Sub-millisecond overhead. [beat] [red-cluster-flare on ${req.params.id}] [stress] On a laptop."
-
-## Tone
-
-Last two sentences land hard — short, definitive, almost punctuation marks on the screen-recording. The "on a laptop" beat should coincide with the red flare in the streaming demo.
+> "Watch this. As Gemma writes, every token gets a colour. Green when it's safe. Yellow when it's getting iffy. Red when it's about to ship a bug. Live. On a laptop. No cloud."

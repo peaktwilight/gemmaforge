@@ -6,8 +6,4 @@
 
 ## Line
 
-> "The standard answer is to scan in the cloud, [pause] after the fact. [beat] A lot of devs can't afford it. [pause] A lot of orgs can't legally use it. [caption-in: Cloud-bound · subscription-gated · runs after the fact. Solo maintainers + air-gapped enterprises priced out.]"
-
-## Tone
-
-The triplet structure ("after the fact / can't afford it / can't legally use it") is doing the work — don't rush.
+> "And the answer right now? You ship your code off to a cloud scanner. After it's already written. If you can afford it. If you're even allowed to."

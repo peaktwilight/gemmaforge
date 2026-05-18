@@ -13,14 +13,9 @@ What if the model itself
 
 ## Line
 
-> *No spoken line. Editor cues drive the entire 8 seconds:*
+> *No spoken line. The screen cuts to black. Four phrases appear one at a time, typewriter-style, about a second apart:*
 >
-> [cut to black] [hold-1s]
-> [type-in: "What if the model itself"] [pause-1s]
-> [type-in: "could tell you"] [pause-1s]
-> [type-in: "which parts of your repo"] [pause-1s]
-> [type-in: "it would file CVEs against?"] [hold-2s]
-
-## Tone
-
-Editor: a single low-pad note under the silence — nothing else. The scene is a deliberate hand-off from "problem" to "answer" and it works because nothing speaks. Do not record audio for this scene.
+> *"What if the model itself"*
+> *"could tell you"*
+> *"which parts of your repo"*
+> *"it would file CVEs against?"*

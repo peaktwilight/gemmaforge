@@ -16,8 +16,8 @@ Caption: *"Same family · same tokenizer · same tool schema · one license. Raw
 
 ## Line
 
-> "[tile-in: E2B] [slow] Three [tile-in: E4B] Gemmas [tile-in: 27B] in one family. [beat] Hidden states for the probe, function-calling for the agent. [pause] Mix Llama with Qwen [pause] and the two halves don't speak the same language."
+> "And here's why this had to be Gemma. Three sizes. Same family. Same way of thinking. Try and mix Llama with Qwen for this and the two halves just don't speak the same language."
 
 ## Tone
 
-Hit each "Three / Gemmas / family" beat as the three tiles animate in. Architecture justification ("hidden states for the probe, function-calling for the agent") in one breath. The Llama/Qwen kicker is dry, not mocking.
+Pride, but quietly. The first three fragments ("Three sizes. Same family. Same way of thinking.") land like building blocks — one, two, three. The Llama/Qwen aside is dry, almost a shrug, not mocking.

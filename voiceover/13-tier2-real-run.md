@@ -18,8 +18,4 @@ Top caption: *"6 leads → 6 attacks · ~5 minutes · local · zero network. Rea
 
 ## Line
 
-> "[flat] This isn't a render. [beat] [yellow-highlight: loaded 6 seed lead(s)] Six seeded leads, [pause] [yellow-highlight: totalAttacks: 6] six investigations, [pause] [yellow-highlight: durationMs: 289969] five minutes of local Gemma 4 inference. [beat] [stress] Nothing left the machine."
-
-## Tone
-
-"This isn't a render" delivered flat, almost defensive — it's the line that converts the demo from "looks cool" to "is real." Numbers as words: *six*, *six*, *five*. Land "Nothing left the machine" hard.
+> "And this isn't a mockup. We ran this today. Real Gemma. Real bugs. Real laptop. The whole thing — start to finish — never touched a cloud."

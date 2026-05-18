@@ -6,8 +6,4 @@
 
 ## Line
 
-> "[slow] Two months ago I disclosed a critical bug in `node-forge` [pause] [zoom-in on Critical badge] — a crypto library used across the JavaScript stack."
-
-## Tone
-
-Matter-of-fact, not bragging. Lead-in is the calmest line of the whole video.
+> "So a couple of months ago, I broke `node-forge` — the crypto library hiding under a huge slice of the JavaScript stack you've probably used today."

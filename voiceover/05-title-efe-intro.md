@@ -6,8 +6,4 @@
 
 ## Line
 
-> "[caption-in: GemmaForge — Small Gemma finds. Big Gemma hunts.] We trained a fifteen-hundred-weight linear probe on Gemma 4's hidden states [pause] — it tells you which tokens the model is about to write [pause] look like the inside of a [stress] known CVE."
-
-## Tone
-
-Eye-line into the lens, not the monitor. Two sentences should feel like one breath — no full stop in the read at the dash. Say "fifteen-hundred-weight" as words, never "1,536".
+> "So we taught Gemma to flinch. Every time it's about to write code that looks like a known bug, the model itself raises a hand — *before* the token even lands."

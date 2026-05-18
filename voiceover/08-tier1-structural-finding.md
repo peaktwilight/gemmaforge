@@ -6,8 +6,4 @@
 
 ## Line
 
-> "When we re-trained on the bigger Gemma, [pause] [arrow-drop L17→L10] the best layer moved from [slow] mid-network down into the [stress] bottom quarter. [beat] Bigger models know what's risky [stress] sooner."
-
-## Tone
-
-"Mid-network" / "bottom quarter" should be said slowly enough that the viewer can ping-pong between the two columns on screen. The second sentence is the takeaway — deliver it as a confident statement, not a hedge.
+> "And here's the weird part. When we trained it on the bigger Gemma, the signal shifted *earlier* in the network. Bigger models figure out something's dangerous way sooner."

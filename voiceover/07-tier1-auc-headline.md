@@ -6,8 +6,4 @@
 
 ## Line
 
-> "[caption-in: AUC 0.907 — Python → JavaScript] Cross-language AUC [slow] nine-oh-seven. [beat] Honest number [pause] — train on Python, test on JavaScript."
-
-## Tone
-
-Say "nine-oh-seven" as three syllables — never "zero point nine zero seven" or "ninety percent." Precision, not magnitude. The half-beat after "Honest number" is the signal to judges that this is OOD, not in-distribution.
+> "And it actually generalises. Train it on Python, point it at JavaScript code it's never seen — and it still catches the bugs."

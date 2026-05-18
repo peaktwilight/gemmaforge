@@ -6,8 +6,4 @@
 
 ## Line
 
-> "The probe was trained partly on bugs we [stress] ourselves found and disclosed. [beat] [badge-land: 200M+ monthly downloads] That's why it knows what danger smells like."
-
-## Tone
-
-"Ourselves" is the stressed word — pride without bragging. The close ("knows what danger smells like") is confident, not boastful — let the visual CVE reel do the heavy lifting.
+> "And one more thing — some of the bugs we trained this on? I found those. Reported them. That's why this model knows what trouble actually looks like."

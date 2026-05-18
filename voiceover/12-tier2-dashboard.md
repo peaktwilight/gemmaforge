@@ -6,8 +6,4 @@
 
 ## Line
 
-> "And you watch it happen — [pause] probe firings on the left, the agent's tool-calls on the right. [beat] [cursor-click on top lead] Click any lead [pause] [highlight-hunt-card] and it lights up the matching investigation."
-
-## Tone
-
-Sync target: "Click any lead" should land *with* the on-screen mouse-click. If editor needs to tighten, shorten the tail to "and the agent shows you why."
+> "And you just watch it happen. The probe firing on the left. The agent hunting on the right. Click any lead — the whole investigation lights up."

@@ -1,8 +1,8 @@
-# Scene 13 — Tier 2, the real run: numbers from today
+# Scene 13 — The real run
 
 **Speaker:** Doruk (voiceover) · **Target:** 10s · **Position:** 2:15–2:25
 
-**On screen while you read:** terminal output (clean monospace), key lines highlighted with a yellow stroke as they appear:
+**On screen while you read:** terminal output, clean monospace, key lines highlighted with a yellow stroke as they appear:
 
 ```
 $ pwnkit-cli review examples/vuln-express-app \
@@ -14,8 +14,8 @@ $ pwnkit-cli review examples/vuln-express-app \
 { "totalAttacks": 6, "durationMs": 289969, "semgrepFindings": 6 }
 ```
 
-Top caption: *"6 leads → 6 attacks · ~5 minutes · local · zero network. Real run. Today. On a laptop."*
+Top caption: *"6 leads → 6 investigations · ~5 minutes of local Gemma 4 inference · zero network · receipts in stdout"*.
 
 ## Line
 
-> "And this isn't a mockup. We ran this today. Real Gemma. Real bugs. Real laptop. The whole thing — start to finish — never touched a cloud."
+> "And this isn't a mockup. We ran the whole thing today — small Gemma, big Gemma, six leads, six investigations. Five minutes of real local inference. The whole pipeline never touched a cloud."

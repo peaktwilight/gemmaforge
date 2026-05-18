@@ -1,9 +1,9 @@
-# Scene 06 — Tier 1, live: the probe colours every token
+# Scene 06 — Probe in action: small Gemma walks a real repo
 
 **Speaker:** Efe (voiceover) · **Target:** 15s · **Position:** 0:50–1:05
 
-**On screen while you read:** screen-recording of the HF Space (`peaktwilight/gemma4ge`) or `python -m src.stream_with_probe --serve`. Gemma 4 is streaming an Express handler; tokens fade green → yellow → red as the probe scores them. A red cluster flares around `${req.params.id}`. Top-right caption sticks for the whole 15s: *"< 1 ms / token overhead · Gemma 4 E2B · sample-level linear probe · layer 17"*.
+**On screen while you read:** the GemmaForge dashboard. Bottom-left, a terminal runs `python -m src.scan examples/vuln-express-app > leads.jsonl`. The dashboard's **Scan** panel fills in real time — files tick across, each one shown as a strip of chunk-tiles that turn yellow / red as the probe scores them. As the scan progresses, the **Leads** panel populates with ranked rows; the top entry lands with a badge `CWE-78 · 0.94`, then `CWE-89 · 0.91`, then `CWE-338 · 0.89`. Top-right caption sticks: *"python -m src.scan examples/vuln-express-app → leads.jsonl · ranked CWE candidates · Gemma 4 E2B"*.
 
 ## Line
 
-> "Watch this. As Gemma writes, every token gets a colour. Green when it's safe. Yellow when it's getting iffy. Red when it's about to ship a bug. Live. On a laptop. No cloud."
+> "Point the little Gemma at a real repo. It walks through it chunk by chunk, scoring every span. The risky ones bubble up over here — ranked, and already labelled with the kind of bug they look like."

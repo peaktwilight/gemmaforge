@@ -98,18 +98,18 @@ Mehmet Efe Akça · MSc Data Science, ETH Zürich
 
 ---
 
-## Scene 06 — Tier 1, live: the probe colours every token (0:50–1:05, 15s)
+## Scene 06 — Probe in action: small Gemma walks a real repo (0:50–1:05, 15s)
 
-**Visual:** screen-recording of the HF Space (`peaktwilight/gemma4ge`) or `python -m src.stream_with_probe --serve`. Gemma 4 streams an Express handler; tokens fade through green → yellow → red as the probe scores them. Red cluster around `${req.params.id}`.
+**Visual:** screen-recording of the GemmaForge dashboard. Bottom-left corner shows a terminal running `python -m src.scan examples/vuln-express-app > leads.jsonl`. The dashboard's **Scan** panel fills in real time — files tick by, each rendered as a strip of chunk-tiles that turn yellow / red as the probe scores them. The **Leads** panel populates simultaneously with ranked rows landing one after another, each carrying a CWE badge: `CWE-78 · 0.94`, `CWE-89 · 0.91`, `CWE-338 · 0.89`.
 
 **Burned-in caption (top-right, sticky 15s):**
 ```
-< 1 ms / token overhead
-Gemma 4 E2B · sample-level linear probe · layer 17
+python -m src.scan examples/vuln-express-app  →  leads.jsonl
+ranked CWE candidates · Gemma 4 E2B probe · laptop-class
 ```
 
 **Efe (voiceover):**
-> "Every token Gemma generates, the probe reads its hidden state and emits a risk score. Sub-millisecond overhead. On a laptop."
+> "Point the little Gemma at a real repo. It walks through it chunk by chunk, scoring every span. The risky ones bubble up over here — ranked, and already labelled with the kind of bug they look like."
 
 ---
 
@@ -176,14 +176,12 @@ Doruk Tan Ozturk · pwnkit · 0sec.ai
 
 ---
 
-## Scene 11 — Tier 2, the command: handoff (1:45–2:00, 15s)
+## Scene 11 — Handoff: leads flow into pwnkit (1:45–2:00, 15s)
 
-**Visual:** terminal recording, slow type-on (no autocomplete, no shell-prefix noise):
+**Visual:** same terminal from Scene 06, still next to the dashboard. The `leads.jsonl` filename pulses briefly to call it out, then the next command types on, character by character:
 
 ```bash
-$ python -m src.scan repo/ > leads.jsonl
-
-$ pwnkit-cli review repo/ \
+$ pwnkit-cli review examples/vuln-express-app \
       --seed-findings leads.jsonl \
       --runtime ollama \
       --model gemma4:27b
@@ -191,40 +189,40 @@ $ pwnkit-cli review repo/ \
 
 **Burned-in caption (right side, sticky 15s):**
 ```
-Ollama · /api/chat · native function-calling
-0sec-labs/pwnkit  #371 + #372  (both merged 2026-05-18)
-Local · no API keys · no network
+pwnkit consumes gemmaforge.leads/v1
+Ollama  /api/chat  +  tools[]   ·   Gemma 4 27B locally
+0sec-labs/pwnkit  #371 + #372  (merged)
 ```
 
 **Doruk (voiceover):**
-> "Two commands. The probe walks the repo and writes the leads. Pwnkit picks them up and drives a local Gemma 4 27B through tool-calls — read files, grep call sites, verify."
+> "Now we hand those leads to pwnkit. One command. It picks up where the probe left off — and fires up the big Gemma, right here on the laptop, to actually go and prove every one of them."
 
 ---
 
-## Scene 12 — Tier 2, the dashboard: four panels, one view (2:00–2:15, 15s)
+## Scene 12 — Big Gemma at work: pwnkit drives the agent (2:00–2:15, 15s)
 
-**Visual:** screen-recording of the HF Space dashboard at `peaktwilight/gemma4ge`. Four panels updating live:
-1. **Stream** — tokens colour-graded by risk
-2. **Scan** — files ticking through with per-chunk strips
-3. **Leads** — ranked rows landing; top row badge `CWE-89 · 0.93`
-4. **Hand-off** — pwnkit lane filling in tool-call cards
+**Visual:** the dashboard's **Hand-off to pwnkit** panel fills in real time. Tool-call cards land one after another:
+- `read_file src/users.js`
+- `grep -n "db.query"`
+- `read_file src/ping.js`
+- `verify — string interpolation reaches sink`
 
-Mouse hovers panel 3, clicks the top lead — panel 4 highlights its matching hunt card.
+Then a verdict card lands with a green stroke: `CWE-89 · CONFIRMED · sql-injection at users.js:31`. Mouse hovers a row in the Leads panel and clicks; the matching investigation card glows.
 
-**Burned-in caption (bottom):**
+**Burned-in caption (bottom, sticky 15s):**
 ```
-huggingface.co/spaces/peaktwilight/gemma4ge
-4 panels · Docker SDK · click-to-highlight provenance
+Gemma 4 27B  via  Ollama   ·   live tool-calls
+click-to-highlight  lead → investigation provenance
 ```
 
 **Doruk (voiceover):**
-> "And you watch it happen — probe firings on the left, the agent's tool-calls on the right, click any lead and it lights up the matching investigation."
+> "And now you watch the big Gemma go to work. It opens the actual file. Greps the call sites. Builds a case. Every lead the probe found is something it can dig into and verify — right here, on the same laptop."
 
 ---
 
-## Scene 13 — Tier 2, the real run: numbers from today (2:15–2:25, 10s)
+## Scene 13 — The real run (2:15–2:25, 10s)
 
-**Visual:** terminal output, monospace, key lines highlighted with a yellow stroke as they appear:
+**Visual:** terminal output, clean monospace, key lines highlighted with a yellow stroke as they appear:
 
 ```
 $ pwnkit-cli review examples/vuln-express-app \
@@ -235,6 +233,15 @@ $ pwnkit-cli review examples/vuln-express-app \
 …
 { "totalAttacks": 6, "durationMs": 289969, "semgrepFindings": 6 }
 ```
+
+**Burned-in caption (top, sticky 10s):**
+```
+6 leads → 6 investigations   ·   ~5 minutes
+local Gemma 4 inference   ·   zero network   ·   receipts in stdout
+```
+
+**Doruk (voiceover):**
+> "And this isn't a mockup. We ran the whole thing today — small Gemma, big Gemma, six leads, six investigations. Five minutes of real local inference. The whole pipeline never touched a cloud."
 
 **Burned-in caption (top):**
 ```

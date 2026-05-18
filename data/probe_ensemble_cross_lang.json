@@ -1,0 +1,66 @@
+{
+  "layers": [
+    8,
+    17,
+    26,
+    34
+  ],
+  "model": "LogisticRegression(max_iter=1000, C=1.0)",
+  "ensemble": "uniform_mean of per-layer predicted probabilities",
+  "dataset": "pairs_v2 / activations_v2",
+  "baseline_single_layer_py_to_js_auc": 0.907,
+  "baseline_random_split_single_l17_auc": 0.9633,
+  "baseline_random_split_ensemble_auc": 0.9764,
+  "directions": [
+    {
+      "train_lang": "python",
+      "test_lang": "javascript",
+      "n_train": 700,
+      "n_test": 498,
+      "n_train_pos": 350,
+      "n_test_pos": 249,
+      "per_layer_auc": {
+        "8": 0.8842196093611393,
+        "17": 0.907283753487847,
+        "26": 0.9076385864744116,
+        "34": 0.8501233851066917
+      },
+      "per_layer_acc": {
+        "8": 0.8052208835341366,
+        "17": 0.8192771084337349,
+        "26": 0.8353413654618473,
+        "34": 0.7429718875502008
+      },
+      "ensemble_auc": 0.9294285576039097,
+      "ensemble_acc": 0.8514056224899599,
+      "best_single_layer": 26,
+      "best_single_auc": 0.9076385864744116,
+      "lift": 0.021789971129498098
+    },
+    {
+      "train_lang": "javascript",
+      "test_lang": "python",
+      "n_train": 498,
+      "n_test": 700,
+      "n_train_pos": 249,
+      "n_test_pos": 350,
+      "per_layer_auc": {
+        "8": 0.8900571428571429,
+        "17": 0.9291755102040816,
+        "26": 0.8733469387755102,
+        "34": 0.8171918367346938
+      },
+      "per_layer_acc": {
+        "8": 0.8028571428571428,
+        "17": 0.8571428571428571,
+        "26": 0.7728571428571429,
+        "34": 0.7257142857142858
+      },
+      "ensemble_auc": 0.9334122448979592,
+      "ensemble_acc": 0.8628571428571429,
+      "best_single_layer": 17,
+      "best_single_auc": 0.9291755102040816,
+      "lift": 0.004236734693877531
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "layer": 17,
+  "top_k": 5,
+  "cwes": [
+    "CWE-78",
+    "CWE-338",
+    "CWE-95",
+    "CWE-94",
+    "CWE-328"
+  ],
+  "per_cwe": [
+    {
+      "cwe": "CWE-78",
+      "auc": 0.9788223140495868,
+      "acc": 0.948905109489051,
+      "n_pos": 82,
+      "n_neg": 599,
+      "n_train": 544,
+      "n_test": 137
+    },
+    {
+      "cwe": "CWE-338",
+      "auc": 0.9895833333333333,
+      "acc": 0.9705882352941176,
+      "n_pos": 79,
+      "n_neg": 599,
+      "n_train": 542,
+      "n_test": 136
+    },
+    {
+      "cwe": "CWE-95",
+      "auc": 0.9255208333333333,
+      "acc": 0.9191176470588235,
+      "n_pos": 78,
+      "n_neg": 599,
+      "n_train": 541,
+      "n_test": 136
+    },
+    {
+      "cwe": "CWE-94",
+      "auc": 0.9878205128205129,
+      "acc": 0.9624060150375939,
+      "n_pos": 65,
+      "n_neg": 599,
+      "n_train": 531,
+      "n_test": 133
+    },
+    {
+      "cwe": "CWE-328",
+      "auc": 0.9810606060606061,
+      "acc": 0.9465648854961832,
+      "n_pos": 55,
+      "n_neg": 599,
+      "n_train": 523,
+      "n_test": 131
+    }
+  ],
+  "macro_auc": 0.9725615199194744,
+  "model": "LogisticRegression(max_iter=1000, C=1.0)",
+  "split": "stratified 80/20, seed=0",
+  "negative_set": "all label==0 rows (safe lead-up positions)",
+  "dataset": "pairs_v2 / activations_v2 layer 17"
+}

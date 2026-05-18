@@ -19,9 +19,10 @@ RUN git clone --depth 1 --branch claude/fix-types-for-gemmaforge-build \
         https://github.com/PwnKit-Labs/pwnkit.git /opt/pwnkit \
     && cd /opt/pwnkit \
     && pnpm install --frozen-lockfile \
-    && pnpm --filter @pwnkit/shared build \
-    && pnpm --filter @pwnkit/core build \
-    && pnpm --filter pwnkit-cli build \
+    # Build pwnkit-cli and all of its workspace deps in topological order
+    # (shared, db, templates, core, then cli) — the `...` suffix tells pnpm
+    # to walk the dep graph.
+    && pnpm --filter "pwnkit-cli..." build \
     && rm -rf /opt/pwnkit/node_modules/.cache /root/.npm /root/.local /root/.cache
 
 ENV PWNKIT_CLI=/opt/pwnkit/packages/cli/dist/index.js

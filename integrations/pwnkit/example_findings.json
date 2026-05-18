@@ -1,0 +1,40 @@
+[
+  {
+    "claim": "OS command injection via unsanitized user input passed to child_process.exec",
+    "snippet": "const { exec } = require('child_process');\nfunction backup(name) {\n  exec('tar -czf /tmp/' + name + '.tgz /var/www');\n}\nbackup(req.query.target);",
+    "cwe": "CWE-78",
+    "confidence": "high",
+    "source": "pwnkit.rules.shell-injection"
+  },
+  {
+    "claim": "Use of Math.random() for token generation enables prediction attacks",
+    "snippet": "function makeSessionToken() {\n  let t = '';\n  for (let i = 0; i < 32; i++) t += Math.random().toString(36).slice(2, 3);\n  return t;\n}",
+    "cwe": "CWE-338",
+    "confidence": "medium",
+    "source": "pwnkit.rules.weak-crypto-rng"
+  },
+  {
+    "claim": "SQL injection at line 42 of router.js — claimed CWE intentionally mismatched for testing",
+    "snippet": "db.query('SELECT * FROM users WHERE id = ' + req.params.id, (err, rows) => {\n  res.json(rows);\n});",
+    "cwe": "CWE-94",
+    "confidence": "high",
+    "source": "pwnkit.rules.sql-injection",
+    "_note": "real CWE is CWE-89 (SQLi) but pwnkit emitted CWE-94 — adapter should return cwe_match in {0.0, 0.5}"
+  },
+  {
+    "claim": "Open redirect via unvalidated next= parameter",
+    "snippet": "app.get('/login/callback', (req, res) => {\n  res.redirect(req.query.next);\n});",
+    "cwe": "CWE-601",
+    "confidence": "medium",
+    "source": "pwnkit.rules.open-redirect",
+    "_note": "CWE-601 is outside the 5 trained heads — adapter should return cwe_match = null"
+  },
+  {
+    "claim": "Hard-coded fallback secret used for HMAC signing",
+    "snippet": "const SECRET = process.env.JWT_SECRET || 'dev-secret-123';\nfunction sign(payload) {\n  return crypto.createHmac('sha256', SECRET).update(payload).digest('hex');\n}",
+    "cwe": "CWE-798",
+    "confidence": "low",
+    "source": "pwnkit.rules.hardcoded-secret",
+    "_note": "CWE-798 is outside the 5 trained heads — adapter should return cwe_match = null"
+  }
+]

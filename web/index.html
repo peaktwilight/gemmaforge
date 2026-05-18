@@ -127,11 +127,39 @@
     min-height: 260px;
     flex: 1;
     overflow-y: auto;
+    position: relative;
+  }
+  #output.empty { display: flex; align-items: center; justify-content: center; }
+  .hint {
+    color: var(--muted);
+    font-family: -apple-system, system-ui, sans-serif;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  .hint .arrow {
+    display: inline-block;
+    color: var(--accent);
+    font-size: 18px;
+    margin: 0 6px;
+    animation: nudge 1.4s ease-in-out infinite;
+  }
+  .hint .arrow.left { transform: scaleX(-1); }
+  @keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-5px); }
+  }
+  .hint .arrow.left { animation-name: nudge-left; }
+  @keyframes nudge-left {
+    0%, 100% { transform: scaleX(-1) translateX(0); }
+    50% { transform: scaleX(-1) translateX(-5px); }
   }
   .tok {
     padding: 1px 1px 2px;
     border-radius: 2px;
     transition: background-color 0.08s ease-in;
+    cursor: help;
   }
   .legend {
     display: flex; gap: 18px; margin-top: 14px;
@@ -160,19 +188,36 @@
   }
   footer a { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); }
   footer a:hover { border-color: var(--accent); }
+  .meter-wrap { margin-top: 14px; }
   .meter {
-    margin-top: 10px;
-    height: 6px;
+    height: 10px;
     border-radius: 999px;
     background: linear-gradient(to right, #28a765 0%, #28a765 40%, #e6a23c 40%, #e6a23c 70%, #ef4444 70%, #ef4444 100%);
     position: relative;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
   }
+  .meter .tick {
+    position: absolute; top: -4px; width: 1px; height: 18px;
+    background: rgba(255,255,255,0.35);
+  }
+  .meter .tick.t40 { left: 40%; }
+  .meter .tick.t70 { left: 70%; }
   .meter .needle {
-    position: absolute; top: -3px; width: 4px; height: 12px;
+    position: absolute; top: -3px; width: 4px; height: 16px;
     background: #fff; border-radius: 2px;
     transform: translateX(-2px);
     transition: left 0.1s linear;
+    box-shadow: 0 0 6px rgba(255,255,255,0.5);
   }
+  .meter-scale {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--muted);
+    margin-top: 6px; font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+  .meter-scale span.mark { position: relative; }
+  .meter-scale span.t40 { margin-left: calc(40% - 30px); }
+  .meter-scale span.t70 { margin-left: calc(30% - 30px); }
 </style>
 </head>
 <body>
@@ -220,8 +265,15 @@
 
   <section class="panel">
     <h2>Gemma 4 output  <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px"> — probe risk overlaid token-by-token</span></h2>
-    <div id="output" aria-live="polite">Click a preset on the left or write your own prompt to begin.</div>
-    <div class="meter"><div class="needle" id="meter-needle" style="left: 0%"></div></div>
+    <div id="output" class="empty" aria-live="polite"><div class="hint"><span class="arrow left">&#10148;</span>Click a preset to watch the probe stream<span class="arrow">&#10148;</span></div></div>
+    <div class="meter-wrap">
+      <div class="meter">
+        <div class="tick t40"></div>
+        <div class="tick t70"></div>
+        <div class="needle" id="meter-needle" style="left: 0%"></div>
+      </div>
+      <div class="meter-scale"><span>safe</span><span class="mark t40">watch · 40%</span><span class="mark t70">vuln · 70%</span><span>100%</span></div>
+    </div>
     <div class="stats">
       <div class="stat"><div class="v" id="stat-tokens">0</div><div class="l">tokens streamed</div></div>
       <div class="stat"><div class="v" id="stat-peak">0%</div><div class="l">peak risk</div></div>
@@ -254,6 +306,7 @@
   function startRun(prompt) {
     if (evt) { try { evt.close(); } catch(_) {} evt = null; }
     out.innerHTML = "";
+    out.classList.remove("empty");
     stats = { n: 0, peak: 0, sum: 0 };
     $("stat-tokens").textContent = "0";
     $("stat-peak").textContent = "0%";
@@ -278,7 +331,10 @@
           const span = document.createElement("span");
           span.className = "tok";
           span.style.backgroundColor = riskColor(e.risk);
-          span.title = `risk ${(e.risk * 100).toFixed(1)}%`;
+          const rawPct = (typeof e.risk_raw === "number")
+            ? (e.risk_raw * 100).toFixed(1) + "%"
+            : "—";
+          span.title = `smoothed ${(e.risk * 100).toFixed(1)}%  ·  raw ${rawPct}`;
           span.textContent = e.token;
           out.appendChild(span);
           out.scrollTop = out.scrollHeight;

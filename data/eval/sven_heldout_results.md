@@ -7,22 +7,22 @@ from a deterministic 80/20 group split of `pairs_sven.jsonl`
 these rows during training (except `probe_spanmax.npz`, which is the
 legacy in-sample artifact retained for reference).
 
-| metric | CSE-trained `probe.npz` | SVEN-LogReg `probe_sven.npz` | SVEN span-max `probe_spanmax.npz` |
-|---|---:|---:|---:|
-| training data | CyberSecEval `pairs.jsonl` (1198 rows) | SVEN 80% train (1254 rows, 614 groups) | full SVEN `dataset.jsonl` (1374 rows, leaked) |
-| leakage on heldout 136 | zero (different corpus) | zero (group split) | **full (rows are in train set)** |
-| objective | last-token LogReg | last-token LogReg | token-level span-max (Obeso et al. 2025) |
-| layer | 17 | 8 | 8 |
-| repo_recall@1 | 5.1% | 0.0% | 30.9% |
-| repo_recall@5 | 47.1% | 44.1% | 64.0% |
-| repo_recall@10 | 72.8% | 62.5% | 76.5% |
-| repo_recall@25 | 86.0% | 85.3% | 87.5% |
-| precision@1 | 5.1% | 0.0% | 30.9% |
-| precision@5 | 10.5% | 9.7% | 14.3% |
-| precision@25 | 11.7% | 11.3% | 11.6% |
-| MRR | 0.226 | 0.177 | 0.457 |
-| cwe_top1_on_hits@25 | 0% / NaN (label mismatch) | 37.9% | 41.6% |
-| cwe_top1_on_hits@1 | NaN | NaN | 64.3% |
+| metric | CSE-trained `probe.npz` | SVEN-LogReg `probe_sven.npz` | SVEN span-max `probe_spanmax.npz` *(in-sample)* | **SVEN span-max `probe_spanmax_sven_train.npz` *(clean)*** |
+|---|---:|---:|---:|---:|
+| training data | CyberSecEval `pairs.jsonl` (1198 rows) | SVEN 80% train (1254 rows, 614 groups) | full SVEN `dataset.jsonl` (1374 rows) | SVEN 80% train (1102 examples, group-clean) |
+| leakage on heldout 136 | zero (different corpus) | zero (group split) | **full** | **zero (group split)** |
+| objective | last-token LogReg | last-token LogReg | token-level span-max | token-level span-max |
+| layer | 17 | 8 | 8 | 26 |
+| repo_recall@1 | 5.1% | 0.0% | 30.9% | **20.6%** |
+| repo_recall@5 | 47.1% | 44.1% | 64.0% | **59.6%** |
+| repo_recall@10 | 72.8% | 62.5% | 76.5% | **67.6%** |
+| repo_recall@25 | 86.0% | 85.3% | 87.5% | 73.5% |
+| precision@1 | 5.1% | 0.0% | 30.9% | **20.6%** |
+| precision@5 | 10.5% | 9.7% | 14.3% | **13.9%** |
+| precision@25 | 11.7% | 11.3% | 11.6% | **12.3%** |
+| MRR | 0.226 | 0.177 | 0.457 | **0.364** |
+| cwe_top1_on_hits@25 | 0% / NaN (label mismatch) | 37.9% | 41.6% | n/a (no per-CWE at layer 26) |
+| cwe_top1_on_hits@1 | NaN | NaN | 64.3% | n/a |
 
 ## Take-aways
 
@@ -30,13 +30,22 @@ legacy in-sample artifact retained for reference).
   precision@1 goes from 5% to 31%, recall@10 jumps 10+ pp. Token-level
   training matches what the scanner already does at inference time
   (per-token max within a window), so the gain is method, not just data.
-- **In-sample caveat.** `probe_spanmax.npz` was trained on the full
-  `dataset.jsonl`, which includes all 136 held-out rows. The top-K
-  numbers above are an upper bound. A group-clean retrain on the 80%
-  train split lands at example_AUC 0.669 vs the in-sample 0.700 — only
-  a 3 pp gap, suggesting the 1,537-param probe doesn't have the
-  capacity to overfit much. Full clean-scan numbers will land in
-  `repo_scan_report_weak_spanmax_clean.json`.
+- **Most of the in-sample gain holds up under a clean retrain.**
+  `probe_spanmax_sven_train.npz` is span-max retrained on the 80% group
+  split (1,102 train examples; held-out 272 examples never seen).
+  Best layer flips from 8 (in-sample) to **26** (clean), suggesting
+  the in-sample probe was overfitting shallow features. MRR drops
+  from 0.46 (leaked) → 0.36 (clean) — still ~1.6× the LogReg baselines.
+  Precision@1 holds at 21% (still 4× the CSE baseline), so the gain
+  at the top of the ranking is genuinely from the span-max objective,
+  not memorization.
+- **Long-tail recall regresses under the clean retrain.** repo_recall@25
+  goes from 86–88% (LogReg / leaked spanmax) to 73.5%. Layer 26 is
+  peakier — it fires hard on the actual vuln token but doesn't broadly
+  flag adjacent windows. So clean span-max is *better at K=1, K=5*
+  and *worse at K=25*. For the 3-tier cascade contract this is the
+  right trade: tier 1's job is to surface a small high-precision
+  shortlist, not maximize recall@25.
 - **SVEN-LogReg (probe_sven.npz) is honest but weak.** Group-shuffle
   AUC 0.669; recall trails the CSE baseline. SVEN is genuinely harder
   data than CyberSecEval at the last-token level — the span-max

@@ -30,6 +30,7 @@ The script exits gracefully and writes a brief status JSON either way.
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 import os
 import random
@@ -59,11 +60,97 @@ except Exception as _e:
     _HAS_TRL = False
     _trl_err = _e
 
+# Lazy + guarded wandb import. The training scripts must keep working
+# without wandb installed; every wandb call below is wrapped in try/except.
+try:
+    import wandb  # type: ignore
+    _HAS_WANDB = True
+except Exception:
+    wandb = None  # type: ignore
+    _HAS_WANDB = False
+
 
 DEFAULT_MODEL = "google/gemma-4-E2B-it"
 FALLBACK_MODEL = "google/gemma-3-4b-it"
 ADAPTER_DIR = Path("data/lora_adapter")
 STATUS_PATH = ADAPTER_DIR / "train_status.json"
+EVAL_JSON_PATH = Path("data/lora_eval.json")  # produced by scripts/eval_lora.py
+
+
+# ---- wandb helpers (all no-op-safe) -----------------------------------------
+
+def _wandb_init(args: argparse.Namespace) -> "object | None":
+    """Initialise a wandb run if --wandb-project was passed.
+
+    Returns the run handle, or None if disabled / failed. Mode picks
+    online when WANDB_API_KEY is set, offline otherwise so that local
+    runs gracefully no-op into ./wandb/ on disk.
+    """
+    if not args.wandb_project:
+        return None
+    if not _HAS_WANDB:
+        print("[train_lora] wandb not installed, skipping logging", file=sys.stderr)
+        return None
+    try:
+        mode = "online" if os.environ.get("WANDB_API_KEY") else "offline"
+        ts = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+        model_tag = args.model.split("/")[-1]
+        run_name = f"lora-{model_tag}-r{args.r}-a{args.alpha}-{ts}"
+        run = wandb.init(
+            project=args.wandb_project,
+            name=run_name,
+            mode=mode,
+            config=vars(args),
+            job_type="lora-train",
+        )
+        print(f"[train_lora] wandb run: {run_name} (mode={mode})", file=sys.stderr)
+        return run
+    except Exception as e:
+        print(f"[train_lora] wandb init failed: {e}", file=sys.stderr)
+        return None
+
+
+def _wandb_log(run, payload: dict, step: int | None = None) -> None:
+    if run is None:
+        return
+    try:
+        if step is not None:
+            wandb.log(payload, step=step)
+        else:
+            wandb.log(payload)
+    except Exception as e:
+        print(f"[train_lora] wandb.log failed: {e}", file=sys.stderr)
+
+
+def _wandb_artifact_dir(run, path: Path, name: str, art_type: str, metadata: dict) -> None:
+    if run is None or not path.exists():
+        return
+    try:
+        art = wandb.Artifact(name=name, type=art_type, metadata=metadata)
+        art.add_dir(str(path))
+        run.log_artifact(art)
+    except Exception as e:
+        print(f"[train_lora] wandb artifact (dir) failed: {e}", file=sys.stderr)
+
+
+def _wandb_artifact_file(run, path: Path, name: str, art_type: str, metadata: dict) -> None:
+    if run is None or not path.exists():
+        return
+    try:
+        art = wandb.Artifact(name=name, type=art_type, metadata=metadata)
+        art.add_file(str(path))
+        run.log_artifact(art)
+    except Exception as e:
+        print(f"[train_lora] wandb artifact (file) failed: {e}", file=sys.stderr)
+
+
+def _wandb_finish(run) -> None:
+    if run is None:
+        return
+    try:
+        wandb.finish()
+    except Exception:
+        pass
 
 
 def _device(prefer_cpu: bool = False) -> str:
@@ -110,7 +197,8 @@ def _write_status(d: dict) -> None:
 
 def _train_dpo(model_id: str, device: str, records: list[dict],
                r: int, alpha: int, dropout: float, lr: float,
-               max_steps: int, max_len: int) -> dict:
+               max_steps: int, max_len: int,
+               wandb_run=None) -> dict:
     from datasets import Dataset
 
     tok = AutoTokenizer.from_pretrained(model_id)
@@ -138,6 +226,11 @@ def _train_dpo(model_id: str, device: str, records: list[dict],
 
     ds = Dataset.from_list(records)
 
+    # If a wandb run is active in this process, let HF Trainer also push
+    # to it via its built-in `wandb` integration. This gives us per-step
+    # loss curves for free, on the same run.
+    report_to = ["wandb"] if (wandb_run is not None and _HAS_WANDB) else []
+
     args = DPOConfig(
         output_dir=str(ADAPTER_DIR),
         per_device_train_batch_size=1,
@@ -148,7 +241,7 @@ def _train_dpo(model_id: str, device: str, records: list[dict],
         logging_steps=5,
         save_steps=10_000,  # we save manually at end
         save_strategy="no",
-        report_to=[],
+        report_to=report_to,
         bf16=False,
         fp16=False,
         remove_unused_columns=False,
@@ -177,7 +270,8 @@ def _train_dpo(model_id: str, device: str, records: list[dict],
 
 def _train_sft(model_id: str, device: str, records: list[dict],
                r: int, alpha: int, dropout: float, lr: float,
-               max_steps: int, max_len: int) -> dict:
+               max_steps: int, max_len: int,
+               wandb_run=None) -> dict:
     """Fallback: SFT on chosen completions only.
 
     No DPO objective; we just teach the LoRA to *imitate* the safe
@@ -254,6 +348,12 @@ def _train_sft(model_id: str, device: str, records: list[dict],
         n_steps += 1
         if step % 5 == 0 or step == max_steps - 1:
             print(f"  step {step}  loss={out.loss.item():.4f}  lr={cur_lr:.2e}", file=sys.stderr)
+        # Per-step wandb log (cheap; one scalar dict).
+        _wandb_log(
+            wandb_run,
+            {"train/loss": float(out.loss.detach()), "train/lr": cur_lr},
+            step=step,
+        )
 
     dt = time.time() - t0
     model.save_pretrained(str(ADAPTER_DIR))
@@ -264,6 +364,46 @@ def _train_sft(model_id: str, device: str, records: list[dict],
         "steps_run": n_steps,
         "mean_loss": (loss_sum / max(1, n_steps)),
     }
+
+
+def _maybe_log_eval_artifact(run, status: dict) -> None:
+    """If `scripts/eval_lora.py` already produced `data/lora_eval.json`,
+    pull its summary metrics into the wandb run as a table + summary.
+
+    Best-effort, all wrapped in try/except.
+    """
+    if run is None or not EVAL_JSON_PATH.exists():
+        return
+    try:
+        eval_blob = json.loads(EVAL_JSON_PATH.read_text())
+        prompts = eval_blob.get("prompts", []) or []
+        tbl = wandb.Table(
+            columns=["prompt", "base_score", "lora_score", "delta",
+                     "base_hits", "lora_hits"]
+        )
+        for p in prompts:
+            base_score = p.get("base_score")
+            lora_score = p.get("lora_score")
+            delta = (lora_score - base_score) if (lora_score is not None and base_score is not None) else None
+            tbl.add_data(
+                p.get("name"),
+                base_score,
+                lora_score,
+                delta,
+                ",".join(p.get("base_hits") or []),
+                ",".join(p.get("lora_hits") or []),
+            )
+        wandb.log({"eval/lora_eval_table": tbl})
+        totals = eval_blob.get("totals", {})
+        if totals:
+            wandb.summary["eval/total_base"] = totals.get("base")
+            wandb.summary["eval/total_lora"] = totals.get("lora")
+        biggest = eval_blob.get("biggest_delta")
+        if biggest:
+            wandb.summary["eval/biggest_delta_prompt"] = biggest.get("prompt")
+            wandb.summary["eval/biggest_delta_value"] = biggest.get("delta")
+    except Exception as e:
+        print(f"[train_lora] eval-artifact logging failed: {e}", file=sys.stderr)
 
 
 def main() -> int:
@@ -278,6 +418,11 @@ def main() -> int:
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--cpu", action="store_true", help="force CPU")
     ap.add_argument("--sft_only", action="store_true", help="skip DPO, go straight to SFT fallback")
+    ap.add_argument(
+        "--wandb-project",
+        default=None,
+        help="W&B project name; omit to disable wandb logging",
+    )
     args = ap.parse_args()
 
     ADAPTER_DIR.mkdir(parents=True, exist_ok=True)
@@ -298,6 +443,8 @@ def main() -> int:
 
     device = _device(prefer_cpu=args.cpu)
     print(f"[2/3] device = {device}, model = {args.model}", file=sys.stderr)
+
+    wandb_run = _wandb_init(args)
 
     # Try training. Catch OOM / package conflicts. Try in order:
     # primary DPO -> SFT -> CPU SFT -> fallback model SFT.
@@ -320,9 +467,10 @@ def main() -> int:
                 model_id, dev, records,
                 r=args.r, alpha=args.alpha, dropout=args.dropout, lr=args.lr,
                 max_steps=args.max_steps, max_len=args.max_len,
+                wandb_run=wandb_run,
             )
             print(f"[3/3] training OK: {result}", file=sys.stderr)
-            _write_status({
+            status = {
                 "status": "ok",
                 "model_id": model_id,
                 "device": dev,
@@ -330,10 +478,38 @@ def main() -> int:
                 "n_examples": len(records),
                 "lora": {"r": args.r, "alpha": args.alpha, "dropout": args.dropout},
                 **result,
-            })
+            }
+            _write_status(status)
+            # Summary metrics on the wandb run.
+            if wandb_run is not None:
+                try:
+                    for k, v in result.items():
+                        wandb.summary[f"final/{k}"] = v
+                    wandb.summary["final/model_id"] = model_id
+                    wandb.summary["final/device"] = dev
+                    wandb.summary["final/n_examples"] = len(records)
+                except Exception as e:
+                    print(f"[train_lora] wandb summary failed: {e}", file=sys.stderr)
+            # Save the adapter directory as an artifact for reproducibility.
+            _wandb_artifact_dir(
+                wandb_run,
+                ADAPTER_DIR,
+                name="lora-adapter",
+                art_type="model",
+                metadata={
+                    "model_id": model_id,
+                    "device": dev,
+                    "trainer": result.get("trainer"),
+                    "r": args.r, "alpha": args.alpha, "dropout": args.dropout,
+                },
+            )
+            # If an eval JSON is already on disk, fold it in.
+            _maybe_log_eval_artifact(wandb_run, status)
+            _wandb_finish(wandb_run)
             return 0
         except KeyboardInterrupt:
             print("interrupted by user", file=sys.stderr)
+            _wandb_finish(wandb_run)
             return 130
         except Exception as e:
             err = f"{type(e).__name__}: {e}"
@@ -354,6 +530,13 @@ def main() -> int:
         "stage": "training_all_attempts",
         "error": last_err or "unknown",
     })
+    if wandb_run is not None:
+        try:
+            wandb.summary["final/status"] = "failed"
+            wandb.summary["final/error"] = last_err or "unknown"
+        except Exception:
+            pass
+    _wandb_finish(wandb_run)
     print("ALL TRAINING ATTEMPTS FAILED -- see data/lora_adapter/train_status.json", file=sys.stderr)
     return 4
 

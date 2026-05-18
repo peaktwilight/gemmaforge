@@ -1,0 +1,83 @@
+{
+  "layer": 10,
+  "top_k": 5,
+  "cwes": [
+    "CWE-78",
+    "CWE-338",
+    "CWE-95",
+    "CWE-94",
+    "CWE-328"
+  ],
+  "per_cwe": [
+    {
+      "cwe": "CWE-78",
+      "auc": 0.9870867768595042,
+      "acc": 0.9635036496350365,
+      "n_pos": 82,
+      "n_neg": 599,
+      "n_train": 544,
+      "n_test": 137,
+      "tn": 118,
+      "fp": 3,
+      "fn": 2,
+      "tp": 14
+    },
+    {
+      "cwe": "CWE-338",
+      "auc": 0.9947916666666666,
+      "acc": 0.9779411764705882,
+      "n_pos": 79,
+      "n_neg": 599,
+      "n_train": 542,
+      "n_test": 136,
+      "tn": 119,
+      "fp": 1,
+      "fn": 2,
+      "tp": 14
+    },
+    {
+      "cwe": "CWE-95",
+      "auc": 0.9817708333333334,
+      "acc": 0.9705882352941176,
+      "n_pos": 78,
+      "n_neg": 599,
+      "n_train": 541,
+      "n_test": 136,
+      "tn": 118,
+      "fp": 2,
+      "fn": 2,
+      "tp": 14
+    },
+    {
+      "cwe": "CWE-94",
+      "auc": 0.9974358974358973,
+      "acc": 0.9849624060150376,
+      "n_pos": 65,
+      "n_neg": 599,
+      "n_train": 531,
+      "n_test": 133,
+      "tn": 119,
+      "fp": 1,
+      "fn": 1,
+      "tp": 12
+    },
+    {
+      "cwe": "CWE-328",
+      "auc": 0.9704545454545455,
+      "acc": 0.9694656488549618,
+      "n_pos": 55,
+      "n_neg": 599,
+      "n_train": 523,
+      "n_test": 131,
+      "tn": 119,
+      "fp": 1,
+      "fn": 3,
+      "tp": 8
+    }
+  ],
+  "macro_auc": 0.9863079439499896,
+  "model": "LogisticRegression(max_iter=1000, C=1.0)",
+  "split": "stratified 80/20, seed=0",
+  "negative_set": "all label==0 rows (safe lead-up positions)",
+  "activations": "data/activations_e4b/activations_layer10.npz"
+}

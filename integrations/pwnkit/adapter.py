@@ -99,16 +99,28 @@ def _token_windows(input_ids: list[int], max_tokens: int, stride: int) -> list[t
 class GemmaForgeFilter:
     """Score pwnkit findings with GemmaForge's vulnerability probes."""
 
+    # Per-CWE probe file to use when no explicit ``per_cwe_probe_path`` is
+    # passed. Each scan profile pins its own per-CWE head so the binary probe
+    # and per-CWE probe agree on the source layer / model.
+    _PER_CWE_BY_PROFILE = {
+        "weak-probe": "data/probe_per_cwe.npz",
+        "strong-probe": "data/probe_strong_per_cwe.npz",
+    }
+
     def __init__(
         self,
         probe_path: str = "data/probe.npz",
-        per_cwe_probe_path: str = "data/probe_per_cwe.npz",
+        per_cwe_probe_path: Optional[str] = None,
         model_id: str = "google/gemma-4-E2B-it",
         max_tokens: int = 512,
         token_stride: Optional[int] = None,
         scan_profile: str = "weak-probe",
     ) -> None:
         self.probe_path = Path(probe_path)
+        if per_cwe_probe_path is None:
+            per_cwe_probe_path = self._PER_CWE_BY_PROFILE.get(
+                scan_profile, "data/probe_per_cwe.npz"
+            )
         self.per_cwe_probe_path = Path(per_cwe_probe_path)
         self.model_id = model_id
         self.max_tokens = max_tokens

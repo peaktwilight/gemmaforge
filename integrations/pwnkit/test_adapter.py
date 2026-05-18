@@ -105,3 +105,52 @@ def test_lm_not_loaded_at_construction(probe_files, monkeypatch):
     bin_path, per_path = probe_files
     gf = GemmaForgeFilter(probe_path=str(bin_path), per_cwe_probe_path=str(per_path))
     assert gf._model is None and gf._tokenizer is None
+
+
+def _make_per_cwe_npz(path: Path, layer: int = 17) -> None:
+    np.savez(
+        path,
+        cwes=np.array(["CWE-78", "CWE-338", "CWE-95", "CWE-94", "CWE-328"]),
+        W=np.zeros((5, DIM), dtype=np.float32),
+        b=np.zeros(5, dtype=np.float32),
+        layer=np.int32(layer),
+    )
+
+
+def test_scan_profile_auto_routes_per_cwe_probe(tmp_path, monkeypatch):
+    """When no per_cwe_probe_path is given the constructor must pick the file
+    that matches scan_profile so weak/strong probes never cross-contaminate."""
+    # Build a binary probe used by both branches.
+    bin_path = tmp_path / "probe.npz"
+    np.savez_compressed(
+        bin_path, w=np.ones(DIM, dtype=np.float32), b=np.float32(0.0),
+        layer=np.int32(17),
+    )
+
+    # Create both candidate per-CWE files under a fake "data/" sibling.
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    weak = data_dir / "probe_per_cwe.npz"
+    strong = data_dir / "probe_strong_per_cwe.npz"
+    _make_per_cwe_npz(weak)
+    _make_per_cwe_npz(strong)
+
+    # Run the constructor from inside tmp_path so the default relative paths
+    # resolve to the fixture files (no real model touched).
+    monkeypatch.chdir(tmp_path)
+
+    gf_weak = GemmaForgeFilter(probe_path=str(bin_path), scan_profile="weak-probe")
+    assert gf_weak.per_cwe_probe_path.name == "probe_per_cwe.npz"
+    assert gf_weak._W_cwe is not None  # was loaded
+
+    gf_strong = GemmaForgeFilter(probe_path=str(bin_path), scan_profile="strong-probe")
+    assert gf_strong.per_cwe_probe_path.name == "probe_strong_per_cwe.npz"
+    assert gf_strong._W_cwe is not None
+
+    # Explicit path beats scan_profile.
+    gf_override = GemmaForgeFilter(
+        probe_path=str(bin_path),
+        per_cwe_probe_path=str(weak),
+        scan_profile="strong-probe",
+    )
+    assert gf_override.per_cwe_probe_path == weak

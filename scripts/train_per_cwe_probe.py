@@ -38,18 +38,18 @@ except Exception:
     _HAS_WANDB = False
 
 ROOT = Path(__file__).resolve().parents[1]
-ACT_PATH = ROOT / "data" / "activations_v2" / "activations_layer17.npz"
+DEFAULT_ACT_PATH = ROOT / "data" / "activations_v2" / "activations_layer17.npz"
 PAIRS_PATH = ROOT / "data" / "pairs.jsonl"
-OUT_NPZ = ROOT / "data" / "probe_per_cwe.npz"
-OUT_CARD = ROOT / "data" / "probe_per_cwe_card.json"
+DEFAULT_OUT_NPZ = ROOT / "data" / "probe_per_cwe.npz"
+DEFAULT_OUT_CARD = ROOT / "data" / "probe_per_cwe_card.json"
 
-LAYER = 17
+DEFAULT_LAYER = 17
 TOP_K = 5
 SEED = 0
 
 
-def load_data():
-    npz = np.load(ACT_PATH)
+def load_data(act_path: Path):
+    npz = np.load(act_path)
     X = npz["X"].astype(np.float32)
     y = npz["y"].astype(np.int8)
 
@@ -112,7 +112,7 @@ def train_head(X, y, cwes, target_cwe, seed=SEED):
     }
 
 
-def _wandb_init(args):
+def _wandb_init(args, layer: int):
     """Init wandb if --wandb-project was passed; gracefully no-op otherwise."""
     if not args.wandb_project:
         return None
@@ -122,12 +122,12 @@ def _wandb_init(args):
     try:
         mode = "online" if os.environ.get("WANDB_API_KEY") else "offline"
         ts = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
-        run_name = f"probe-per-cwe-L{LAYER}-k{TOP_K}-{ts}"
+        run_name = f"probe-per-cwe-L{layer}-k{TOP_K}-{ts}"
         run = wandb.init(
             project=args.wandb_project,
             name=run_name,
             mode=mode,
-            config={**vars(args), "layer": LAYER, "top_k": TOP_K, "seed": SEED},
+            config={**vars(args), "layer": layer, "top_k": TOP_K, "seed": SEED},
             job_type="per-cwe-probe",
         )
         print(f"[train_per_cwe] wandb run: {run_name} (mode={mode})", file=sys.stderr)
@@ -172,19 +172,45 @@ def _wandb_finish(run):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument(
+        "--activations",
+        default=str(DEFAULT_ACT_PATH),
+        help="Path to activations .npz (must contain X, y).",
+    )
+    ap.add_argument(
+        "--layer",
+        type=int,
+        default=DEFAULT_LAYER,
+        help="Layer index recorded in the metric card / weights file.",
+    )
+    ap.add_argument(
+        "--out",
+        default=str(DEFAULT_OUT_NPZ),
+        help="Output path for stacked per-CWE weights (.npz).",
+    )
+    ap.add_argument(
+        "--card",
+        default=str(DEFAULT_OUT_CARD),
+        help="Output path for the metric card (.json).",
+    )
+    ap.add_argument(
         "--wandb-project",
         default=None,
         help="W&B project name; omit to disable wandb logging",
     )
     args = ap.parse_args()
 
-    X, y, cwes = load_data()
-    print(f"loaded activations: X={X.shape}  y={y.shape}  layer={LAYER}")
+    act_path = Path(args.activations)
+    out_npz = Path(args.out)
+    out_card = Path(args.card)
+    layer = int(args.layer)
+
+    X, y, cwes = load_data(act_path)
+    print(f"loaded activations: X={X.shape}  y={y.shape}  layer={layer}")
 
     targets = top_cwes(cwes, y, TOP_K)
     print(f"top-{TOP_K} CWEs (by positive count): {targets}")
 
-    run = _wandb_init(args)
+    run = _wandb_init(args, layer)
 
     W = np.zeros((len(targets), X.shape[1]), dtype=np.float32)
     b = np.zeros((len(targets),), dtype=np.float32)
@@ -236,18 +262,18 @@ def main():
     print("-" * 48)
     print(f"macro-AUC across {len(targets)} heads: {macro_auc:.4f}")
 
-    OUT_NPZ.parent.mkdir(parents=True, exist_ok=True)
+    out_npz.parent.mkdir(parents=True, exist_ok=True)
     np.savez(
-        OUT_NPZ,
+        out_npz,
         cwes=np.array(targets),
         W=W,
         b=b,
-        layer=np.int32(LAYER),
+        layer=np.int32(layer),
     )
-    print(f"saved weights: {OUT_NPZ}")
+    print(f"saved weights: {out_npz}")
 
     card = {
-        "layer": LAYER,
+        "layer": layer,
         "top_k": TOP_K,
         "cwes": targets,
         "per_cwe": per_cwe,
@@ -255,10 +281,10 @@ def main():
         "model": "LogisticRegression(max_iter=1000, C=1.0)",
         "split": "stratified 80/20, seed=0",
         "negative_set": "all label==0 rows (safe lead-up positions)",
-        "dataset": "pairs_v2 / activations_v2 layer 17",
+        "activations": str(act_path),
     }
-    OUT_CARD.write_text(json.dumps(card, indent=2))
-    print(f"saved card:    {OUT_CARD}")
+    out_card.write_text(json.dumps(card, indent=2))
+    print(f"saved card:    {out_card}")
 
     # Final summary: macro-AUC + a per-CWE table + a confusion-matrix table.
     if run is not None:
@@ -282,10 +308,10 @@ def main():
 
     _wandb_artifact(
         run,
-        OUT_NPZ,
+        out_npz,
         name="probe-per-cwe-weights",
         art_type="model",
-        metadata={"layer": LAYER, "top_k": TOP_K, "macro_auc": macro_auc, "cwes": targets},
+        metadata={"layer": layer, "top_k": TOP_K, "macro_auc": macro_auc, "cwes": targets},
     )
     _wandb_finish(run)
 

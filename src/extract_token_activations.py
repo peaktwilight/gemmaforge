@@ -1,13 +1,19 @@
 """Capture per-token hidden states from Gemma 4, with per-token vulnerability labels.
 
 This is the proper "span-aware" extraction. For each labelled example row:
-  1. Tokenize the full code.
-  2. Locate the vulnerable line via the row's `_vuln_line_text` field (carried
-     from the dataset builder) — find which tokens fall inside that line.
-  3. Forward-pass once through Gemma 4 with `output_hidden_states=True`.
-  4. For each captured layer, store hidden states at **every token position**
-     along with a per-token binary label (1 if token is inside the vulnerable
-     line span, 0 otherwise).
+  1. Tokenize the full code **once** (with offsets + special tokens) so the
+     model input and the offset mapping are perfectly aligned.
+  2. Resolve per-token labels from the row's `token_labels` char ranges
+     (the SVEN/diff-oracle builder writes these). Positive spans:
+     evidence / vulnerable_line / sink / source. Sanitizer spans are
+     negative (label-0) and are NOT used to mark tokens as vulnerable.
+  3. If a row predates the new builder and lacks `token_labels`, fall
+     back to the legacy `_vuln_line_text` line-locator (graceful
+     degradation for older datasets).
+  4. Forward-pass once through Gemma 4 with `output_hidden_states=True`.
+  5. For each captured layer, store hidden states at **every token
+     position** along with a per-token binary label (1 if token is inside
+     a positive vulnerability span, 0 otherwise).
 
 Output: `data/token_activations_layer{NN}.npz` containing
   - X: float32 array  (N_total_positions, hidden_dim)
@@ -32,6 +38,13 @@ import numpy as np
 import torch
 
 
+# Keys in `token_labels` that mark tokens as vulnerable (positive).
+POSITIVE_LABEL_KEYS: tuple[str, ...] = ("evidence", "vulnerable_line", "sink", "source")
+# Keys in `token_labels` that mark tokens as mitigated (negative / label-0).
+# We deliberately do NOT mark these as vulnerable.
+NEGATIVE_LABEL_KEYS: tuple[str, ...] = ("sanitizer",)
+
+
 def _device() -> str:
     if torch.backends.mps.is_available():
         return "mps"
@@ -40,44 +53,95 @@ def _device() -> str:
     return "cpu"
 
 
-def find_vuln_span(text: str, line_text: str, tokenizer) -> tuple[int, int] | None:
-    """Return (start_tok, end_tok) of the vulnerable line in token space.
+def _row_label(row: dict) -> int:
+    """Return 0/1 label, tolerant to rows that omit `label` (use is_completion_vulnerable)."""
+    lbl = row.get("label")
+    if lbl is not None:
+        try:
+            return int(lbl)
+        except (TypeError, ValueError):
+            pass
+    return 1 if row.get("is_completion_vulnerable") else 0
 
-    `text` is the full code. `line_text` is the literal vulnerable line content
-    (with original whitespace, as provided by CyberSecEval).
 
-    We use the tokenizer's offset_mapping to map character offsets to token
-    indices, then locate `line_text` in the source via plain str.find.
+def positive_char_spans(row: dict) -> list[tuple[int, int]]:
+    """Collect deduplicated positive char ranges from `row['token_labels']`.
+
+    Returns a list of (start_char, end_char) half-open ranges. Sanitizer
+    spans are intentionally excluded — they're negative evidence.
+    """
+    tl = row.get("token_labels") or {}
+    seen: set[tuple[int, int]] = set()
+    spans: list[tuple[int, int]] = []
+    for key in POSITIVE_LABEL_KEYS:
+        for entry in tl.get(key, []) or []:
+            try:
+                s, e = int(entry[0]), int(entry[1])
+            except (TypeError, ValueError, IndexError):
+                continue
+            if e <= s:
+                continue
+            k = (s, e)
+            if k in seen:
+                continue
+            seen.add(k)
+            spans.append(k)
+    return spans
+
+
+def char_spans_to_token_indices(
+    char_spans: list[tuple[int, int]],
+    offsets: list[tuple[int, int]],
+) -> list[tuple[int, int]]:
+    """Map char ranges → (start_tok, end_tok) inclusive token-index ranges.
+
+    `offsets[i] == (s, e)` is the char span for token i. Special tokens
+    (e.g. BOS) get (0, 0) from HuggingFace tokenizers — those are skipped
+    because their range is empty.
+
+    A char-range maps to every token whose char span overlaps it. Empty
+    overlaps (e.g. a sanitizer span that only touches whitespace tokens)
+    are dropped by the caller.
+    """
+    out: list[tuple[int, int]] = []
+    for c_s, c_e in char_spans:
+        first = last = -1
+        for i, (t_s, t_e) in enumerate(offsets):
+            if t_s == t_e:
+                # Special / empty token. Skip; do not let it anchor a span.
+                continue
+            if t_e <= c_s:
+                continue
+            if t_s >= c_e:
+                break
+            if first < 0:
+                first = i
+            last = i
+        if first >= 0 and last >= first:
+            out.append((first, last))
+    return out
+
+
+def find_vuln_span(text: str, line_text: str, offsets: list[tuple[int, int]]) -> tuple[int, int] | None:
+    """Legacy fallback: locate vulnerable line via `_vuln_line_text` lookup.
+
+    Used only for rows that predate the SVEN builder and don't have
+    `token_labels`. `offsets` must already come from the same tokenizer
+    call as the model input (i.e. include special-token (0,0) entries).
     """
     if not line_text:
         return None
     target = line_text.rstrip("\n")
     char_start = text.find(target)
     if char_start < 0:
-        # try stripped match
         ls = target.lstrip()
         char_start = text.find(ls)
         if char_start < 0:
             return None
         target = ls
     char_end = char_start + len(target)
-
-    enc = tokenizer(text, return_offsets_mapping=True, add_special_tokens=False, truncation=True, max_length=1024)
-    offsets = enc["offset_mapping"]
-    if not offsets:
-        return None
-
-    start_tok = end_tok = -1
-    for i, (s, e) in enumerate(offsets):
-        if s == e:
-            continue  # special tokens get (0,0)
-        if start_tok < 0 and e > char_start:
-            start_tok = i
-        if s < char_end:
-            end_tok = i
-    if start_tok < 0 or end_tok < start_tok:
-        return None
-    return start_tok, end_tok
+    spans = char_spans_to_token_indices([(char_start, char_end)], offsets)
+    return spans[0] if spans else None
 
 
 def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[int] | None = None) -> None:
@@ -117,39 +181,64 @@ def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[
     spans: list[tuple[int, int, int]] = []  # (example_id, tok_start_inclusive, tok_end_inclusive)
 
     skipped = 0
+    fallback_legacy = 0
+    fallback_last5 = 0
     t_loop = time.time()
     with torch.inference_mode():
         for eid, row in enumerate(rows):
             code = row["code"]
-            label = int(row["label"])
-            vuln_line_text = row.get("_vuln_line_text") or row.get("vuln_line_text") or ""
+            label = _row_label(row)
 
-            ids = tokenizer.encode(code, return_tensors="pt", truncation=True, max_length=1024).to(device)
+            # Single tokenize call: produces both the model input ids AND the
+            # offset mapping under the SAME `add_special_tokens` setting, so
+            # there is no off-by-one between hidden states and char spans.
+            enc = tokenizer(
+                code,
+                return_offsets_mapping=True,
+                add_special_tokens=True,
+                truncation=True,
+                max_length=1024,
+                return_tensors="pt",
+            )
+            ids = enc["input_ids"].to(device)
+            # `offset_mapping` from return_tensors="pt" is a tensor; convert to
+            # a plain list of (int, int) for our mapper.
+            om = enc["offset_mapping"][0].tolist()
+            offsets: list[tuple[int, int]] = [(int(s), int(e)) for s, e in om]
             out = model(ids, output_hidden_states=True, use_cache=False)
             n_pos = ids.shape[1]
             hs = out.hidden_states
 
-            # span: positive examples have the vulnerable line; negative do not.
-            span = None
-            if label == 1 and vuln_line_text:
-                span = find_vuln_span(code, vuln_line_text, tokenizer)
-
-            # If we have a span, label tokens INSIDE the span as 1, outside as 0.
-            # If no span (e.g. negative example), all tokens labeled 0.
-            tok_labels = np.zeros(n_pos, dtype=np.int8)
-            if span is not None:
-                s, e = span
-                s = max(0, min(s, n_pos - 1))
-                e = max(s, min(e, n_pos - 1))
-                tok_labels[s : e + 1] = 1
-                spans.append((eid, s, e))
+            # --- Resolve token spans ---------------------------------------
+            # Preferred: char ranges from the diff-oracle builder.
+            char_spans = positive_char_spans(row) if label == 1 else []
+            tok_spans: list[tuple[int, int]] = []
+            if char_spans:
+                tok_spans = char_spans_to_token_indices(char_spans, offsets)
             elif label == 1:
-                # Positive example but couldn't locate span — fall back to
-                # labeling just the last few tokens (this is our previous
-                # "snippet-level" behavior, retained as a fallback).
+                # Legacy fallback for older datasets without `token_labels`.
+                line_text = row.get("_vuln_line_text") or row.get("vuln_line_text") or ""
+                if line_text:
+                    span = find_vuln_span(code, line_text, offsets)
+                    if span is not None:
+                        tok_spans = [span]
+                        fallback_legacy += 1
+
+            # Label tokens inside any positive span as 1, else 0.
+            tok_labels = np.zeros(n_pos, dtype=np.int8)
+            if tok_spans:
+                for s, e in tok_spans:
+                    s = max(0, min(s, n_pos - 1))
+                    e = max(s, min(e, n_pos - 1))
+                    tok_labels[s : e + 1] = 1
+                    spans.append((eid, s, e))
+            elif label == 1:
+                # Positive example with no usable span — last-5 fallback.
+                # Logged so the caller can see how often we degrade.
                 fallback_span_start = max(0, n_pos - 5)
                 tok_labels[fallback_span_start:] = 1
                 spans.append((eid, fallback_span_start, n_pos - 1))
+                fallback_last5 += 1
 
             for li in layer_indices:
                 h = hs[li + 1][0, :, :].detach().to("cpu").float().numpy()  # (n_pos, dim)
@@ -161,7 +250,11 @@ def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[
                 rate = (eid + 1) / (time.time() - t_loop)
                 print(f"[token-extract] {eid+1}/{len(rows)}  {rate:.2f} ex/s", file=sys.stderr)
 
-    print(f"[token-extract] skipped {skipped} rows", file=sys.stderr)
+    print(
+        f"[token-extract] skipped {skipped} rows | "
+        f"legacy-line fallback: {fallback_legacy} | last-5 fallback: {fallback_last5}",
+        file=sys.stderr,
+    )
     y = np.array(labels, dtype=np.int8)
     eid_arr = np.array(example_ids, dtype=np.int32)
 

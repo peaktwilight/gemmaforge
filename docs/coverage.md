@@ -34,3 +34,16 @@ Headline cross-language number: training the probe on Python activations and eva
 - **Priority 3: add at least one systems-language outside SVEN (Rust or Go, n≥300 per class).** Effort: 2–3 days including extraction. Expected gain: lets us claim "language-portable" with three languages on the cross-language curve instead of two, which is the main credibility ask in the writeup.
 
 Tracked in [#7](https://github.com/peaktwilight/gemmaforge/issues/7).
+
+## Length-matched eval
+
+Issue [#22](https://github.com/peaktwilight/gemmaforge/issues/22) flagged that in `data/pairs.jsonl` positives are truncated AFTER the vulnerable line and negatives BEFORE it, so positives are ~2x longer (mean 396 vs 200 chars). A length-only baseline gets AUC 0.883 on Py->JS — the probe's 0.907 was only +0.024 above that. To control for length we matched each positive to a same-language negative within +/- 10% character length (greedy, closest delta, each negative used at most once) and re-ran the layer-17 LogReg probe on the surviving rows using the cached activations from `data/activations_v2/activations_layer17.npz`. Pipeline: `scripts/build_length_matched_eval.py` -> `data/pairs_length_matched.jsonl` -> `scripts/eval_length_matched.py` -> `data/eval_length_matched.json`. Kept **230 matched pairs** (135 Python, 95 JavaScript). Post-match mean character length is ~284 / ~285 (JS) and ~304 / ~307 (Py) across the two classes, i.e. effectively balanced.
+
+| Split                              | Probe AUC | Length-only AUC | Delta  |
+|------------------------------------|----------:|----------------:|-------:|
+| Full pairs.jsonl (random 80/20)    |     0.963 |           0.737 | +0.226 |
+| Py->JS, full                       |     0.907 |           0.883 | +0.024 |
+| Length-matched subset (80/20)      |     0.903 |           0.614 | +0.288 |
+| Py->JS, length-matched             |     0.843 |           0.514 | +0.329 |
+
+Verdict: the probe holds up. Once positives and negatives have matched character lengths, the length baseline collapses to near-chance (Py->JS 0.514) while the probe stays at AUC 0.843 — a delta of +0.329 versus the +0.024 delta we had with the length artifact still present. The probe drops modestly (0.907 -> 0.843 on Py->JS, an absolute -0.064) but it is now beating length by an order of magnitude wider margin, so the 0.907 headline was **not** mostly length. This is post-hoc evidence and the writeup should still keep the disclosure of the original artifact, but it closes [#22](https://github.com/peaktwilight/gemmaforge/issues/22) on the "probe partially learns length" question.

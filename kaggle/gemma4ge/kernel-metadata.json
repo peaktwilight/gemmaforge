@@ -1,0 +1,17 @@
+{
+  "id": "peaktwilight/gemma4ge",
+  "title": "Gemma4ge",
+  "code_file": "gemma4ge.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": false,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "machine_shape": "NvidiaTeslaT4",
+  "enable_internet": true,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": ["gemma-4-good-hackathon"],
+  "model_sources": []
+}

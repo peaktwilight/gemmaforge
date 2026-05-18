@@ -1,0 +1,16 @@
+{
+  "kind": "attention_probe_toy",
+  "layer": 17,
+  "auc": 0.9590972222222223,
+  "acc": 0.8833333333333333,
+  "n_train": 958,
+  "n_test": 240,
+  "pos_rate": 0.5,
+  "k": 8,
+  "n_heads": 8,
+  "lr": 0.001,
+  "epochs": 50,
+  "batch_size": 64,
+  "seed": 7,
+  "note": "Degenerate run: buffer = last-token repeated K times. With a constant buffer the attention pool reduces to a linear probe. Replace _fake_buffer with real per-token activations once issue #17 (per-token extraction) lands."
+}

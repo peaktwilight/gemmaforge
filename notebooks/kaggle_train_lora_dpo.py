@@ -98,9 +98,11 @@ print(f"out_dir={OUT_DIR}")
 import sys
 import subprocess
 # Kaggle's base image has transformers ~4.42 which doesn't know gemma4.
-# Install >=4.49 WITHOUT --upgrade so we don't bump torch (Kaggle's CUDA
-# driver doesn't have kernel images for a newer torch build).
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "transformers>=4.49", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
+# Force-upgrade JUST transformers (not torch, not nvidia-* which would mismatch CUDA).
+subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "--upgrade", "--no-deps", "transformers>=4.49"], check=True)
+subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
+import transformers
+print(f"transformers version after install: {transformers.__version__}")
 
 import torch
 print(f"torch={torch.__version__}  cuda_available={torch.cuda.is_available()}")

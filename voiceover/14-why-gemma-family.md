@@ -17,7 +17,3 @@ Caption: *"Same family · same tokenizer · same tool schema · one license. Raw
 ## Line
 
 > "And here's why this had to be Gemma. Three sizes. Same family. Same way of thinking. Try and mix Llama with Qwen for this and the two halves just don't speak the same language."
-
-## Tone
-
-Pride, but quietly. The first three fragments ("Three sizes. Same family. Same way of thinking.") land like building blocks — one, two, three. The Llama/Qwen aside is dry, almost a shrug, not mocking.

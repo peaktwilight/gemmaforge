@@ -16,8 +16,4 @@
 
 ## Line
 
-> "[slow] [stress] Local. [pause] [stress] Open. [pause] [stress] Verifiable. [hold-1s for room tone]"
-
-## Tone
-
-Three words. Hit each one. Don't rush. Eye-line into the camera, not at each other. Record several takes — editor picks the tightest unison. Leave at least 1 second of room tone after "Verifiable" before you stop talking.
+> "Local. Open. Verifiable."

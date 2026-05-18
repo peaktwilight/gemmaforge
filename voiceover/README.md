@@ -32,31 +32,7 @@ Each scene file has:
 
 1. **Header** — scene number, target seconds, who reads it, position in the video.
 2. **What's on screen while you read** — one sentence so you know the tone.
-3. **The line** — in a blockquote, with inline `[bracketed]` cues for the speaker and the editor (legend below). Read at the pace that lands inside the target window; if you can't, shorten the *line* (not the on-screen caption — that's in `VIDEO_SCRIPT.md` and the editor needs it intact).
-4. **Tone** — one sentence on delivery (eye-line, mood) where the inline cues don't capture it.
-
-## Inline cue legend
-
-The same `[brackets]` work for both speaker and editor — read them as performance / cut directions, not aloud.
-
-**Speaker cues (timing + delivery):**
-- `[pause]` — short breath, ≈ 0.3 s
-- `[beat]` — longer pause, ≈ 0.7 s
-- `[stress]` — emphasise the next word
-- `[slow]` / `[normal]` — tempo shift, applies until reset
-- `[flat]` — deliver matter-of-fact, no lift
-- `[soft]` — drop the volume one notch
-
-**Editor cues (visuals + sync):**
-- `[caption-in: …]` — burned-in caption fades in *now*
-- `[caption-out]` — caption fades out
-- `[cursor-click]` — mouse-click on screen
-- `[badge-land]` — small badge animates onto frame
-- `[type-in: "…"]` — text appears typewriter-style
-- `[zoom-in]` / `[zoom-out]` — push or pull on the live frame
-- `[cut]` — hard cut at this exact word
-
-Backticks are literal — read what's inside as the word(s) on the page.
+3. **The line** — in a blockquote. Read it at the pace that lands inside the target window; if you can't, shorten the line (don't shorten the on-screen caption — that's in `VIDEO_SCRIPT.md` and the editor needs it intact).
 
 ## Recording tips
 

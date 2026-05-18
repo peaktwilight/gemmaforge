@@ -95,7 +95,9 @@ print(f"out_dir={OUT_DIR}")
 #
 # Kaggle base images already ship recent torch + transformers, so we only
 # install what's missing. `trl>=0.21` keeps `beta`/`max_length` on DPOConfig.
-import subprocess; subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
+import sys
+import subprocess
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
 
 import torch
 print(f"torch={torch.__version__}  cuda_available={torch.cuda.is_available()}")

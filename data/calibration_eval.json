@@ -1,0 +1,54 @@
+{
+  "T": 1.794355144680561,
+  "a": -0.26854962742734356,
+  "seed": 7,
+  "holdout": {
+    "n_val": 240,
+    "auc_before": 0.9633333333333333,
+    "auc_after": 0.9633333333333333,
+    "brier_before": 0.07098106544902283,
+    "brier_after": 0.07285864780765229,
+    "ece_before": 0.05810062184195882,
+    "ece_after": 0.05543085874502747
+  },
+  "adversarial": {
+    "threshold": 0.5,
+    "n_examples": 20,
+    "baseline_last": {
+      "mean_before": 0.9660117536783218,
+      "mean_after": 0.9191175699234009,
+      "flip_rate_before": 0.0,
+      "flip_rate_after": 0.0
+    },
+    "baseline_max": {
+      "mean_before": 0.999234738945961,
+      "mean_after": 0.988639184832573,
+      "flip_rate_before": 0.0,
+      "flip_rate_after": 0.0
+    },
+    "t1_last": {
+      "mean_before": 0.9643025636672974,
+      "mean_after": 0.9152082890272141,
+      "flip_rate_before": 0.0,
+      "flip_rate_after": 0.0
+    },
+    "t1_max": {
+      "mean_before": 0.9975454539060593,
+      "mean_after": 0.983446153998375,
+      "flip_rate_before": 0.0,
+      "flip_rate_after": 0.0
+    },
+    "t3_last": {
+      "mean_before": 0.8793736584950238,
+      "mean_after": 0.8349240172654391,
+      "flip_rate_before": 0.05,
+      "flip_rate_after": 0.05
+    },
+    "t3_max": {
+      "mean_before": 0.9948219388723374,
+      "mean_after": 0.9740114599466324,
+      "flip_rate_before": 0.0,
+      "flip_rate_after": 0.0
+    }
+  }
+}

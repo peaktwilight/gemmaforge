@@ -2,6 +2,14 @@
 
 Operational drill-down for submission day. `SUBMISSION.md` is the high-level checklist; this file says exactly what to run and in what order. Times are minutes before the 23:59 UTC deadline.
 
+## Architecture (locked)
+
+| Surface | Purpose | Notes |
+|---|---|---|
+| **GitHub** `peaktwilight/gemmaforge` | code repo, all artifacts | private until submission |
+| **HuggingFace Space** `peaktwilight/gemma4ge` | live demo for judges | CPU-basic (free tier). The probe-only path is fast enough on CPU; the demo plays the streamed-token UI |
+| **Kaggle** | training + competition submission | DPO LoRA via `notebooks/kaggle_train_lora_dpo.py`, future span-max + 26B-A4B replication go here too |
+
 ## T-30 min — pre-flight
 
 1. **Repo clean and synced.**

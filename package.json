@@ -1,0 +1,41 @@
+{
+  "name": "gemmaforge",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Local-first CVE hunting in npm packages, powered by Gemma 4 via Ollama. Built on pwnkit.",
+  "bin": {
+    "gemmaforge": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsx src/cli.ts",
+    "audit": "tsx src/cli.ts audit",
+    "smoke": "tsx scripts/smoke-gemma.ts",
+    "web": "cd web && pnpm dev"
+  },
+  "keywords": [
+    "gemma",
+    "gemma4",
+    "ollama",
+    "security",
+    "npm",
+    "cve",
+    "supply-chain",
+    "ai-agent",
+    "pwnkit"
+  ],
+  "author": "Doruk Tan Ozturk <dtozturk02@gmail.com> (@peaktwilight)",
+  "homepage": "https://github.com/peaktwilight/gemmaforge",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

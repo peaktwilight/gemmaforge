@@ -42,6 +42,8 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 
 Best layer: **17 of 35** (mid-network). **0.907 cross-language** is the honest headline. Ablations: 4-layer ensemble → **0.976** (+0.013); MLP head → 0.919 cross-lang (closes ~30% of gap). The other 70% lives in the representation.
 
+![AUC ladder](web/auc-ladder.png)
+
 **Per-CWE multi-head probe** — 5 logits (CWE-78 / 338 / 95 / 94 / 328) on the same layer 17, trained one-vs-rest. **Macro AUC 0.9726, top-1 routing 94.7%**. The off-diagonal of the confusion matrix is near-zero, which means the heads are doing real per-class work — not five copies of a binary "danger" detector. Comparable to Obeso's >0.9 on Llama-3.3-70B for hallucinations, on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
 
 ## Why this is novel

@@ -124,12 +124,15 @@ def _train_dpo(model_id: str, device: str, records: list[dict],
     model.to(device)
     model.config.use_cache = False
 
+    # Gemma 4 is a Gemma4ForConditionalGeneration — has both a vision
+    # tower and a language model, each with q_proj/k_proj/v_proj/o_proj.
+    # We only want to LoRA-adapt the language model attentions.
     peft_cfg = LoraConfig(
         r=r,
         lora_alpha=alpha,
         lora_dropout=dropout,
         bias="none",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        target_modules=r".*language_model\..*\.(q_proj|k_proj|v_proj|o_proj)$",
         task_type="CAUSAL_LM",
     )
 
@@ -151,7 +154,6 @@ def _train_dpo(model_id: str, device: str, records: list[dict],
         remove_unused_columns=False,
         beta=0.1,
         max_length=max_len,
-        max_prompt_length=max_len // 2,
     )
 
     trainer = DPOTrainer(
@@ -202,7 +204,7 @@ def _train_sft(model_id: str, device: str, records: list[dict],
         lora_alpha=alpha,
         lora_dropout=dropout,
         bias="none",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        target_modules=r".*language_model\..*\.(q_proj|k_proj|v_proj|o_proj)$",
         task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, peft_cfg)

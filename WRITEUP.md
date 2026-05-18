@@ -31,7 +31,17 @@ We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](http
 
 The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
 
-**Result on Gemma 4 E2B:** **AUC 0.846 / acc 73.6%** on stratified 80/20 of 1,056 examples, layer 8 of 35 (the earliest of four candidates) wins — consistent with interp work showing mid-network features are often more linearly separable than the final residual stream. Layer 17 / 26 / 34 score 0.823 / 0.839 / 0.800.
+**Result on Gemma 4 E2B (layer 17, 1,198 CyberSecEval pairs):**
+
+| Eval split | AUC | accuracy | what it tests |
+|---|---:|---:|---|
+| Random stratified | 0.963 | 92.1% | in-distribution, baseline (paired-leakage warning ↓) |
+| Group-by-repo | 0.958 | 91.6% | no shared repo across train/test — leakage was real but only 0.005 |
+| Held-out CWE-78 | 0.924 | 84.8% | unseen vuln class |
+| Held-out CWE-338 | 0.923 | 82.9% | unseen vuln class |
+| **Cross-language (Python→JS)** | **0.907** | **81.9%** | **realistic transfer headline** |
+
+Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.958, doesn't beat single-layer 17. We report the **cross-language 0.907** as the headline because it's the most demanding split that excludes the same-source / same-language leakage that random/group splits don't.
 
 Obeso et al. reached AUC > 0.9 on Llama-3.3-70B for hallucinations; we hit 0.846 on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples. The obvious next steps from §3 of that paper — LoRA-augmented probes, more data, per-CWE heads — should close the gap.
 

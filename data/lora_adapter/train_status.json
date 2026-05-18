@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "model_id": "google/gemma-4-E2B-it",
+  "device": "mps",
+  "adapter_dir": "data/lora_adapter",
+  "n_examples": 8,
+  "lora": {
+    "r": 8,
+    "alpha": 16,
+    "dropout": 0.05
+  },
+  "trainer": "SFT-fallback",
+  "elapsed_sec": 92.36966681480408,
+  "steps_run": 2,
+  "mean_loss": 2.724501371383667
+}

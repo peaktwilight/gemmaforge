@@ -50,13 +50,34 @@ and specialised to vulnerability-detection probes on Gemma 4 hidden states.
 ### CLI (one-shot)
 
 ```bash
-uv run python scripts/run_eval_framework.py \
+# `uv run` needs sklearn + numpy; pull them inline if you don't have the
+# requirements.txt venv active.
+uv run --with scikit-learn --with numpy python scripts/run_eval_framework.py \
     --activations data/activations_v2/activations_layer17.npz \
     --pairs       data/pairs.jsonl \
     --layer       17 \
     --out-md      data/eval/report.md \
     --out-json    data/eval/report.json
 ```
+
+Two probe modes:
+- `--refit` (default) refits a fresh logreg on each split's train partition.
+  This is the right thing for OOD claims; every row is honest.
+- `--no-refit --probe data/probe.npz` uses a fixed shipped probe and only
+  scores test slices. Useful for "how does the deployed probe behave on
+  slice X" — but note that if the shipped probe was trained on the full
+  dataset, every "OOD" split here is in-distribution for it.
+
+### Group key for paired data
+
+`split_group_repo` keys on `pair_group_key(row)`:
+1. `_origin_repo` when present (CyberSecEval / CyberNative builders)
+2. `(_file_name, _func_name)` otherwise (SVEN builder via `scripts/build_dataset.py`)
+3. row identity as a last-resort singleton
+
+When the dataset is rebuilt from SVEN, the group split degenerates if you
+forget to pair safe/vulnerable rows under the same `(_file_name, _func_name)`
+— `n_groups` in the report's split-notes line is the cheap way to spot this.
 
 ### Notebooks
 

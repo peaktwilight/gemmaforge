@@ -180,11 +180,17 @@ def full_report(
     baselines: Optional[list[Baseline]] = None,
     include: tuple[str, ...] = ("random", "group_repo", "heldout_cwe", "heldout_lang", "heldout_source"),
     seed: int = 7,
+    bootstrap_n: int = 1000,
+    threshold: float = 0.5,
 ) -> FullReport:
     """Run the full split bundle and return a `FullReport`."""
     splits = make_splits(rows, y, include=include, seed=seed)
     reports = [
-        evaluate_split(X, y, rows, sp, probe=probe, refit=refit, baselines=baselines)
+        evaluate_split(
+            X, y, rows, sp,
+            probe=probe, refit=refit, baselines=baselines,
+            bootstrap_n=bootstrap_n, threshold=threshold,
+        )
         for sp in splits
     ]
     return FullReport(

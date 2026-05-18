@@ -35,18 +35,44 @@ class Split:
     note: str = ""
 
 
-def attach_paired_cwe(rows: list[dict]) -> list[dict]:
-    """In v2 pairs.jsonl the negatives have cwe=None — propagate from the
-    paired positive in the same `_origin_repo` so heldout-CWE keeps pairs
-    together. Returns the same list with `_paired_cwe` added on each row.
+def pair_group_key(row: dict) -> str:
+    """Canonical group key for paired safe/vulnerable variants.
+
+    Different builders emit different group metadata:
+      - CyberSecEval / CyberNative -> `_origin_repo` populated
+      - SVEN (`scripts/build_dataset.py`) -> `_origin_repo` is None,
+        but `_file_name` and `_func_name` are populated
+    To keep `group_repo` meaningful on either corpus, we use the first
+    non-empty source in priority order and fall back to a per-row sentinel
+    so an unkeyable row becomes its own singleton group (won't leak, won't
+    join anything).
     """
-    repo_cwe: dict[str, str | None] = {}
+    repo = row.get("_origin_repo")
+    if repo:
+        return f"repo::{repo}"
+    f = row.get("_file_name") or ""
+    fn = row.get("_func_name") or ""
+    if f or fn:
+        return f"func::{f}::{fn}"
+    # Last resort: keep stable across calls within a process by using id().
+    return f"row::{id(row)}"
+
+
+def attach_paired_cwe(rows: list[dict]) -> list[dict]:
+    """Propagate CWE from each pair's positive row down to its paired
+    negative, keyed by `pair_group_key` so heldout-CWE keeps pairs together.
+
+    Adds `_paired_cwe` and `_pair_group` to each row in place.
+    """
+    pair_cwe: dict[str, str | None] = {}
     for r in rows:
+        key = pair_group_key(r)
+        r["_pair_group"] = key
         if r.get("label") == 1 and r.get("cwe"):
-            repo_cwe[r.get("_origin_repo")] = r["cwe"]
+            pair_cwe[key] = r["cwe"]
     for r in rows:
         if r.get("label") == 0 and r.get("cwe") is None:
-            r["_paired_cwe"] = repo_cwe.get(r.get("_origin_repo"))
+            r["_paired_cwe"] = pair_cwe.get(r["_pair_group"])
         else:
             r["_paired_cwe"] = r.get("cwe")
     return rows
@@ -55,14 +81,19 @@ def attach_paired_cwe(rows: list[dict]) -> list[dict]:
 def split_random(y: np.ndarray, seed: int = 7) -> Split:
     idx = np.arange(len(y))
     tr, te = train_test_split(idx, test_size=0.2, stratify=y, random_state=seed)
-    return Split("random_stratified", tr, te, note="leaky baseline; pairs share repos")
+    return Split("random_stratified", tr, te, note="leaky baseline; pairs share group key")
 
 
 def split_group_repo(rows: list[dict], y: np.ndarray, seed: int = 7) -> Split:
-    groups = np.array([r.get("_origin_repo") for r in rows])
+    """Group split on `pair_group_key(row)` — repo when available,
+    `(file, func)` for SVEN-style data.
+    """
+    groups = np.array([pair_group_key(r) for r in rows])
+    n_unique = len(set(groups.tolist()))
     gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=seed)
     (tr, te), = gss.split(np.zeros((len(y), 1)), y, groups=groups)
-    return Split("group_repo", tr, te, note="GroupShuffleSplit on _origin_repo")
+    note = f"GroupShuffleSplit on pair_group_key (n_groups={n_unique})"
+    return Split("group_repo", tr, te, note=note)
 
 
 def split_heldout_cwe(rows: list[dict], y: np.ndarray, top_k: int = 5) -> list[Split]:

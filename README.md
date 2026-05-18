@@ -35,7 +35,9 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 - **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
 - **Live demo:** [HuggingFace Space](https://huggingface.co/spaces/peaktwilight/gemmaforge) (ZeroGPU). All weights and data in this repo.
 
-See [`docs/coverage.md`](docs/coverage.md) for per-language analysis and [`SUBMISSION.md`](SUBMISSION.md) for the hackathon submission checklist.
+See [`docs/coverage.md`](docs/coverage.md) for per-language analysis, [`RESULTS.md`](RESULTS.md) for the full metrics dashboard, and [`SUBMISSION.md`](SUBMISSION.md) for the hackathon submission checklist.
+
+![GemmaForge demo grid](web/demo-grid.png)
 
 ## Tracks targeted
 

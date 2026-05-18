@@ -1,0 +1,75 @@
+{
+  "layer": 17,
+  "split": "heldout_lang::test=javascript",
+  "auc": 0.907283753487847,
+  "acc": 0.8192771084337349,
+  "n_train": 700,
+  "n_test": 498,
+  "source_activations": "data/activations_v2/activations_layer17.npz",
+  "source_pairs": "data/pairs.jsonl",
+  "all_splits": [
+    {
+      "split": "random_stratified",
+      "auc": 0.9633333333333333,
+      "acc": 0.9208333333333333,
+      "n_train": 958,
+      "n_test": 240
+    },
+    {
+      "split": "group_repo",
+      "auc": 0.9584068921686323,
+      "acc": 0.9159663865546218,
+      "n_train": 960,
+      "n_test": 238
+    },
+    {
+      "split": "heldout_cwe::CWE-78",
+      "auc": 0.9235968263297091,
+      "acc": 0.8484848484848485,
+      "n_train": 1033,
+      "n_test": 165
+    },
+    {
+      "split": "heldout_cwe::CWE-338",
+      "auc": 0.9227687870533569,
+      "acc": 0.8291139240506329,
+      "n_train": 1040,
+      "n_test": 158
+    },
+    {
+      "split": "heldout_cwe::CWE-95",
+      "auc": 0.9422285533396644,
+      "acc": 0.8930817610062893,
+      "n_train": 1039,
+      "n_test": 159
+    },
+    {
+      "split": "heldout_cwe::CWE-94",
+      "auc": 0.9602366863905325,
+      "acc": 0.9076923076923077,
+      "n_train": 1068,
+      "n_test": 130
+    },
+    {
+      "split": "heldout_cwe::CWE-328",
+      "auc": 0.9448051948051948,
+      "acc": 0.8288288288288288,
+      "n_train": 1087,
+      "n_test": 111
+    },
+    {
+      "split": "heldout_lang::test=python",
+      "auc": 0.9291755102040816,
+      "acc": 0.8571428571428571,
+      "n_train": 498,
+      "n_test": 700
+    },
+    {
+      "split": "heldout_lang::test=javascript",
+      "auc": 0.907283753487847,
+      "acc": 0.8192771084337349,
+      "n_train": 700,
+      "n_test": 498
+    }
+  ]
+}

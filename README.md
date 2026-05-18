@@ -129,6 +129,23 @@ python -m src.stream_with_probe --serve     # loads shipped data/probe.npz
 
 Or just visit the hosted Space: [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge).
 
+## Pipeline: GemmaForge → pwnkit (small Gemma finds, big Gemma hunts)
+
+The probe doesn't have to stop at "this looks risky" — it can hand findings to an agentic hunter that actually exploits them. Today GemmaForge ships a first-party integration with [pwnkit](https://github.com/0sec-labs/pwnkit), an open-source agentic-AI pentest framework:
+
+```bash
+# 1. scan a repo with the probe → ND-JSON leads (gemmaforge.leads/v1)
+python -m src.scan examples/vuln-express-app --top-k 10 > /tmp/leads.jsonl
+
+# 2. hand the leads to pwnkit; agent loop runs on local Gemma 4 27B via Ollama
+pwnkit-cli review examples/vuln-express-app \
+    --seed-findings /tmp/leads.jsonl \
+    --runtime ollama \
+    --model gemma4:latest
+```
+
+Same Gemma family, two roles: small 8B probe finds, big 27B agent hunts. Zero cloud spend, zero data leaving the laptop. Schema contracts at [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md). Pre-computed [`examples/leads.jsonl`](examples/leads.jsonl) is shipped so judges without local Gemma weights can run step 2 alone. The pwnkit side landed in [PR #371](https://github.com/0sec-labs/pwnkit/pull/371) and [PR #372](https://github.com/0sec-labs/pwnkit/pull/372).
+
 ## How to reproduce the headline numbers
 
 ```bash
@@ -242,7 +259,7 @@ Tracked as 13 open GitHub issues. Highlights:
 - **Token-level probe → head-to-head vs sample-level.** Both trainers are live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces the shipped sample-level probe.
 - **Full DPO LoRA on dedicated GPU.** `scripts/train_lora.py` already supports `--max_steps 500`; we need a clean CUDA box. Stretch goal: re-train the probe *jointly* with the LoRA, the way Obeso §3 does — probe gradient gets a stop-grad on the base, the LoRA gradient flows.
 - **More languages.** Rust + Go via CyberSecEval-2; Ruby via RubySec advisory DB; PHP via SARD/Juliet. The activation-extraction pipeline is the bottleneck, not the probe.
-- **VS Code extension** that reads the same SSE stream, and a **pwnkit confidence-filter** that prunes agentic exploits gated on probe risk.
+- **VS Code extension** that reads the same SSE stream.
 
 ## Citations
 

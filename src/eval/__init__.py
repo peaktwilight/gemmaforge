@@ -1,21 +1,30 @@
 """Evaluation framework for GemmaForge vulnerability-detection probes.
 
-Adapted from the hallucination-probes paper methodology (Obeso et al. 2025,
-arxiv.org/abs/2509.03531). The paper evaluates probes at three aggregation
-levels — all-token, in-span-token, and span-max. For vulnerability probes we
-add leakage-aware splits (paired safe/vulnerable variants share repos), a
-per-CWE and per-language breakdown, regex baselines, and bootstrap CIs.
+Two evaluation paths:
 
-Public API:
-    metrics.compute_clf_metrics(preds, labels, probs) -> dict
-    metrics.bootstrap_auc_ci(labels, probs, n=1000) -> (lo, hi)
-    metrics.calibration_metrics(labels, probs) -> dict
-    splits.make_splits(rows, y, names=...) -> list[Split]
-    baselines.RegexBaseline().score(rows) -> np.ndarray
-    protocol.evaluate_split(X, y, rows, split, probe=None) -> SplitReport
-    protocol.full_report(X, y, rows, probe=None) -> FullReport
-    report.render_markdown(report) -> str
+  Sample-level (legacy / baseline)
+    - dataset:    `data/pairs.jsonl` (one row = one file)
+    - activations:`data/activations_v2/activations_layer*.npz` (last token)
+    - probe:      `data/probe.npz` (the shipped sample-level probe)
+    - entry:      `src.eval.protocol.full_report`, `scripts/run_eval_framework.py`
+
+  Token-level (new / primary)
+    - dataset:    `data/dataset.jsonl` (one row = one file + char-range spans)
+    - activations:per-token vectors (extractor blocked by issue #17)
+    - probe:      output of `src/train_probe_spanmax.py`
+    - entry:      `src.eval.token_protocol.full_token_report`, `scripts/run_token_eval.py`
+
+Both paths share `metrics`, `splits`, `baselines`, `report`. The old
+sample-level probe is available as `baselines.ProbeBaseline` /
+`BroadcastProbeBaseline` so it lines up next to random / length / regex
+in either path.
 """
-from . import metrics, splits, baselines, protocol, report, probe_io  # noqa: F401
+from . import (
+    metrics, splits, baselines, protocol, report, probe_io,
+    token_data, token_protocol, runtime,
+)  # noqa: F401
 
-__all__ = ["metrics", "splits", "baselines", "protocol", "report", "probe_io"]
+__all__ = [
+    "metrics", "splits", "baselines", "protocol", "report", "probe_io",
+    "token_data", "token_protocol", "runtime",
+]

@@ -20,22 +20,6 @@ Probe fit mode: `refit per split (OOD)`
 | `heldout_source::CyberSecEval` | n/a (n/a-n/a) | n/a | n/a | n/a | n/a | n/a | 599 | 599 |
 | `heldout_source::CyberSecEval-leadup` | n/a (n/a-n/a) | n/a | n/a | n/a | n/a | n/a | 599 | 0 |
 
-## Probe vs baselines (AUC)
-
-| split | probe | random | length | regex |
-|---|---|---|---|---|
-| `random_stratified` | 0.963 | 0.393 | 0.895 | 0.701 |
-| `group_repo` | 0.958 | 0.508 | 0.911 | 0.685 |
-| `heldout_cwe::CWE-78` | 0.923 | 0.520 | 0.840 | 0.721 |
-| `heldout_cwe::CWE-338` | 0.923 | 0.474 | 0.885 | 0.782 |
-| `heldout_cwe::CWE-95` | 0.942 | 0.446 | 0.884 | 0.675 |
-| `heldout_cwe::CWE-94` | 0.960 | 0.476 | 0.935 | 0.748 |
-| `heldout_cwe::CWE-328` | 0.944 | 0.473 | 0.904 | 0.991 |
-| `heldout_lang::test=javascript` | 0.907 | 0.522 | 0.883 | 0.647 |
-| `heldout_lang::test=python` | 0.929 | 0.519 | 0.885 | 0.719 |
-| `heldout_source::CyberSecEval` | n/a | n/a | n/a | n/a |
-| `heldout_source::CyberSecEval-leadup` | n/a | n/a | n/a | n/a |
-
 ## Split notes
 
 - `random_stratified`: leaky baseline; pairs share group key

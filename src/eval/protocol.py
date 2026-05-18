@@ -107,14 +107,15 @@ def evaluate_split(
     _, lo, hi = bootstrap_auc_ci(y_te, probs, n_iter=bootstrap_n)
     cal = calibration_metrics(y_te, probs)
 
-    # Baselines on the same test slice; rows[te] only.
+    # Baselines on the same test slice; rows[te] only. Baselines that
+    # require activations (the shipped sample-level probe) get X[te].
     baseline_aucs: dict[str, float] = {}
     if baselines:
         from sklearn.metrics import roc_auc_score
         rows_te = [rows[i] for i in te.tolist()]
         for bl in baselines:
             try:
-                s = bl.score(rows_te)
+                s = bl.score(rows_te, X=X[te] if getattr(bl, "needs_activations", False) else None)
                 if len(np.unique(y_te)) >= 2:
                     baseline_aucs[bl.name] = float(roc_auc_score(y_te, s))
                 else:

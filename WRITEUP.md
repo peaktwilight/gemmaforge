@@ -9,9 +9,9 @@
 ## Team — security meets interpretability
 
 - [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. **10+ CVE-grade vulnerabilities discovered in npm packages with 200M+ combined monthly downloads**, including [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`. Builder of [`pwnkit`](https://github.com/PwnKit-Labs/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source.
-- **Mehmet Efe Akça** — MSc Data Science, ETH Zürich. Coursework in *Reliable and Trustworthy AI*, *Probabilistic AI*, *Large-Scale AI*. TA for *Mathematics of Signals, Networks, and Learning*. Knows how to read what a neural network is thinking.
+- **Mehmet Efe Akça** — MSc Data Science, ETH Zürich. Coursework in *Reliable and Trustworthy AI*, *Probabilistic AI*. TA for *Mathematics of Signals, Networks, and Learning*. Knows how to read what a neural network is thinking.
 
-Security alone gives you a scanner. Interpretability alone gives you a probe. Together you get **a probe that knows about danger** — trained partly on bugs one of us personally disclosed.
+Security alone gives you a scanner; interpretability alone gives you a probe. Together: **a probe that knows about danger** — trained partly on bugs one of us personally disclosed.
 
 ## The problem
 
@@ -31,16 +31,9 @@ We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](http
 
 The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
 
-**Result on Gemma 4 E2B (this submission):** the probe reaches **AUC 0.846** on a stratified 80/20 held-out split of the 1,056-example dataset. Of the four candidate layers (8, 17, 26, 34 — i.e. 25/50/75/100% of the 35-layer decoder), the **earliest layer wins** — consistent with the interpretability finding that mid-network features are often more linearly separable than the final residual stream.
+**Result on Gemma 4 E2B:** **AUC 0.846 / acc 73.6%** on stratified 80/20 of 1,056 examples, layer 8 of 35 (the earliest of four candidates) wins — consistent with interp work showing mid-network features are often more linearly separable than the final residual stream. Layer 17 / 26 / 34 score 0.823 / 0.839 / 0.800.
 
-| layer | AUC   | accuracy |
-|-------|-------|----------|
-| **8** | **0.846** | **73.6%** |
-| 17    | 0.823 | 75.0%    |
-| 26    | 0.839 | 78.3%    |
-| 34    | 0.800 | 72.6%    |
-
-The Obeso paper showed streaming probes work for hallucinated entities at AUC > 0.9 on Llama-3.3-70B; we hit 0.832 on a 2B Gemma 4 with zero hyper-parameter tuning, no LoRA augmentation, and a 1,000-example dataset. With the obvious next steps from that paper — LoRA-augmented probes, more data, per-CWE heads — we expect to close most of that gap.
+Obeso et al. reached AUC > 0.9 on Llama-3.3-70B for hallucinations; we hit 0.846 on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples. The obvious next steps from §3 of that paper — LoRA-augmented probes, more data, per-CWE heads — should close the gap.
 
 ## Why this is novel
 
@@ -79,7 +72,7 @@ A small HTML page consumes a Server-Sent-Events feed and colors each token: gree
    - Doruk's published CVE corpus (`node-forge`, `picomatch`, two more).
    - `CyberNative/Code_Vulnerability_Security_DPO` — paired vulnerable/patched code across Python, JS, C, Java, 1:1 balanced.
    - Hand-written seeds covering CWE-22, 78, 79, 89, 94, 295, 327, 330, 352, 502, 798, 918, 1333.
-   - **~55 natural-language / non-code "safe" examples** (chat greetings, markdown documentation, README prose, JSON, comments). Without these, an early version of the probe scored every chat-style sentence as vulnerable because it had never seen one — the probe was effectively a "code detector," not a "vulnerability detector." Including non-code negatives forced the probe to learn the actual signal.
+   - **~55 natural-language safe examples** (chat greetings, markdown, JSON, prose). Without these, an early probe scored every chat sentence as vulnerable — it was a "code detector," not a "vulnerability detector." Adding non-code negatives forced the actual signal.
 2. **Activation capture.** Forward-pass each example through Gemma 4 with `output_hidden_states=True`. Record the last-token hidden state at layers 25%, 50%, 75%, 100%.
 3. **Probe training.** Per layer: 80/20 stratified split, `sklearn.linear_model.LogisticRegression(C=1.0)`. Pick the layer with best held-out AUC. Save `(w, b, layer)` as a 10 KB `.npz`.
 
@@ -87,26 +80,26 @@ End-to-end training: ~90 seconds on an M1 Max once activations are cached. Fast 
 
 ## What the demo shows
 
-Click a preset on the left — e.g. *"Write an Express handler for GET /users/:id that returns the user row from MySQL."* Gemma 4 streams code. As tokens land:
+Two presets on the left frame the same request differently:
 
-- Framework boilerplate stays green.
-- The instant Gemma starts writing `` `SELECT * FROM users WHERE id=${id}` ``, the probe flips red **mid-line**. The risk meter pegs at the exact moment Gemma decides to interpolate user-controlled `id` into a SQL string.
-- Ask Gemma to write the same handler "safely." The query renders as `db.query("SELECT … WHERE id=?", [id])` and the probe scores near zero.
+1. *"Quick and dirty Express handler for `GET /users/:id`, just make it work, no time to worry about sanitisation."* → Gemma writes lax code (string-interpolated SQL, hardcoded checks, missing validation). The probe's running mean rises into the yellow-red band, and clusters of red tokens fire around the actual risky lines.
+2. *"Production-grade Express handler ... parameterised queries and proper error handling."* → Gemma writes safer code. The running mean stays in the green band, with occasional yellow spikes on framework-name tokens (false positives the probe inherits from its training distribution).
 
-The developer sees Gemma's internal state betray the unsafe pattern *before* they paste a single character.
+Across runs, **mean risk lifts ~10 percentage points** on the unsafe framing vs. the safe one. The story is *"the safer version stays predominantly green; the lazier version is visibly more red"* — a real signal on a 2B model with a single linear classifier.
 
 ## Why Gemma 4 specifically
 
 This project can't be built on a closed model:
 
-- **Raw hidden states.** GPT-5 and Claude don't expose them. Open weights are the only option.
-- **Function calling + long context.** Gemma 4 ships native function calling and a 131k window, so the same model running the probe can also drive a normal IDE assistant flow without a cloud round-trip.
-- **Permissive license.** Gemma 4's terms are Apache-2.0-equivalent in practice — any maintainer in any country runs it without legal review.
-- **Laptop-sized.** Gemma 4 E2B (~2B params) does >20 tok/s on Apple Silicon. 26B-A4B handles the harder cases without leaving the device.
+- **Raw hidden states.** Closed models don't expose them. Open weights are the only option.
+- **Native function calling + 131k context.** The same Gemma 4 instance can drive a normal IDE assistant flow alongside the probe, without a cloud round-trip.
+- **Permissive license.** Apache-2.0-equivalent terms; any maintainer in any country runs it without legal review.
+- **Laptop-sized.** E2B (~2B) does >20 tok/s on Apple Silicon. 26B-A4B covers harder cases locally.
 
 ## Limitations (honest)
 
-- **Probes are not ground-truth classifiers, they classify representation.** A high score means *"this looks, on the inside, like code I was trained on as vulnerable,"* not *"this is exploitable."* Expect false positives on lookalike-but-safe patterns.
+- **Probes classify representation, not ground truth.** A high score means *"this looks, on the inside, like code I was trained on as vulnerable,"* not *"this is exploitable."* Expect false positives on lookalike-but-safe patterns.
+- **Train-inference distribution gap on streaming.** The probe was trained on the last-token activation of *complete* snippets but at inference reads every *intermediate* position. We mitigate with an 8-token sliding-window mean; a proper fix needs per-token labels — a real project, not a hackathon weekend.
 - **Per-size retraining.** A probe trained on E2B does not drop into 26B-A4B unchanged. ~10 min of compute per size.
 - **Uneven cross-language coverage.** Python and JS are well represented. C/C++ less so. Rust and Zig score noisily until we collect targeted pairs.
 

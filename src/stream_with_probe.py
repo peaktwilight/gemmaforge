@@ -91,8 +91,15 @@ def stream(
 
     # KV-cached streaming: prime the cache with the full prompt once, then
     # feed one token at a time and keep the cache alive. Cuts per-token cost
-    # from O(seq_len) to O(1) attention ops. Without this, 200 tokens of
-    # streaming on M1 Max is unwatchably slow.
+    # from O(seq_len) to O(1) attention ops.
+    #
+    # The probe is trained on SNIPPET-LEVEL last-token activations, so
+    # per-token scores during streaming are noisy. We surface BOTH the
+    # raw per-token risk and a sliding-window mean. The UI uses the smoothed
+    # value for coloring (visually stable) and reports the raw for stats.
+    SMOOTH_WIN = 8
+    window: list[float] = []
+
     with torch.inference_mode():
         out = model(input_ids, output_hidden_states=True, use_cache=True)
         past_kv = out.past_key_values
@@ -105,18 +112,28 @@ def stream(
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_id = int(torch.multinomial(probs, 1).item())
 
-            # Risk score from the hidden state at the position we just predicted
-            # FROM (i.e. the last position before sampling).
-            hs = out.hidden_states  # tuple length = n_layers + 1 (embedding included)
+            hs = out.hidden_states
             h = hs[layer + 1][0, -1, :].detach().to("cpu").float().numpy()
-            risk = _sigmoid(float(np.dot(w, h) + b))
+            raw_risk = _sigmoid(float(np.dot(w, h) + b))
+
+            window.append(raw_risk)
+            if len(window) > SMOOTH_WIN:
+                window.pop(0)
+            smooth_risk = sum(window) / len(window)
 
             try:
                 tok_text = tokenizer.decode([next_id])
             except Exception:
                 tok_text = "?"
 
-            yield {"event": "token", "token": tok_text, "risk": risk, "step": step}
+            # `risk` is what the UI uses for color; `risk_raw` is per-token.
+            yield {
+                "event": "token",
+                "token": tok_text,
+                "risk": smooth_risk,
+                "risk_raw": raw_risk,
+                "step": step,
+            }
 
             if eos_id is not None and next_id == eos_id:
                 yield {"event": "done", "reason": "eos"}

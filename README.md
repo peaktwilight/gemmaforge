@@ -29,9 +29,9 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 ```
 
 - **Model:** `gemma4:8b` (8B params, 1536-dim hidden states, 131k context, native function-calling)
-- **Probe:** a 2560-input linear classifier (~10KB) on the hidden state at each generated token
-- **Training data:** patched/vulnerable function pairs from GHSA advisories, BigVul, and the author's CVE corpus
-- **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
+- **Probe:** a 1,536-input linear classifier (~10KB) on the hidden state at decoder layer 8 (of 35). **AUC 0.846** on held-out 80/20.
+- **Training data:** 1,056 examples — paired vulnerable/patched code (CyberNative DPO + the author's CVE corpus) + ~55 natural-language safe negatives so the probe doesn't fire on Gemma's chat preamble
+- **Inference:** < 1 ms per token of overhead on top of normal forward pass. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
 
 ## Tracks targeted
 

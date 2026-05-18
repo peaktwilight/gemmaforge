@@ -27,7 +27,7 @@ Yes. We built it.
 
 ## The technique
 
-**Two paths.** Numbers below are from the **sample-level** path (one label per snippet, linear probe on last-token hidden state) — what ships. A **token-level** value-head probe with per-token spans + BCE + span-max loss is in parallel training as the intended replacement.
+**Two paths, both trained.** **Sample-level** (one label per snippet, linear probe on last-token state) is what ships — numbers below. **Token-level** (per-token spans, BCE + span-max loss à la Obeso §3) is the principled version: token AUC **0.768** / example AUC **0.700** at layer 8 on the SVEN-diff token-labelled dataset (see `data/probe_spanmax_card.json`). It scores lower in absolute terms because per-token classification is a harder task, but it's the right shape for streaming inference; we keep the sample-level probe shipping today and the token-level one as the post-hackathon successor.
 
 Adapts the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.03531) from *fabricated entities* to *vulnerable code patterns*. A linear classifier sits on Gemma 4's last-token hidden state at an intermediate decoder layer; binary label = *"the code emitted so far is the vulnerable side of a known patch pair."* Probe = ~1,536 weights, <10 KB, sub-ms per token on the same laptop as Gemma 4.
 

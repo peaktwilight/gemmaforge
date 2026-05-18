@@ -105,8 +105,11 @@ def extract(model_id: str, jsonl_path: Path, out_dir: Path, layer_indices: list[
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="google/gemma-3-4b-it")
-    ap.add_argument("--pairs", default="data/pairs.jsonl")
+    # Canonical defaults match scripts/build_dataset.py output and
+    # src/stream_with_probe.py model — closes #15. Any mismatch here
+    # silently invalidates the probe (Gemma-3 activations vs Gemma-4 inference).
+    ap.add_argument("--model", default="google/gemma-4-E2B-it")
+    ap.add_argument("--pairs", default="data/dataset.jsonl")
     ap.add_argument("--out", default="data/activations")
     args = ap.parse_args()
 

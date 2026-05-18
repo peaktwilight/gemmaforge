@@ -28,6 +28,7 @@ from src.scan import (
     SCAN_PROFILES,
     SCHEMA_EVENTS,
     SCHEMA_LEADS,
+    _chunk_file,
     _chunk_lines,
     _iter_files,
     build_parser,
@@ -84,6 +85,44 @@ def test_chunk_lines_skips_blank_only_windows():
 
 def test_chunk_lines_empty_returns_nothing():
     assert list(_chunk_lines("", "x.py", window=4, stride=2)) == []
+
+
+def test_python_chunks_include_prior_import_context():
+    text = "\n".join([
+        "import os",
+        "from pathlib import Path",
+        "",
+        "def read_user(name):",
+        "    p = Path('/tmp') / name",
+        "    return os.readlink(p)",
+    ])
+    chunks = list(_chunk_file(text, "x.py", lang="py", window=2, stride=2))
+    later = chunks[1]
+    assert later.start_line == 3
+    assert later.text.startswith("import os\nfrom pathlib import Path\n\n")
+    assert "def read_user" in later.text
+
+
+def test_javascript_chunks_include_prior_import_context():
+    text = "\n".join([
+        "import fs from 'fs';",
+        "const cp = require('child_process');",
+        "",
+        "export function run(cmd) {",
+        "  return cp.execSync(cmd).toString();",
+        "}",
+    ])
+    chunks = list(_chunk_file(text, "x.js", lang="js", window=2, stride=2))
+    later = chunks[1]
+    assert later.start_line == 3
+    assert later.text.startswith("import fs from 'fs';\nconst cp = require('child_process');\n\n")
+    assert "export function run" in later.text
+
+
+def test_unsupported_language_uses_plain_chunks():
+    text = "import thing\n\ncall_thing()\n"
+    chunks = list(_chunk_file(text, "x.rb", lang="rb", window=2, stride=2))
+    assert chunks[1].text == "call_thing()"
 
 
 # ---------------- walking ---------------- #

@@ -17,7 +17,9 @@ can pick leads for a larger agentic hunter to chase.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
+import re
 import sys
 import time
 from dataclasses import dataclass
@@ -81,6 +83,13 @@ SKIP_DIRS = {
     ".next", ".nuxt", ".cache", ".tox",
 }
 
+IMPORT_CONTEXT_LANGS = {"py", "js", "ts"}
+MAX_IMPORT_CONTEXT_LINES = 80
+
+_JS_REQUIRE_RE = re.compile(
+    r"^\s*(?:const|let|var)\s+[\w${}\s,*]+\s*=\s*require\s*\("
+)
+
 
 @dataclass
 class Chunk:
@@ -133,8 +142,10 @@ def _chunk_lines(
     file_rel: str,
     window: int,
     stride: int,
+    context_blocks: Optional[list[tuple[int, int, str]]] = None,
+    max_context_lines: int = MAX_IMPORT_CONTEXT_LINES,
 ) -> Iterator[Chunk]:
-    """Sliding line-window chunks. Language-agnostic v1."""
+    """Sliding line-window chunks, optionally prefixed with import context."""
     lines = text.splitlines()
     if not lines:
         return
@@ -144,15 +155,136 @@ def _chunk_lines(
         end = min(i + window, n)
         body = "\n".join(lines[i:end])
         if body.strip():
+            prefix = _context_before_line(
+                context_blocks or [],
+                before_line=i + 1,
+                max_lines=max_context_lines,
+            )
+            chunk_text = f"{prefix}\n\n{body}" if prefix else body
             yield Chunk(
                 file=file_rel,
                 start_line=i + 1,
                 end_line=end,
-                text=body,
+                text=chunk_text,
             )
         if end == n:
             return
         i += stride
+
+
+def _chunk_file(
+    text: str,
+    file_rel: str,
+    lang: Optional[str],
+    window: int,
+    stride: int,
+) -> Iterator[Chunk]:
+    """Chunk a file and prepend easy import context for supported languages.
+
+    Python and JS/TS have simple, high-value import forms that are cheap to
+    extract without adding heavy parser dependencies. Other languages fall
+    back to standard line-window chunks.
+    """
+    context_blocks = _import_context_blocks(text, lang)
+    yield from _chunk_lines(
+        text,
+        file_rel,
+        window=window,
+        stride=stride,
+        context_blocks=context_blocks,
+    )
+
+
+def _import_context_blocks(text: str, lang: Optional[str]) -> list[tuple[int, int, str]]:
+    if lang not in IMPORT_CONTEXT_LANGS:
+        return []
+    if lang == "py":
+        return _python_import_blocks(text)
+    if lang in {"js", "ts"}:
+        return _javascript_import_blocks(text)
+    return []
+
+
+def _context_before_line(
+    blocks: list[tuple[int, int, str]],
+    before_line: int,
+    max_lines: int,
+) -> str:
+    """Return import blocks ending before `before_line`, capped from the tail."""
+    selected: list[str] = []
+    used = 0
+    for _start, end, block in reversed(blocks):
+        if end >= before_line:
+            continue
+        block_lines = block.splitlines()
+        if used + len(block_lines) > max_lines:
+            continue
+        selected.append(block)
+        used += len(block_lines)
+    return "\n".join(reversed(selected))
+
+
+def _python_import_blocks(text: str) -> list[tuple[int, int, str]]:
+    lines = text.splitlines()
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return _regex_python_import_blocks(lines)
+
+    blocks: list[tuple[int, int, str]] = []
+    for node in tree.body:
+        if not isinstance(node, (ast.Import, ast.ImportFrom)):
+            continue
+        if getattr(node, "col_offset", 0) != 0:
+            continue
+        start = int(getattr(node, "lineno", 0))
+        end = int(getattr(node, "end_lineno", start))
+        if start <= 0 or end < start or start > len(lines):
+            continue
+        block = "\n".join(lines[start - 1:min(end, len(lines))]).strip()
+        if block:
+            blocks.append((start, min(end, len(lines)), block))
+    return blocks
+
+
+def _regex_python_import_blocks(lines: list[str]) -> list[tuple[int, int, str]]:
+    blocks: list[tuple[int, int, str]] = []
+    for idx, line in enumerate(lines, start=1):
+        stripped = line.strip()
+        if stripped.startswith("import ") or stripped.startswith("from "):
+            blocks.append((idx, idx, line))
+    return blocks
+
+
+def _javascript_import_blocks(text: str) -> list[tuple[int, int, str]]:
+    lines = text.splitlines()
+    blocks: list[tuple[int, int, str]] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if not stripped:
+            i += 1
+            continue
+
+        is_import = (
+            stripped.startswith("import ")
+            or stripped.startswith("export ") and " from " in stripped
+        )
+        is_require = bool(_JS_REQUIRE_RE.match(line))
+        if not (is_import or is_require):
+            i += 1
+            continue
+
+        start = i
+        end = i
+        while end + 1 < len(lines) and ";" not in lines[end] and not lines[end].rstrip().endswith(")"):
+            end += 1
+        block = "\n".join(lines[start:end + 1]).strip()
+        if block:
+            blocks.append((start + 1, end + 1, block))
+        i = end + 1
+    return blocks
 
 
 # ---------------- scan loop ---------------- #
@@ -191,7 +323,8 @@ def scan(
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        file_chunks = list(_chunk_lines(text, rel, window=window, stride=stride))
+        lang = LANG_BY_EXT.get(path.suffix.lower())
+        file_chunks = list(_chunk_file(text, rel, lang=lang, window=window, stride=stride))
         events.emit("scan.file", file=rel, chunks=len(file_chunks))
 
         for ch in file_chunks:

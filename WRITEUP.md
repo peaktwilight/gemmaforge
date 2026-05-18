@@ -40,7 +40,9 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 | Held-out CWE | 0.92–0.96 | 83–91% | unseen vuln class |
 | **Cross-language (Py→JS)** | **0.907** | **81.9%** | **honest headline** |
 
-Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.958, doesn't beat single-layer 17. We report **0.907 cross-language** as the honest headline. Obeso et al. reached >0.9 on Llama-3.3-70B for hallucinations; we hit comparable numbers on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
+Best layer: **17 of 35** (mid-network). Multi-layer concat doesn't beat it. **0.907 cross-language** is the honest headline.
+
+**Per-CWE multi-head probe** — 5 logits (CWE-78 / 338 / 95 / 94 / 328) on the same layer 17, trained one-vs-rest. **Macro AUC 0.9726, top-1 routing 94.7%**. The off-diagonal of the confusion matrix is near-zero, which means the heads are doing real per-class work — not five copies of a binary "danger" detector. Comparable to Obeso's >0.9 on Llama-3.3-70B for hallucinations, on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
 
 ## Why this is novel
 
@@ -114,11 +116,10 @@ Tractable with time and data, not blockers on the technique.
 
 ## What we'd build next
 
-Tracked as 13 GitHub issues in the repo. Highlights:
-- **Per-CWE heads** (one logit per CWE so the UI names the bug class)
-- **Token-level training with span-max loss** — SVEN + CyberSecEval data integrated; trainer written; needs a full per-token run to close the gap toward 0.95.
-- **LoRA-augmented Gemma** — Obeso §3 shows the same LoRA used to train a hallucination probe also makes the model *itself* more cautious. We have the training script + an 8-example adapter; full DPO run is next.
-- **VS Code extension** + **pwnkit confidence-filter hook** + **W&B telemetry**.
+Tracked as 13 open GitHub issues. Highlights:
+- **Token-level span-max training** — SVEN + CyberSecEval data integrated; trainer written; per-token run pending.
+- **LoRA-augmented Gemma** — Obeso §3: the LoRA that trains the probe also makes the model itself more cautious. Script + 8-ex adapter shipped; full DPO run next.
+- **VS Code extension** + **pwnkit confidence-filter** + **W&B telemetry**.
 
 ## License & ethics
 

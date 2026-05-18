@@ -75,12 +75,7 @@ Two presets on the left frame the same request differently:
 
 ## Why Gemma 4 specifically
 
-This project can't be built on a closed model:
-
-- **Raw hidden states.** Closed models don't expose them. Open weights are the only option.
-- **Native function calling + 131k context.** The same Gemma 4 instance can drive a normal IDE assistant flow alongside the probe, without a cloud round-trip.
-- **Permissive license.** Apache-2.0-equivalent terms; any maintainer in any country runs it without legal review.
-- **Laptop-sized.** E2B (~2B) does >20 tok/s on Apple Silicon. 26B-A4B covers harder cases locally.
+Can't be built on a closed model: **raw hidden states** (GPT-5/Claude don't expose them), **native function calling + 131k context** (one Gemma instance can drive both the probe and a normal IDE assistant flow), **Apache-2.0-equivalent license** (no legal review for any maintainer), **laptop-sized** (E2B does >20 tok/s on Apple Silicon).
 
 ## Limitations (honest)
 
@@ -92,9 +87,7 @@ This project can't be built on a closed model:
 
 ## Bonus: LoRA-augmented safe-code generation
 
-Obeso §3 reports the LoRA that trains the probe also makes the model itself more cautious. We wired the analogue: `scripts/train_lora.py` fine-tunes Gemma 4 E2B (r=8, α=16, q/k/v/o_proj on the language tower only) on CyberNative DPO chosen completions. Primary path: `trl.DPOTrainer`; SFT fallback.
-
-**Result.** 30 SFT steps, 64 examples, 39s on MPS, mean CE 2.30. `scripts/eval_lora.py` regex-scores base vs base+LoRA on the 5 demo prompts: total **base=3, LoRA=0 vulnerable patterns**. The delta is entirely on CWE-22 (path traversal): base emits `open(f"/var/data/{request.args.get('filename')}", 'r').read()`; LoRA refuses the file-read framing and returns an HTTP-client wrapper instead. Whether that's "safer" or "dodged" is fair to debate, but the model's generation distribution has measurably shifted on a 2B model after a sub-1-min adapter fit. A full DPO run via `trl` is the obvious next step.
+Obeso §3: the LoRA that trains the probe also makes the model more cautious. We wired the analogue (`scripts/train_lora.py`, r=8, α=16, q/k/v/o_proj on language tower) on CyberNative DPO chosen completions. 30 SFT steps, 64 examples, 39s MPS, mean CE 2.30. **base=3, LoRA=0 vulnerable patterns** on the 5 demo prompts. Delta entirely on CWE-22: base emits `open(f"/var/data/{request.args.get('filename')}", 'r').read()`; LoRA refuses the file-read framing and returns an HTTP-client wrapper. Whether "safer" or "dodged" is fair to debate — the distribution has measurably shifted on a 2B model after a sub-1-min fit.
 
 ## What we'd build next
 

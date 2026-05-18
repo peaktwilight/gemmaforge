@@ -1,0 +1,13 @@
+{
+  "probe_layer": 17,
+  "seed": 7,
+  "n_heldout_full": 240,
+  "n_subset_reforwarded": 60,
+  "baseline_last_token_auc_full_heldout": 0.9633333333333333,
+  "subset_last_token_auc": 0.9744444444444444,
+  "subset_max_pool_auc": 0.9722222222222222,
+  "delta_auc_subset": -0.0022222222222222365,
+  "model": "google/gemma-4-E2B-it",
+  "max_length": 512,
+  "note": "baseline is on the full held-out split using cached last-token activations; max-pool is on a stratified subset re-forwarded through Gemma to capture per-token activations."
+}

@@ -35,8 +35,8 @@ Adapts the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https:
 
 | Eval split | AUC | accuracy | what it tests |
 |---|---:|---:|---|
-| Random stratified | 0.963 | 92.1% | in-distribution baseline |
-| Group-by-repo | 0.958 | 91.6% | no shared repo (leakage only 0.005) |
+| Random stratified | 0.963 | 92.1% | in-dist baseline |
+| Group-by-repo | 0.958 | 91.6% | leakage only 0.005 |
 | Held-out CWE | 0.92–0.96 | 83–91% | unseen vuln class |
 | **Cross-language (Py→JS)** | **0.907** | **81.9%** | **honest headline** |
 

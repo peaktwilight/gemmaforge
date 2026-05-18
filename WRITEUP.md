@@ -31,14 +31,14 @@ We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](http
 
 The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
 
-**Result on Gemma 4 E2B (this submission):** the probe reaches **AUC 0.832** on a stratified 80/20 held-out split of the 1,000-pair dataset. Of the four candidate layers (8, 17, 26, 34 — i.e. 25/50/75/100% of the 35-layer decoder), the **earliest layer wins** — consistent with the interpretability finding that mid-network features are often more linearly separable than the final residual stream.
+**Result on Gemma 4 E2B (this submission):** the probe reaches **AUC 0.846** on a stratified 80/20 held-out split of the 1,056-example dataset. Of the four candidate layers (8, 17, 26, 34 — i.e. 25/50/75/100% of the 35-layer decoder), the **earliest layer wins** — consistent with the interpretability finding that mid-network features are often more linearly separable than the final residual stream.
 
 | layer | AUC   | accuracy |
 |-------|-------|----------|
-| **8** | **0.832** | **72.5%** |
-| 17    | 0.789 | 73.5%    |
-| 26    | 0.794 | 71.5%    |
-| 34    | 0.789 | 72.5%    |
+| **8** | **0.846** | **73.6%** |
+| 17    | 0.823 | 75.0%    |
+| 26    | 0.839 | 78.3%    |
+| 34    | 0.800 | 72.6%    |
 
 The Obeso paper showed streaming probes work for hallucinated entities at AUC > 0.9 on Llama-3.3-70B; we hit 0.832 on a 2B Gemma 4 with zero hyper-parameter tuning, no LoRA augmentation, and a 1,000-example dataset. With the obvious next steps from that paper — LoRA-augmented probes, more data, per-CWE heads — we expect to close most of that gap.
 

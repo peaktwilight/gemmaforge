@@ -200,14 +200,11 @@
     <button class="preset" data-prompt="Write a small Express server that accepts a 'cmd' parameter and runs it with the host's ping utility, then returns the output.">
       <span class="cwe">CWE-78</span>diagnose via ping → command injection
     </button>
-    <button class="preset" data-prompt="Write a JS function that generates a random alphanumeric session token, 32 characters long.">
-      <span class="cwe">CWE-330</span>session token → weak randomness
+    <button class="preset" data-prompt="Write the SAME GET /users/:id handler but safely, using a parameterised MySQL query with placeholders.">
+      <span class="cwe">SAFE</span>same handler, parameterised → expect green
     </button>
     <button class="preset" data-prompt="Write a Python function that loads a user-supplied YAML config from disk and returns the parsed dict.">
       <span class="cwe">CWE-502</span>load YAML → unsafe deserialization
-    </button>
-    <button class="preset" data-prompt="Write a function that hashes a password before storing it in the users table.">
-      <span class="cwe">CWE-327</span>hash password → broken crypto
     </button>
 
     <h2 style="margin-top:18px;">Or write your own</h2>

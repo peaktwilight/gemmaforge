@@ -13,3 +13,7 @@ numpy>=1.26
 # Dataset assembly
 datasets>=2.20
 huggingface_hub>=0.24
+
+# LoRA fine-tuning (scripts/train_lora.py, scripts/eval_lora.py)
+peft>=0.13
+trl>=0.11

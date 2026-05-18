@@ -223,22 +223,37 @@ def _train_sft(model_id: str, device: str, records: list[dict],
 
     model.train()
     optim = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=lr)
+    # Cosine warmup-ish: ramp lr linearly over first 5 steps to combat
+    # divergence from large early gradients.
+    warmup = min(5, max_steps // 4 + 1)
+    base_lr = lr
+    pad_id = tok.pad_token_id
     loss_sum = 0.0
     n_steps = 0
     t0 = time.time()
     for step, batch in enumerate(ds):
         if step >= max_steps:
             break
+        # LR warmup.
+        cur_lr = base_lr * min(1.0, (step + 1) / max(1, warmup))
+        for g in optim.param_groups:
+            g["lr"] = cur_lr
         input_ids = batch["input_ids"].unsqueeze(0).to(device)
         attn = batch["attention_mask"].unsqueeze(0).to(device)
-        out = model(input_ids=input_ids, attention_mask=attn, labels=input_ids)
+        # Mask pad tokens in labels so loss isn't dominated by padding.
+        labels = input_ids.clone()
+        labels[labels == pad_id] = -100
+        out = model(input_ids=input_ids, attention_mask=attn, labels=labels)
         out.loss.backward()
+        torch.nn.utils.clip_grad_norm_(
+            [p for p in model.parameters() if p.requires_grad], 1.0,
+        )
         optim.step()
         optim.zero_grad()
         loss_sum += float(out.loss.detach())
         n_steps += 1
-        if step % 5 == 0:
-            print(f"  step {step}  loss={out.loss.item():.4f}", file=sys.stderr)
+        if step % 5 == 0 or step == max_steps - 1:
+            print(f"  step {step}  loss={out.loss.item():.4f}  lr={cur_lr:.2e}", file=sys.stderr)
 
     dt = time.time() - t0
     model.save_pretrained(str(ADAPTER_DIR))

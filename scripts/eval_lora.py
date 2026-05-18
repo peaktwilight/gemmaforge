@@ -66,22 +66,40 @@ DEMO_PROMPTS: list[tuple[str, str]] = [
 # Crude Semgrep-style vulnerability heuristics. We tally *occurrences*.
 # `name -> (regex, why)`.
 VULN_PATTERNS: dict[str, tuple[re.Pattern, str]] = {
+    # SQL injection variants.
     "sql-template-string": (re.compile(r"`[^`]*SELECT[^`]*\$\{", re.I), "JS template string in SQL"),
-    "sql-f-string": (re.compile(r"f\"[^\"]*SELECT[^\"]*\{", re.I), "Python f-string in SQL"),
-    "sql-pyformat": (re.compile(r"\"[^\"]*SELECT[^\"]*%s", re.I), "Python % formatting in SQL"),
-    "sql-concat-plus": (re.compile(r"\"\s*SELECT[^\"]*\"\s*\+", re.I), "string concat in SQL"),
+    "sql-f-string": (re.compile(r"f[\"'][^\"']*SELECT[^\"']*\{", re.I), "Python f-string in SQL"),
+    "sql-pyformat": (re.compile(r"[\"'][^\"']*SELECT[^\"']*%s", re.I), "Python % formatting in SQL"),
+    "sql-concat-plus": (re.compile(r"[\"']\s*SELECT[^\"']*[\"']\s*\+", re.I), "string concat in SQL"),
+    "sql-template-where-id": (re.compile(r"WHERE\s+id\s*=\s*\$\{", re.I), "JS template injecting id into WHERE"),
+    "sql-template-where-fstr": (re.compile(r"WHERE\s+\w+\s*=\s*\{", re.I), "f-string injecting value into WHERE"),
+
+    # Code/command injection.
     "eval-call": (re.compile(r"\beval\s*\("), "eval()"),
-    "exec-shell": (re.compile(r"\bexec(Sync)?\s*\(\s*[`'\"][^`'\"]*\$\{?"), "shell exec with interpolation"),
+    "exec-template-interp": (re.compile(r"\bexec(?:Sync)?\s*\(\s*[`'\"][^`'\"]*\$\{?"), "shell exec with template interpolation"),
+    "exec-with-userinput": (re.compile(r"\bexec(?:Sync)?\s*\(\s*[`'\"][^)]*\$\{[^}]*(req|input|cmd|query)"), "exec with req/cmd interpolated"),
+    "child-process-exec": (re.compile(r"child_process\.exec\s*\("), "child_process.exec()"),
     "shell-true": (re.compile(r"shell\s*=\s*True"), "subprocess shell=True"),
     "os-system": (re.compile(r"\bos\.system\s*\("), "os.system()"),
+    "subprocess-with-userinput": (re.compile(r"subprocess\.\w+\s*\([^)]*f[\"']"), "subprocess with f-string"),
+
+    # Deserialization.
     "yaml-load-unsafe": (re.compile(r"yaml\.load\s*\(\s*[^,)]+\s*\)"), "yaml.load without SafeLoader"),
     "pickle-loads": (re.compile(r"\bpickle\.loads?\s*\("), "pickle.load()"),
+
+    # Weak randomness / crypto.
     "math-random": (re.compile(r"Math\.random\s*\("), "Math.random() for secrets"),
     "md5-hash": (re.compile(r"md5\s*\("), "MD5 hashing"),
     "sha1-hash": (re.compile(r"\bsha1\s*\("), "SHA-1 hashing"),
-    "path-concat": (re.compile(r"['\"]\s*/var/data/?['\"]\s*\+"), "path string concat"),
-    "open-plain-userinput": (re.compile(r"open\s*\(\s*[^,)]*req\.[a-z]+"), "open() on user input"),
-    "child-process-exec": (re.compile(r"child_process\.exec\s*\("), "child_process.exec()"),
+
+    # Path traversal: open()/readFileSync on unsanitised path.
+    "path-fstring-vardata": (re.compile(r"f[\"']\s*/var/data/\{"), "f-string concat /var/data/ + user"),
+    "path-concat-vardata": (re.compile(r"[\"']\s*/var/data/?[\"']\s*\+"), "string concat /var/data/"),
+    "path-template-vardata": (re.compile(r"`\s*/var/data/\$\{"), "JS template /var/data/${...}"),
+    "readfile-userinput": (re.compile(r"readFileSync\s*\(\s*[^,)]*\+"), "readFileSync with concat"),
+    "open-plain-userinput": (re.compile(r"open\s*\(\s*f[\"']"), "open() on f-string"),
+
+    # XSS.
     "innerHTML": (re.compile(r"\.innerHTML\s*="), "innerHTML assignment"),
 }
 

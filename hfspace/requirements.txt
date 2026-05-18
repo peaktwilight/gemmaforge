@@ -1,8 +1,10 @@
-gradio>=4.36.0
+# Gradio 4.44 imports HfFolder which was removed in huggingface_hub 0.27+.
+# Pin both: keep gradio 4.44 (matches local dev) and an HF Hub that still has HfFolder.
+gradio==4.44.1
+huggingface_hub<0.27,>=0.24
 spaces
 transformers>=4.45
 torch
 numpy
 accelerate
-huggingface_hub
 audioop-lts; python_version >= "3.13"

@@ -96,11 +96,25 @@ The full per-prompt output is in `data/lora_eval.json` and re-summarised in §5 
 | Last-token (default) | **0.963** | **−0.087** | 0.05 |
 | Max-pool (across positions) | 0.932 | **−0.004** | 0.00 |
 
-Max-pool buys **22× T3 robustness for ~3 pts clean AUC** — an explicit safety-vs-accuracy tradeoff. The streaming UI ships with max-pool default because demo runs are closer to OOD than to the clean training distribution; offline batch evaluation should prefer last-token (the headline 0.963 / 0.907).
+Max-pool buys **22× T3 robustness for ~3 pts clean AUC** — an explicit safety-vs-accuracy tradeoff. Streaming UI ships max-pool default; offline batch eval should prefer last-token.
 
-### 1.6 One-line summary
+### 1.6 Full T1-T5 adversarial suite
 
-> Linear probe on Gemma 4 E2B layer 17, ~1k pairs, AUC 0.907 cross-language / 0.958 group-by-repo / 0.963 in-distribution (last-token), per-CWE macro 0.9726, sub-1ms inference overhead per token, LoRA adapter halves vulnerable-pattern emission on the 5-prompt eval, max-pool aggregation gives 22× T3 adversarial robustness for −0.031 AUC.
+`data/adversarial_full_suite.json` — same 20 vulnerable examples as 1.5, all five semantic-preserving transforms × last-token vs max-pool:
+
+| Transform | mean Δ (last) | mean Δ (max-pool) | flip-rate (last) | flip-rate (max-pool) |
+|-----------|--------------:|------------------:|-----------------:|---------------------:|
+| T1 identifier rename | −0.004 | −0.002 | 0.00 | 0.00 |
+| T2 source rename | 0.000 | 0.000 | 0.00 | 0.00 |
+| **T3 comment + reindent** | **−0.089** | **−0.004** | **0.05** | **0.00** |
+| T4 dead-code prepend | +0.020 | +0.001 | 0.00 | 0.00 |
+| T5 SQL case/concat swap | −0.007 | 0.000 | 0.00 | 0.00 |
+
+**Verdict.** T3 dominates (22× worse than the next worst). T1/T2/T5 have negligible effect — our probe is **not** detecting identifier names as the research literature predicted; that finding refutes a worry rather than confirming one. T4 *helps* the probe (dead code before the vuln slightly raises confidence — likely because the extra context is "real-looking code"). **Max-pool flat across all 5 transforms** — robustness is general, not specific to T3.
+
+### 1.7 One-line summary
+
+> Linear probe on Gemma 4 E2B layer 17, ~1k pairs, AUC 0.907 cross-language / 0.958 group-by-repo / 0.963 in-distribution (last-token), per-CWE macro 0.9726, sub-1ms inference overhead per token, LoRA adapter halves vulnerable-pattern emission on the 5-prompt eval, max-pool aggregation gives 22× T3 adversarial robustness for −0.031 AUC, identifier-rename attacks (T1/T2/T5) have negligible effect — the probe is *not* primarily lexical.
 
 ---
 

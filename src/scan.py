@@ -25,10 +25,10 @@ from pathlib import Path
 from typing import IO, Iterable, Iterator, Optional
 
 from integrations.pwnkit.adapter import GemmaForgeFilter
+from src.events import SCHEMA_EVENTS, EventSink
 
 
 SCHEMA_LEADS = "gemmaforge.leads/v1"
-SCHEMA_EVENTS = "gemmaforge.events/v1"
 
 # Extension → language family. Used by the --languages filter and for
 # selecting reasonable chunking defaults. Conservative on purpose: probe
@@ -128,37 +128,6 @@ def _chunk_lines(
         if end == n:
             return
         i += stride
-
-
-# ---------------- event emission ---------------- #
-
-
-class EventSink:
-    """Writes ND-JSON events. ``-`` routes to stderr; path opens append."""
-
-    def __init__(self, target: Optional[str]) -> None:
-        self._fp: Optional[IO[str]]
-        self._owns: bool
-        if target is None:
-            self._fp = None
-            self._owns = False
-        elif target == "-":
-            self._fp = sys.stderr
-            self._owns = False
-        else:
-            self._fp = open(target, "a", encoding="utf-8")
-            self._owns = True
-
-    def emit(self, kind: str, **fields: object) -> None:
-        if self._fp is None:
-            return
-        rec = {"schema": SCHEMA_EVENTS, "ts": time.time(), "kind": kind, **fields}
-        self._fp.write(json.dumps(rec, ensure_ascii=False) + "\n")
-        self._fp.flush()
-
-    def close(self) -> None:
-        if self._owns and self._fp is not None:
-            self._fp.close()
 
 
 # ---------------- scan loop ---------------- #

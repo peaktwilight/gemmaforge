@@ -108,18 +108,18 @@ print(f"gpu={torch.cuda.get_device_name(0)}  bf16_ok={torch.cuda.is_bf16_support
 subprocess.run(["nvidia-smi"], check=False)
 
 # In[4]:
-# ## Login
+# ## Login (optional)
 #
-# Push-to-hub needs a write token. wandb key (if any) flips on
-# `report_to=["wandb"]` inside DPOConfig below.
-from huggingface_hub import login
-
-if not HF_TOKEN:
-    raise RuntimeError(
-        "HF_TOKEN not found. Add it under Add-ons -> Secrets with label 'HF_TOKEN'."
-    )
-login(token=HF_TOKEN)
-print("Logged in to Hugging Face Hub.")
+# Gemma 4 E2B is ungated (verified via HF API), so HF_TOKEN is optional.
+# If a token is set, we'll use it for the Hub push at the end. Without it,
+# the adapter just stays at /kaggle/working/lora_adapter_dpo/ for download
+# via `kaggle kernels output`.
+if HF_TOKEN:
+    from huggingface_hub import login
+    login(token=HF_TOKEN)
+    print("Logged in to Hugging Face Hub — adapter will be pushed at the end.")
+else:
+    print("No HF_TOKEN set — adapter will only be saved to /kaggle/working/. That's fine.")
 
 if WANDB_API_KEY:
     os.environ["WANDB_API_KEY"] = WANDB_API_KEY
@@ -362,14 +362,21 @@ print("=" * 64)
 print("(Negative delta on risky prompts == LoRA pushed model toward safer code.)")
 
 # In[10]:
-# ## Upload to the Hub
+# ## Upload to the Hub (optional — skipped if no HF_TOKEN)
 #
-# Pushes adapter weights + a minimal model card to `OUT_REPO_ID`. The adapter
-# also remains under `/kaggle/working/lora_adapter_dpo/` as a notebook output
-# artifact you can attach to other Kaggle notebooks. Flip `private=True` to
-# keep the HF repo unlisted.
-from huggingface_hub import HfApi
+# When `HF_TOKEN` is set, pushes adapter weights + a minimal model card to
+# `OUT_REPO_ID`. Otherwise the adapter stays under
+# `/kaggle/working/lora_adapter_dpo/` and is downloadable via
+# `kaggle kernels output peaktwilight/gemmaforge-dpo-lora-training -p ./`.
 from pathlib import Path
+
+if not HF_TOKEN:
+    print("Skipping Hub upload — adapter is at /kaggle/working/lora_adapter_dpo/")
+    print("Download via: kaggle kernels output peaktwilight/gemmaforge-dpo-lora-training -p ./")
+    import sys
+    sys.exit(0)
+
+from huggingface_hub import HfApi
 
 readme = f"""---
 library_name: peft

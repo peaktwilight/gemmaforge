@@ -25,6 +25,8 @@ from typing import Iterator
 import numpy as np
 import torch
 
+from src.events import EventSink
+
 
 def _device() -> str:
     if torch.backends.mps.is_available():
@@ -91,6 +93,8 @@ def stream(
     temperature: float = 0.7,
     per_cwe_probe_path: Path | None = None,
     use_max_pool: bool = True,
+    events: EventSink | None = None,
+    alarm_threshold: float = 0.7,
 ) -> Iterator[dict]:
     model, tokenizer, device = _ensure_model(model_id)
     w, b, layer = _load_probe(probe_path)
@@ -132,6 +136,7 @@ def stream(
     SMOOTH_WIN = 8
     window: list[float] = []
     running_max: float = 0.0
+    last_alarm_state: bool = False
 
     with torch.inference_mode():
         out = model(input_ids, output_hidden_states=True, use_cache=True)
@@ -186,6 +191,27 @@ def stream(
             # pre-max-pool clients keep working unchanged.
             # `top_cwe` / `top_cwe_score` are populated only when the
             # per-CWE multi-head probe is loaded; otherwise they're None.
+            if events is not None and events.enabled:
+                events.emit(
+                    "probe.token",
+                    token=tok_text,
+                    score=raw_risk,
+                    smoothed=smooth_risk,
+                    maxpool=maxpool_risk,
+                    top_cwe=top_cwe,
+                    position=step,
+                )
+                alarm_now = smooth_risk >= alarm_threshold
+                if alarm_now and not last_alarm_state:
+                    events.emit(
+                        "probe.alarm",
+                        threshold=alarm_threshold,
+                        confidence=smooth_risk,
+                        top_cwe=top_cwe,
+                        position=step,
+                    )
+                last_alarm_state = alarm_now
+
             yield {
                 "event": "token",
                 "token": tok_text,
@@ -237,6 +263,18 @@ def main_cli() -> None:
         "the smoothed score in that field (default off; max-pool is the default since "
         "it's ~22x more robust to comment+reindent attacks — see data/adversarial_eval.json).",
     )
+    ap.add_argument(
+        "--events",
+        default=None,
+        help='Emit gemmaforge.events/v1 ND-JSON for downstream dashboards. '
+        '"-" for stderr; otherwise a file path (append). See docs/events.md.',
+    )
+    ap.add_argument(
+        "--alarm-threshold",
+        type=float,
+        default=0.7,
+        help="Smoothed-risk threshold above which a probe.alarm event fires (default 0.7).",
+    )
     args = ap.parse_args()
 
     if args.serve:
@@ -248,6 +286,7 @@ def main_cli() -> None:
         sys.exit(2)
 
     pc_path = Path(args.per_cwe_probe) if args.per_cwe_probe else None
+    events_sink = EventSink(args.events)
     for event in stream(
         args.model,
         Path(args.probe),
@@ -256,6 +295,8 @@ def main_cli() -> None:
         args.temperature,
         per_cwe_probe_path=pc_path,
         use_max_pool=not args.no_max_pool,
+        events=events_sink,
+        alarm_threshold=args.alarm_threshold,
     ):
         if event.get("event") == "token":
             # CLI colours by max-pool when enabled (matches new UI),
@@ -266,6 +307,7 @@ def main_cli() -> None:
             sys.stdout.flush()
         elif event.get("event") == "done":
             sys.stdout.write("\n")
+    events_sink.close()
 
 
 def run_server(args) -> None:

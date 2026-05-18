@@ -29,9 +29,13 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 ```
 
 - **Model:** `gemma4:8b` (8B params, 1536-dim hidden states, 131k context, native function-calling)
-- **Probe:** a 1,536-input linear classifier (~10KB) on the hidden state at decoder layer 8 (of 35). **AUC 0.846** on held-out 80/20.
-- **Training data:** 1,056 examples — paired vulnerable/patched code (CyberNative DPO + the author's CVE corpus) + ~55 natural-language safe negatives so the probe doesn't fire on Gemma's chat preamble
-- **Inference:** < 1 ms per token of overhead on top of normal forward pass. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
+- **Probe:** 1,536-input linear classifier on Gemma 4 E2B's hidden state at decoder layer 17 (of 35). **AUC 0.963** in-distribution, **0.907 cross-language (Py→JS)** — the realistic transfer headline. Group-by-repo split: 0.958. Held-out CWE: 0.92–0.96.
+- **Per-CWE multi-head probe:** Macro AUC **0.9726** across CWE-78 / 338 / 95 / 94 / 328, top-1 routing 94.7%. The activations carry distinct per-CWE structure — see `data/probe_per_cwe_card.json`.
+- **Training data:** 1,198 CyberSecEval position-paired rows + 1,560 SVEN char-level rows merged → 2,758 examples covering Python, JS, C, C++. Plus ~55 natural-language negatives so the probe doesn't fire on chat preamble.
+- **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
+- **Live demo:** [HuggingFace Space](https://huggingface.co/spaces/peaktwilight/gemmaforge) (ZeroGPU). All weights and data in this repo.
+
+See [`docs/coverage.md`](docs/coverage.md) for per-language analysis and [`SUBMISSION.md`](SUBMISSION.md) for the hackathon submission checklist.
 
 ## Tracks targeted
 

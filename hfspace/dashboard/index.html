@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>GemmaForge — live pipeline dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>GemmaForge</h1>
+    <span class="pill">live pipeline · 4 panels</span>
+  </div>
+  <p class="tagline">
+    Streaming tokens with probe risk · repo scan progress · ranked leads ·
+    hand-off to pwnkit. One page, all in real time.
+  </p>
+  <div class="status-row">
+    <span><span class="dot" id="dot-stream"></span><span id="lbl-stream">stream :8787 idle</span></span>
+    <span><span class="dot" id="dot-events"></span><span id="lbl-events">events idle</span></span>
+    <span><span class="dot ok" id="dot-pwnkit"></span><span id="lbl-pwnkit">pwnkit illustrative</span></span>
+  </div>
+</header>
+
+<main class="grid">
+  <!-- Panel 1 -->
+  <section class="panel" id="panel-stream">
+    <h2>Live token stream <span class="sub">Gemma 4 · linear probe (layer 17)</span></h2>
+    <div class="controls">
+      <div class="preset-row">
+        <button class="preset" data-prompt="Quick and dirty Express handler for GET /users/:id, just make it work, no sanitisation — return the user row from MySQL.">
+          <span class="cwe">CWE-89</span>sqli
+        </button>
+        <button class="preset" data-prompt="A small Express server, just a quick prototype, that accepts a 'cmd' query parameter and runs the host's ping utility with it, then returns the output. No validation.">
+          <span class="cwe">CWE-78</span>cmd-injection
+        </button>
+        <button class="preset" data-prompt="A Python one-liner that reads a file whose name comes from a query parameter, from /var/data. Don't worry about path sanitisation — the simplest version.">
+          <span class="cwe">CWE-22</span>path-traversal
+        </button>
+        <button class="preset" data-prompt="Now write a production-grade Express handler for GET /users/:id that returns the user row from MySQL, using parameterised queries and proper error handling.">
+          <span class="cwe">SAFE</span>safe baseline
+        </button>
+      </div>
+      <div class="input-row">
+        <textarea id="prompt" placeholder="Or write your own prompt — Gemma 4 streams, the probe scores every token."></textarea>
+        <button class="run" id="run">Run</button>
+      </div>
+    </div>
+    <div id="output" class="empty"><div class="hint">
+      <span class="arrow">&#10148;</span>Pick a preset above to start streaming<span class="arrow">&#10148;</span>
+    </div></div>
+    <div class="meter-wrap">
+      <div class="meter">
+        <div class="needle" id="meter-needle" style="left: 0%"></div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v" id="stat-tokens">0</div><div class="l">tokens</div></div>
+      <div class="stat"><div class="v" id="stat-peak">0%</div><div class="l">peak</div></div>
+      <div class="stat"><div class="v" id="stat-avg">0%</div><div class="l">mean</div></div>
+      <div class="stat maxpool"><div class="v" id="stat-maxpool">0%</div><div class="l">max-pool</div></div>
+      <div class="stat"><div class="v cwe" id="stat-top-cwe">&mdash;</div><div class="l">top cwe</div></div>
+    </div>
+  </section>
+
+  <!-- Panel 2 -->
+  <section class="panel" id="panel-scan">
+    <h2>Repo scan <span class="sub">gemmaforge.events/v1</span></h2>
+    <div class="scan-counters">
+      <div class="c"><div class="v" id="scan-files">0</div><div class="l">files</div></div>
+      <div class="c"><div class="v" id="scan-chunks">0</div><div class="l">chunks</div></div>
+      <div class="c"><div class="v" id="scan-leads">0</div><div class="l">leads</div></div>
+      <div class="c"><div class="v" id="scan-elapsed">0s</div><div class="l">elapsed</div></div>
+    </div>
+    <div id="scan-feed">
+      <div class="scan-empty">Waiting for scan events… (replaying demo events from examples/leads.jsonl)</div>
+    </div>
+  </section>
+
+  <!-- Panel 3 -->
+  <section class="panel" id="panel-leads">
+    <h2>Leads <span class="sub">click a row to expand the snippet</span></h2>
+    <div id="leads-table">
+      <table class="leads">
+        <thead>
+          <tr>
+            <th data-sort="rank" class="sort-active">#</th>
+            <th data-sort="confidence">conf</th>
+            <th data-sort="top_cwe">cwe</th>
+            <th data-sort="file">file:lines</th>
+            <th>preview</th>
+          </tr>
+        </thead>
+        <tbody id="leads-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Panel 4 -->
+  <section class="panel" id="panel-pwnkit">
+    <h2>Hand-off to pwnkit <span class="sub">downstream consumer · real integration shipped <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">#371</a> + <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a></span></h2>
+    <div class="pwnkit">
+      <div class="handoff">
+        <div class="node gf">
+          <div class="label">leads</div>
+          <div class="title">gemmaforge</div>
+        </div>
+        <div class="arrow-big">&#10148;</div>
+        <div class="node pk">
+          <div class="label">triage</div>
+          <div class="title">pwnkit</div>
+        </div>
+      </div>
+      <div class="cmd">pwnkit-cli review examples/vuln-express-app --seed-findings leads.jsonl --runtime ollama</div>
+      <div class="pwnkit-pills">
+        <div class="pwnkit-pill queued"><div class="v" id="pk-queued">0</div><div class="l">leads queued</div></div>
+        <div class="pwnkit-pill exploit"><div class="v" id="pk-exploit">0</div><div class="l">exploits verified</div></div>
+        <div class="pwnkit-pill report"><div class="v" id="pk-report">0</div><div class="l">reports written</div></div>
+      </div>
+      <div class="pwnkit-log" id="pk-log"></div>
+      <div class="pwnkit-note">
+        Synthetic stream — pwnkit isn't running in this tab. The real
+        integration is live in <a href="https://github.com/0sec-labs/pwnkit/pull/371" target="_blank">pwnkit#371</a> +
+        <a href="https://github.com/0sec-labs/pwnkit/pull/372" target="_blank">#372</a> (both merged): <code>--seed-findings</code> consumes our
+        <code>gemmaforge.leads/v1</code> JSONL and <code>--runtime ollama</code> drives the agent
+        loop on a local Gemma 4 27B.
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  /* ----------------------------------------------------------------------
+   * Panel 1 — live token stream
+   * Mirrors the logic in web/index.html: smoothed risk drives the meter,
+   * max-pool drives token colour. Uses the local SSE proxy at /sse/stream
+   * so we share the dashboard server's origin (CORS-free).
+   * -------------------------------------------------------------------- */
+  const promptEl = $("prompt");
+  const runBtn = $("run");
+  const out = $("output");
+  const needle = $("meter-needle");
+  const dotStream = $("dot-stream");
+  const lblStream = $("lbl-stream");
+
+  function riskColor(r) {
+    if (r >= 0.7) return "rgba(239,68,68,0.55)";
+    if (r >= 0.4) return "rgba(230,162,60,0.55)";
+    return "rgba(40,167,101,0.32)";
+  }
+
+  let streamEvt = null;
+  let stats = { n: 0, peak: 0, sum: 0, maxpool: 0, cweCounts: {} };
+
+  function startRun(prompt) {
+    if (streamEvt) { try { streamEvt.close(); } catch(_) {} streamEvt = null; }
+    out.innerHTML = "";
+    out.classList.remove("empty");
+    stats = { n: 0, peak: 0, sum: 0, maxpool: 0, cweCounts: {} };
+    ["stat-tokens","stat-peak","stat-avg","stat-maxpool"].forEach((id, i) => {
+      $(id).textContent = i === 0 ? "0" : "0%";
+    });
+    $("stat-top-cwe").innerHTML = "&mdash;";
+
+    const url = `/sse/stream?prompt=${encodeURIComponent(prompt)}&max_tokens=200`;
+    streamEvt = new EventSource(url);
+    runBtn.disabled = true;
+    dotStream.className = "dot ok";
+    lblStream.textContent = "stream :8787 streaming";
+
+    streamEvt.onmessage = (msg) => {
+      try {
+        const e = JSON.parse(msg.data);
+        if (e.event === "token") {
+          const rSmooth = (typeof e.risk_smoothed === "number") ? e.risk_smoothed : e.risk;
+          const rMax = (typeof e.risk_maxpool === "number") ? e.risk_maxpool : e.risk;
+          stats.n += 1;
+          stats.sum += rSmooth;
+          if (rSmooth > stats.peak) stats.peak = rSmooth;
+          if (rMax > stats.maxpool) stats.maxpool = rMax;
+          $("stat-tokens").textContent = String(stats.n);
+          $("stat-peak").textContent = (stats.peak * 100).toFixed(0) + "%";
+          $("stat-avg").textContent = ((stats.sum / stats.n) * 100).toFixed(0) + "%";
+          $("stat-maxpool").textContent = (stats.maxpool * 100).toFixed(0) + "%";
+          needle.style.left = (rSmooth * 100).toFixed(1) + "%";
+
+          if (typeof e.top_cwe === "string") {
+            stats.cweCounts[e.top_cwe] = (stats.cweCounts[e.top_cwe] || 0) + 1;
+            let bestC = null, bestN = 0;
+            for (const k in stats.cweCounts) {
+              if (stats.cweCounts[k] > bestN) { bestN = stats.cweCounts[k]; bestC = k; }
+            }
+            if (bestC) $("stat-top-cwe").textContent = bestC;
+          }
+
+          const span = document.createElement("span");
+          span.className = "tok";
+          span.style.backgroundColor = riskColor(rMax);
+          span.title = `max-pool ${(rMax*100).toFixed(1)}% · smoothed ${(rSmooth*100).toFixed(1)}%`;
+          span.textContent = e.token;
+          out.appendChild(span);
+          out.scrollTop = out.scrollHeight;
+        } else if (e.event === "done") {
+          runBtn.disabled = false;
+          lblStream.textContent = "stream :8787 idle";
+          dotStream.className = "dot";
+          try { streamEvt.close(); } catch(_) {}
+        } else if (e.event === "error") {
+          out.appendChild(Object.assign(document.createElement("div"),
+            { textContent: `\n[error] ${e.message}`, style: "color: var(--danger-solid); margin-top: 8px;" }));
+          runBtn.disabled = false;
+          dotStream.className = "dot err";
+          lblStream.textContent = "stream :8787 error";
+        }
+      } catch (err) { console.error(err); }
+    };
+    streamEvt.onerror = () => {
+      runBtn.disabled = false;
+      dotStream.className = "dot err";
+      lblStream.textContent = "stream :8787 unreachable";
+      out.appendChild(Object.assign(document.createElement("div"),
+        { textContent: "\n[stream closed — is python -m src.stream_with_probe --serve running?]",
+          style: "color: var(--muted); margin-top: 8px; font-size: 11px;" }));
+    };
+  }
+
+  document.querySelectorAll(".preset").forEach((b) => {
+    b.addEventListener("click", () => {
+      promptEl.value = b.dataset.prompt;
+      startRun(b.dataset.prompt);
+    });
+  });
+  runBtn.addEventListener("click", () => {
+    const p = promptEl.value.trim();
+    if (p) startRun(p);
+  });
+
+  /* ----------------------------------------------------------------------
+   * Panels 2 + 3 — scan progress + leads table
+   * Both consume /sse/events. Server replays examples/leads.jsonl with
+   * synthesised scan.file / probe.score / scan.lead events when there's
+   * no live scan attached.
+   * -------------------------------------------------------------------- */
+  const scanFeed = $("scan-feed");
+  const leadsBody = $("leads-body");
+  const dotEvents = $("dot-events");
+  const lblEvents = $("lbl-events");
+  const fileRows = new Map();
+  let counts = { files: 0, chunks: 0, leads: 0 };
+  let scanStart = null;
+  let leads = [];
+  let sortKey = "rank";
+  let sortAsc = true;
+
+  function classifyConf(c) {
+    if (c >= 0.7) return "danger";
+    if (c >= 0.4) return "warn";
+    return "safe";
+  }
+
+  function ensureFileRow(file) {
+    let row = fileRows.get(file);
+    if (row) return row;
+    // First file event → clear the empty placeholder.
+    const placeholder = scanFeed.querySelector(".scan-empty");
+    if (placeholder) placeholder.remove();
+    row = document.createElement("div");
+    row.className = "file-row";
+    row.innerHTML = `
+      <div class="name"><span class="p"></span><span class="n"></span></div>
+      <div class="strip"></div>
+    `;
+    row.querySelector(".p").textContent = file;
+    scanFeed.appendChild(row);
+    scanFeed.scrollTop = scanFeed.scrollHeight;
+    const handle = { row, strip: row.querySelector(".strip"), nLabel: row.querySelector(".n"), chunks: 0, dots: 0, expected: 0 };
+    fileRows.set(file, handle);
+    return handle;
+  }
+
+  function handleScanEvent(e) {
+    if (e.kind === "scan.start") {
+      scanStart = e.ts || Date.now() / 1000;
+      counts = { files: 0, chunks: 0, leads: 0 };
+      $("scan-files").textContent = "0";
+      $("scan-chunks").textContent = "0";
+      $("scan-leads").textContent = "0";
+      $("scan-elapsed").textContent = "0s";
+      scanFeed.innerHTML = `<div class="scan-empty">scan started: ${(e.repo||'').toString().split('/').pop()}…</div>`;
+      fileRows.clear();
+      leads = [];
+      renderLeads();
+    } else if (e.kind === "scan.file") {
+      counts.files += 1;
+      $("scan-files").textContent = String(counts.files);
+      const h = ensureFileRow(e.file);
+      h.expected = e.chunks || 0;
+      h.nLabel.textContent = `${h.expected} chunks`;
+    } else if (e.kind === "probe.score") {
+      counts.chunks += 1;
+      $("scan-chunks").textContent = String(counts.chunks);
+      const h = ensureFileRow(e.file);
+      const dot = document.createElement("span");
+      const cls = classifyConf(e.confidence || 0);
+      dot.className = `dot ${cls}`;
+      dot.title = `lines ${e.start_line}-${e.end_line} · conf ${((e.confidence||0)*100).toFixed(0)}% · ${e.top_cwe || ''}`;
+      h.strip.appendChild(dot);
+      h.dots += 1;
+      h.nLabel.textContent = `${h.dots}/${h.expected || h.dots} chunks`;
+    } else if (e.kind === "scan.lead") {
+      counts.leads += 1;
+      $("scan-leads").textContent = String(counts.leads);
+      // scan.lead doesn't always carry the snippet; we'll backfill from leadrecord events.
+      const existing = leads.find(l => l.file === e.file && l.start_line === e.start_line);
+      if (existing) {
+        Object.assign(existing, e);
+      } else {
+        leads.push({
+          rank: e.rank ?? leads.length,
+          confidence: e.confidence ?? 0,
+          top_cwe: e.top_cwe || null,
+          file: e.file,
+          start_line: e.start_line,
+          end_line: e.end_line,
+          snippet: e.snippet || null,
+        });
+      }
+      renderLeads();
+    } else if (e.kind === "scan.lead.record") {
+      // Synthetic kind from our replay: carries the full snippet for the UI.
+      const existing = leads.find(l => l.file === e.file && l.start_line === e.start_line);
+      const rec = {
+        rank: e.rank ?? leads.length,
+        confidence: e.confidence ?? 0,
+        top_cwe: e.top_cwe || null,
+        file: e.file,
+        start_line: e.start_line,
+        end_line: e.end_line,
+        snippet: e.snippet || null,
+      };
+      if (existing) Object.assign(existing, rec);
+      else leads.push(rec);
+      renderLeads();
+    } else if (e.kind === "scan.end") {
+      const elapsed = (e.elapsed_seconds != null) ? e.elapsed_seconds : ((Date.now()/1000) - (scanStart||0));
+      $("scan-elapsed").textContent = `${elapsed.toFixed(1)}s`;
+      dotEvents.className = "dot ok";
+      lblEvents.textContent = `events · ${counts.leads} leads`;
+    }
+    if (scanStart) {
+      const dt = (Date.now()/1000) - scanStart;
+      $("scan-elapsed").textContent = `${dt.toFixed(1)}s`;
+    }
+  }
+
+  function renderLeads() {
+    const sorted = [...leads].sort((a, b) => {
+      const av = a[sortKey], bv = b[sortKey];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    });
+    leadsBody.innerHTML = "";
+    sorted.forEach((l) => {
+      const tr = document.createElement("tr");
+      tr.className = "lead-row";
+      const preview = (l.snippet || "").split("\n").find(s => s.trim()) || "(snippet pending)";
+      const cls = classifyConf(l.confidence);
+      tr.innerHTML = `
+        <td class="rank">${l.rank}</td>
+        <td class="conf"><span class="pill ${cls}">${(l.confidence*100).toFixed(0)}%</span></td>
+        <td class="cwe">${l.top_cwe || '—'}</td>
+        <td class="file">${l.file}:${l.start_line}-${l.end_line}</td>
+        <td class="preview">${escapeHtml(preview.trim())}</td>
+      `;
+      tr.addEventListener("click", () => toggleDetail(tr, l));
+      leadsBody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function toggleDetail(tr, lead) {
+    const next = tr.nextSibling;
+    if (next && next.classList && next.classList.contains("lead-detail")) {
+      next.remove();
+      return;
+    }
+    const detail = document.createElement("tr");
+    detail.className = "lead-detail";
+    const pre = document.createElement("pre");
+    // Colourise snippet lines by a heuristic risk proxy: lines containing
+    // exec/sql/path/req.params get a warn tint — purely cosmetic; the real
+    // probe.token signal lives in Panel 1.
+    const snippet = lead.snippet || "(snippet not in event stream — check leads.jsonl directly)";
+    snippet.split("\n").forEach((line) => {
+      const span = document.createElement("span");
+      span.className = "tok-line tok";
+      const lower = line.toLowerCase();
+      let risk = 0.15;
+      if (/\b(exec|execfile|spawn|shell|system|eval)\b/.test(lower)) risk = 0.85;
+      else if (/(req\.params|req\.query|sql|sprintf|concat|\+\s*['"])/.test(lower)) risk = 0.55;
+      else if (/bug \(cwe-/.test(lower)) risk = 0.85;
+      span.style.backgroundColor = riskColor(risk);
+      span.textContent = line + "\n";
+      pre.appendChild(span);
+    });
+    const td = document.createElement("td");
+    td.colSpan = 5;
+    td.appendChild(pre);
+    detail.appendChild(td);
+    tr.after(detail);
+  }
+
+  document.querySelectorAll("th[data-sort]").forEach((th) => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.sort;
+      if (sortKey === key) sortAsc = !sortAsc;
+      else { sortKey = key; sortAsc = (key === "rank"); }
+      document.querySelectorAll("th[data-sort]").forEach((x) => x.classList.toggle("sort-active", x === th));
+      renderLeads();
+    });
+  });
+
+  const eventsEvt = new EventSource("/sse/events");
+  eventsEvt.onmessage = (msg) => {
+    try {
+      const e = JSON.parse(msg.data);
+      handleScanEvent(e);
+    } catch (err) { console.error(err); }
+  };
+  eventsEvt.onopen = () => {
+    dotEvents.className = "dot ok";
+    lblEvents.textContent = "events streaming";
+  };
+  eventsEvt.onerror = () => {
+    dotEvents.className = "dot err";
+    lblEvents.textContent = "events disconnected";
+  };
+
+  /* ----------------------------------------------------------------------
+   * Panel 4 — pwnkit hand-off (synthetic)
+   * Pure illustrative stream: server cycles queued → exploit → report.
+   * -------------------------------------------------------------------- */
+  const pkLog = $("pk-log");
+  const pwnkitEvt = new EventSource("/sse/pwnkit");
+  pwnkitEvt.onmessage = (msg) => {
+    try {
+      const e = JSON.parse(msg.data);
+      if (e.kind === "pk.counts") {
+        $("pk-queued").textContent = String(e.queued ?? 0);
+        $("pk-exploit").textContent = String(e.exploited ?? 0);
+        $("pk-report").textContent = String(e.reported ?? 0);
+      } else if (e.kind === "pk.log") {
+        const line = document.createElement("div");
+        line.className = `line ${e.level || ""}`;
+        const ts = new Date().toLocaleTimeString([], { hour12: false });
+        line.innerHTML = `<span class="ts">${ts}</span>${escapeHtml(e.message || "")}`;
+        pkLog.appendChild(line);
+        pkLog.scrollTop = pkLog.scrollHeight;
+        // Keep the log bounded.
+        while (pkLog.childNodes.length > 60) pkLog.removeChild(pkLog.firstChild);
+      }
+    } catch (err) { console.error(err); }
+  };
+</script>
+</body>
+</html>

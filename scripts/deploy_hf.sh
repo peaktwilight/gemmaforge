@@ -11,33 +11,27 @@ set -euo pipefail
 
 HF_USER="${HF_USER:-peaktwilight}"
 SPACE_NAME="${SPACE_NAME:-gemma4ge}"
-SDK="${SDK:-gradio}"
+SDK="${SDK:-docker}"
 
 if ! command -v hf >/dev/null 2>&1; then
   echo "error: \`hf\` CLI not found. install with: pip install -U huggingface_hub" >&2
   exit 1
 fi
 
-if [ ! -f "data/probe.npz" ]; then
-  echo "error: data/probe.npz missing. train the probe first:" >&2
-  echo "  python -m src.extract_activations && python -m src.train_probe" >&2
-  exit 1
-fi
-
 # Auth check.
-if ! hf whoami >/dev/null 2>&1; then
+if ! hf auth whoami >/dev/null 2>&1; then
   echo "not logged in. running \`hf auth login\`…"
   hf auth login
 fi
 
-# Copy probe into the space.
-cp data/probe.npz hfspace/probe.npz
-if [ -f "data/probe_card.json" ]; then
-  cp data/probe_card.json hfspace/probe_card.json
-fi
+# Sync the canonical dashboard sources + demo leads into the space staging
+# dir (idempotent — overwrites if they have drifted since the last deploy).
+mkdir -p hfspace/dashboard hfspace/examples
+cp dashboard/index.html dashboard/style.css dashboard/server.py dashboard/__init__.py hfspace/dashboard/
+cp examples/leads.jsonl hfspace/examples/leads.jsonl
 
 # Try create, ignore "already exists".
-hf repo create "${HF_USER}/${SPACE_NAME}" --repo-type space --space_sdk "${SDK}" || true
+hf repo create "${HF_USER}/${SPACE_NAME}" --repo-type space --space-sdk "${SDK}" || true
 
 # Upload everything in hfspace/ to the Space root.
 hf upload "${HF_USER}/${SPACE_NAME}" hfspace/ . --repo-type space

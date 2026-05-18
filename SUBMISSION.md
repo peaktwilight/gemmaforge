@@ -37,4 +37,4 @@ gemma, gemma-4, ollama, security, ai-safety, interpretability, linear-probe, vul
 
 - **HF Space not deploying:** submit the GitHub repo URL as "Live Demo" with `bash scripts/setup.sh && python -m src.stream_with_probe --serve` instructions in the README. Kaggle accepts "files for the demo." Attach a 30-second GIF of the working UI.
 - **Video not ready by deadline:** YouTube allows upload + immediate publish. We have screen-share recordings of the demo as raw fallback B-roll. Even a single-shot Loom is acceptable if needed.
-- **Probe regression on demo day:** the `data/probe.npz` is checked into the repo at the AUC-0.832 build. Roll back via `git checkout` if a later commit regresses.
+- **Probe regression on demo day:** the shipped `data/probe.npz` is layer 17, **AUC 0.963 in-dist / 0.907 cross-language**. If a later commit regresses, `git log -- data/probe.npz` will identify the last known good commit; `git checkout <sha> -- data/probe.npz`. Backup: `data/probe_v2.npz` is a stable copy.

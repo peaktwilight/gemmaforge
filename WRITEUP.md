@@ -3,12 +3,12 @@
 **Tracks:** Main Track ($50K) · Impact: Safety & Trust ($10K) · Special Tech: Ollama ($10K)
 
 **Repo:** https://github.com/peaktwilight/gemmaforge
-**Live demo:** https://gemmaforge.doruk.ch
+**Live demo:** https://huggingface.co/spaces/peaktwilight/gemma4ge
 **Video:** https://youtube.com/watch?v=TODO
 
 ## Team — security meets interpretability
 
-- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. **10+ CVE-grade vulnerabilities discovered in npm packages with 200M+ combined monthly downloads**, including [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`. Builder of [`pwnkit`](https://github.com/PwnKit-Labs/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source.
+- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. **10+ CVE-grade vulnerabilities discovered in npm packages with 200M+ combined monthly downloads**, including [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`. Builder of [`pwnkit`](https://github.com/0sec-labs/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source.
 - **Mehmet Efe Akça** — MSc Data Science, ETH Zürich. Coursework in *Reliable and Trustworthy AI*, *Probabilistic AI*. TA for *Mathematics of Signals, Networks, and Learning*. Knows how to read what a neural network is thinking.
 
 Security alone gives you a scanner; interpretability alone gives you a probe. Together: **a probe that knows about danger** — trained partly on bugs one of us personally disclosed.
@@ -79,7 +79,7 @@ Can't be built on a closed model: **raw hidden states** (GPT-5/Claude don't expo
 
 ## Limitations (honest)
 
-- **Length artefact (refuted, but worth disclosing).** On the unmatched dataset, a length-only baseline gets AUC 0.883 on Py→JS (vs probe 0.907) — only +0.024 margin, which raised a real concern (issue #22). On a length-matched eval set (230 pairs balanced within ~3 chars per class), the **length baseline collapses to chance (0.514)** while the probe still hits **0.843**, widening the probe-minus-length delta from +0.024 to **+0.329**. The 0.907 wasn't mostly length. Regex baseline still beats us on CWE-328 (0.991 vs 0.944) — that one is a genuine win for static patterns.
+- **Length artefact (refuted).** Unmatched dataset: length-only baseline 0.883 vs probe 0.907 (+0.024 — raised in #22). On a length-matched eval (230 pairs balanced within ~3 chars/class), **length collapses to chance (0.514) while the probe holds 0.843**, widening the delta to **+0.329**. The 0.907 wasn't mostly length. Regex still beats us on CWE-328 (0.991 vs 0.944) — a genuine win for static patterns.
 - **Probes classify representation, not ground truth.** A high score means *"looks like code I was trained on as vulnerable,"* not *"is exploitable."*
 - **Train-inference distribution gap.** Probe trained on last-token of complete snippets; inference reads intermediate positions. Mitigated with 8-token mean; proper fix needs per-token labels (Efe's parallel track).
 - **Surface-form sensitivity.** Full T1–T5 adversarial suite ([Bailey et al. ICLR 2026](https://arxiv.org/abs/2412.09565), [RL-Obfuscation, 2025](https://arxiv.org/abs/2506.14261)): identifier/source renames + SQL case shift mean score ≤0.007 — refutes "probe detects API names." Only **T3 (comment+reindent)** dominates at Δ −0.089. **Max-pool** flattens all 5 to |Δ|≤0.005 (22× T3 robustness) at −0.031 clean AUC. Streaming UI ships max-pool; offline eval reports last-token.
@@ -89,12 +89,16 @@ Can't be built on a closed model: **raw hidden states** (GPT-5/Claude don't expo
 
 Obeso §3: the LoRA that trains the probe also makes the model more cautious. We wired the analogue (`scripts/train_lora.py`, r=8, α=16, q/k/v/o_proj on language tower) on CyberNative DPO chosen completions. 30 SFT steps, 64 examples, 39s MPS, mean CE 2.30. **base=3, LoRA=0 vulnerable patterns** on the 5 demo prompts. Delta entirely on CWE-22: base emits `open(f"/var/data/{request.args.get('filename')}", 'r').read()`; LoRA refuses the file-read framing and returns an HTTP-client wrapper. Whether "safer" or "dodged" is fair to debate — the distribution has measurably shifted on a 2B model after a sub-1-min fit.
 
+## Bonus: small Gemma finds, big Gemma hunts
+
+GemmaForge ships a first-party hand-off into [pwnkit](https://github.com/0sec-labs/pwnkit). `python -m src.scan repo/ > leads.jsonl` walks a codebase with the same 8B Gemma 4 + probe and emits ranked candidate spans (`gemmaforge.leads/v1`). pwnkit's review agent consumes them with `--seed-findings -` and runs the hunt on a larger **Gemma 4 27B locally via Ollama** (`--runtime ollama`). Two Gemma sizes, two roles, zero cloud. A live dashboard renders probe firings, seeded leads, and agent tool-calls in one view. Integration: two merged PRs on pwnkit ([#371](https://github.com/0sec-labs/pwnkit/pull/371), [#372](https://github.com/0sec-labs/pwnkit/pull/372), ~3k LOC) + producer side here (`src/scan.py`, `docs/leads-schema.md`).
+
 ## What we'd build next
 
 Tracked as 13 open GitHub issues. Highlights:
-- **Token-level probe → head-to-head vs. sample-level.** Both trainers are live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces the shipped sample-level probe.
-- **Full DPO LoRA on dedicated GPU.** The script supports it (`--max_steps 500`); we need a clean MPS slot or a single CUDA box. Stretch goal: re-train the probe *jointly* with the LoRA, the way Obeso §3 does — probe gradient gets a stop-grad on the base, the LoRA gradient flows.
-- **VS Code extension** + **pwnkit confidence-filter** + **W&B telemetry**.
+- **Token-level probe vs. sample-level head-to-head** — both trainers live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`); eval picks the winner.
+- **Full DPO LoRA on a dedicated GPU.** Script ready (`--max_steps 500`); stretch is joint probe+LoRA training à la Obeso §3.
+- **VS Code extension** + **W&B telemetry**.
 
 ## License & ethics
 

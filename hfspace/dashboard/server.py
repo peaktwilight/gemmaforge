@@ -235,6 +235,85 @@ def replay_events_demo(handler: BaseHTTPRequestHandler, leads_path: Path) -> Non
             return
 
 
+def replay_events_file(
+    handler: BaseHTTPRequestHandler,
+    events_path: Path,
+    leads_path: Path,
+    speedup: float = 4.0,
+    max_gap: float = 1.2,
+) -> None:
+    """Replay a recorded gemmaforge.events/v1 ND-JSON file with original
+    inter-event timing (compressed by ``speedup`` and capped at ``max_gap``).
+
+    Injects ``scan.lead.record`` events after each ``scan.lead`` by looking
+    up the snippet in ``leads_path`` — that synthetic kind is what Panel 3
+    of the dashboard reads to render code with line numbers.
+    """
+    if not events_path.exists():
+        return
+
+    events: list[dict] = []
+    for line in events_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    if not events:
+        return
+
+    lead_snippets: dict[tuple[str, int, int], str] = {}
+    if leads_path.exists():
+        for line in leads_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                lead = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            key = (lead.get("file"), lead.get("start_line"), lead.get("end_line"))
+            if all(k is not None for k in key) and lead.get("snippet"):
+                lead_snippets[key] = lead["snippet"]
+
+    t_origin = events[0]["ts"]
+    started = time.time()
+    last_target = 0.0
+    rank = 0
+
+    for ev in events:
+        raw_offset = float(ev.get("ts", t_origin)) - t_origin
+        raw_gap = max(0.0, raw_offset - last_target)
+        gap = min(raw_gap, max_gap) / max(speedup, 0.1)
+        target = last_target + gap
+        elapsed = time.time() - started
+        if target > elapsed:
+            time.sleep(target - elapsed)
+        last_target = target
+
+        if not _emit(handler, ev):
+            return
+
+        if ev.get("kind") == "scan.lead":
+            key = (ev.get("file"), ev.get("start_line"), ev.get("end_line"))
+            snippet = lead_snippets.get(key)
+            if snippet:
+                record = {**ev, "kind": "scan.lead.record", "rank": rank, "snippet": snippet}
+                if not _emit(handler, record):
+                    return
+            rank += 1
+
+    while True:
+        time.sleep(15)
+        try:
+            handler.wfile.write(b": keep-alive\n\n")
+            handler.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError):
+            return
+
+
 def tail_events_file(handler: BaseHTTPRequestHandler, path: Path) -> None:
     """Tail an ND-JSON events file. Re-reads existing lines first, then follows."""
     # Backfill existing lines so a late connector sees the scan to date.
@@ -320,6 +399,8 @@ def pwnkit_stream(handler: BaseHTTPRequestHandler) -> None:
 def make_handler(args):
     leads_path = Path(args.leads_file) if args.leads_file else DEFAULT_LEADS
     events_file = Path(args.events_file) if args.events_file else None
+    replay_events = Path(args.replay_events) if args.replay_events else None
+    speedup = float(args.replay_speedup)
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *largs):
@@ -340,7 +421,9 @@ def make_handler(args):
                 return
             if path == "/sse/events":
                 _sse_headers(self)
-                if events_file is not None:
+                if replay_events is not None:
+                    replay_events_file(self, replay_events, leads_path, speedup=speedup)
+                elif events_file is not None:
                     tail_events_file(self, events_file)
                 else:
                     replay_events_demo(self, leads_path)
@@ -363,18 +446,39 @@ def main(argv=None) -> int:
     ap.add_argument(
         "--events-file",
         default=None,
-        help="ND-JSON events file to tail (gemmaforge.events/v1). When omitted, "
-        "replay --leads-file as a synthetic 10s scan walkthrough.",
+        help="ND-JSON events file to *live-tail* (gemmaforge.events/v1). For "
+        "the local dev loop alongside `src/scan.py --events <file>`. Use "
+        "--replay-events for a finished recording.",
+    )
+    ap.add_argument(
+        "--replay-events",
+        default=None,
+        help="Recorded ND-JSON events file to *replay* with original-relative "
+        "timing (compressed by --replay-speedup, capped per-gap at 1.2s). "
+        "Faithful playback of a real scan — every byte is what `src/scan.py` "
+        "actually emitted. This is what the hosted HF Space uses.",
+    )
+    ap.add_argument(
+        "--replay-speedup",
+        type=float,
+        default=4.0,
+        help="Time-compression factor when --replay-events is set.",
     )
     ap.add_argument(
         "--leads-file",
         default=str(DEFAULT_LEADS),
-        help="Cached leads.jsonl used to synthesise the demo scan stream.",
+        help="leads.jsonl whose snippets are injected as scan.lead.record "
+        "events alongside scan.lead during replay/demo.",
     )
     args = ap.parse_args(argv)
 
     server = ThreadingHTTPServer((args.host, args.port), make_handler(args))
-    mode = f"tailing {args.events_file}" if args.events_file else f"demo replay ({Path(args.leads_file).name})"
+    if args.replay_events:
+        mode = f"replay {args.replay_events} @ {args.replay_speedup:g}x"
+    elif args.events_file:
+        mode = f"tailing {args.events_file}"
+    else:
+        mode = f"demo synthesis ({Path(args.leads_file).name})"
     sys.stderr.write(
         f"[dashboard] listening on http://{args.host}:{args.port}/  ({mode})\n"
         f"[dashboard] Panel 1 needs `python -m src.stream_with_probe --serve` on :8787\n"

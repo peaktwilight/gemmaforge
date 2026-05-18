@@ -1,0 +1,35 @@
+{"schema": "gemmaforge.events/v1", "ts": 1779133105.847195, "kind": "scan.start", "repo": "examples/vuln-express-app", "model_id": "google/gemma-4-E2B-it", "layer": 17, "chunker": "sliding-window:30/20"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133105.847669, "kind": "scan.file", "file": "src/files.js", "chunks": 3}
+{"schema": "gemmaforge.events/v1", "ts": 1779133173.7091851, "kind": "probe.score", "file": "src/files.js", "start_line": 1, "end_line": 30, "confidence": 0.9999986032731156, "top_cwe": "CWE-78"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133174.5227368, "kind": "probe.score", "file": "src/files.js", "start_line": 21, "end_line": 50, "confidence": 0.9998921837643383, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133175.157098, "kind": "probe.score", "file": "src/files.js", "start_line": 41, "end_line": 65, "confidence": 0.5253039568480453, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133175.157706, "kind": "scan.file", "file": "src/index.js", "chunks": 2}
+{"schema": "gemmaforge.events/v1", "ts": 1779133175.8791769, "kind": "probe.score", "file": "src/index.js", "start_line": 1, "end_line": 30, "confidence": 0.9895720071255403, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133176.610594, "kind": "probe.score", "file": "src/index.js", "start_line": 21, "end_line": 50, "confidence": 0.99792682566691, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133176.6110752, "kind": "scan.file", "file": "src/ping.js", "chunks": 3}
+{"schema": "gemmaforge.events/v1", "ts": 1779133177.509104, "kind": "probe.score", "file": "src/ping.js", "start_line": 1, "end_line": 30, "confidence": 0.8686172755967625, "top_cwe": "CWE-94"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133178.410917, "kind": "probe.score", "file": "src/ping.js", "start_line": 21, "end_line": 50, "confidence": 0.9999736816167245, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133178.8577101, "kind": "probe.score", "file": "src/ping.js", "start_line": 41, "end_line": 51, "confidence": 3.3743627846887875e-05, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133178.858221, "kind": "scan.file", "file": "src/token.js", "chunks": 3}
+{"schema": "gemmaforge.events/v1", "ts": 1779133179.712505, "kind": "probe.score", "file": "src/token.js", "start_line": 1, "end_line": 30, "confidence": 0.18157907215850452, "top_cwe": "CWE-338"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133180.4957252, "kind": "probe.score", "file": "src/token.js", "start_line": 21, "end_line": 50, "confidence": 0.9999991404828075, "top_cwe": "CWE-338"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133180.963469, "kind": "probe.score", "file": "src/token.js", "start_line": 41, "end_line": 55, "confidence": 0.04986957634182949, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133180.964041, "kind": "scan.file", "file": "src/users.js", "chunks": 3}
+{"schema": "gemmaforge.events/v1", "ts": 1779133181.741517, "kind": "probe.score", "file": "src/users.js", "start_line": 1, "end_line": 30, "confidence": 0.9999717733810983, "top_cwe": "CWE-78"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133182.6341481, "kind": "probe.score", "file": "src/users.js", "start_line": 21, "end_line": 50, "confidence": 0.9558467535824606, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2447119, "kind": "probe.score", "file": "src/users.js", "start_line": 41, "end_line": 63, "confidence": 0.8438896374240737, "top_cwe": "CWE-95"}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2448618, "kind": "scan.lead", "file": "src/token.js", "start_line": 21, "end_line": 50, "confidence": 0.9999991404828075, "top_cwe": "CWE-338", "rank": 0}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244889, "kind": "scan.lead", "file": "src/files.js", "start_line": 1, "end_line": 30, "confidence": 0.9999986032731156, "top_cwe": "CWE-78", "rank": 1}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244906, "kind": "scan.lead", "file": "src/ping.js", "start_line": 21, "end_line": 50, "confidence": 0.9999736816167245, "top_cwe": "CWE-95", "rank": 2}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.24494, "kind": "scan.lead", "file": "src/users.js", "start_line": 1, "end_line": 30, "confidence": 0.9999717733810983, "top_cwe": "CWE-78", "rank": 3}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244954, "kind": "scan.lead", "file": "src/files.js", "start_line": 21, "end_line": 50, "confidence": 0.9998921837643383, "top_cwe": "CWE-95", "rank": 4}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2449658, "kind": "scan.lead", "file": "src/index.js", "start_line": 21, "end_line": 50, "confidence": 0.99792682566691, "top_cwe": "CWE-95", "rank": 5}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244977, "kind": "scan.lead", "file": "src/index.js", "start_line": 1, "end_line": 30, "confidence": 0.9895720071255403, "top_cwe": "CWE-95", "rank": 6}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244988, "kind": "scan.lead", "file": "src/users.js", "start_line": 21, "end_line": 50, "confidence": 0.9558467535824606, "top_cwe": "CWE-95", "rank": 7}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.244999, "kind": "scan.lead", "file": "src/ping.js", "start_line": 1, "end_line": 30, "confidence": 0.8686172755967625, "top_cwe": "CWE-94", "rank": 8}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.24501, "kind": "scan.lead", "file": "src/users.js", "start_line": 41, "end_line": 63, "confidence": 0.8438896374240737, "top_cwe": "CWE-95", "rank": 9}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2450209, "kind": "scan.lead", "file": "src/files.js", "start_line": 41, "end_line": 65, "confidence": 0.5253039568480453, "top_cwe": "CWE-95", "rank": 10}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2450318, "kind": "scan.lead", "file": "src/token.js", "start_line": 1, "end_line": 30, "confidence": 0.18157907215850452, "top_cwe": "CWE-338", "rank": 11}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.2450418, "kind": "scan.lead", "file": "src/token.js", "start_line": 41, "end_line": 55, "confidence": 0.04986957634182949, "top_cwe": "CWE-95", "rank": 12}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.245054, "kind": "scan.lead", "file": "src/ping.js", "start_line": 41, "end_line": 51, "confidence": 3.3743627846887875e-05, "top_cwe": "CWE-95", "rank": 13}
+{"schema": "gemmaforge.events/v1", "ts": 1779133183.24508, "kind": "scan.end", "files_seen": 5, "chunks_scored": 14, "leads_emitted": 14, "elapsed_seconds": 77.398}

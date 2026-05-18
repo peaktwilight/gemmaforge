@@ -13,4 +13,4 @@ COPY examples/ /app/examples/
 ENV PORT=7860
 EXPOSE 7860
 
-CMD ["sh", "-c", "python -m dashboard.server --port ${PORT}"]
+CMD ["sh", "-c", "python -m dashboard.server --port ${PORT} --replay-events examples/events.ndjson --leads-file examples/leads.jsonl --replay-speedup 6"]

@@ -14,12 +14,12 @@ short_description: Live dashboard for the two-Gemma vulnerability pipeline
 
 Four-panel dashboard for the GemmaForge two-Gemma vulnerability pipeline.
 
-- **Panel 1 · Probe stream** — colour-graded per-token risk feed (replays a canned demo here; live mode runs against the local streaming probe server on `:8787`).
-- **Panel 2 · Scan progress** — `scan.file` / `probe.score` / `scan.end` events as `src/scan.py` walks the repo.
-- **Panel 3 · Ranked leads** — `gemmaforge.leads/v1` records with file:line, CWE, snippet preview, and probe confidence.
-- **Panel 4 · pwnkit handoff** — synthetic `queued → exploit → report` cycle illustrating the Tier 3 verifier handoff (pwnkit `--seed-findings` consuming our leads JSONL).
+- **Panel 1 · Probe stream** — colour-graded per-token risk feed. *Empty on this hosted Space* (free CPU tier can't host Gemma 4); the local pipeline runs `src/stream_with_probe.py --serve` on `:8787` and Panel 1 wires up automatically.
+- **Panel 2 · Scan progress** — `scan.start` / `scan.file` / `probe.score` / `scan.lead` / `scan.end` events from a **real `src/scan.py` run** against `examples/vuln-express-app`. The bytes you see were emitted by an actual Gemma 4 E2B forward pass — captured into `examples/events.ndjson`, replayed at 6× original speed.
+- **Panel 3 · Ranked leads** — `gemmaforge.leads/v1` records from that same real run. 14 chunks scored, 14 leads emitted; the probe correctly identifies CWE-78 (cmd injection in `ping.js`, `users.js`), CWE-338 (weak RNG in `token.js`), and CWE-95 (eval-class) at confidence 1.000, while dying off on boilerplate at 0.05–0.18.
+- **Panel 4 · pwnkit handoff** — illustration of the Tier 2 (pwnkit `--seed-findings`) verifier consuming the leads. Synthetic queue/exploit/report animation; the real pwnkit run is in the project README.
 
-This hosted Space replays `examples/leads.jsonl` so judges can see the layout end-to-end without bringing up a backend. For the live pipeline, clone the repo and follow `dashboard/README.md`.
+Every byte on Panels 2–3 came out of a genuine `src/scan.py` invocation — no hand-crafted data. The recording lives in this Space at `examples/events.ndjson` and `examples/leads.jsonl`; replay logic in `dashboard/server.py:replay_events_file()`.
 
 Built for the [Gemma 4 Good Hackathon](https://kaggle.com/competitions/gemma-4-good-hackathon) by [Doruk Tan Ozturk](https://doruk.ch) and Mehmet Efe Akça.
 

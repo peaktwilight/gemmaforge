@@ -1,0 +1,14 @@
+{
+  "name": "vuln-express-app",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Intentionally vulnerable Express target used to demo the GemmaForge -> pwnkit pipeline. Not for production use.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql": "^2.18.1"
+  }
+}

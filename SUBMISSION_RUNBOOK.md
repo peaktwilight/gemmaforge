@@ -46,13 +46,13 @@ The visibility field must read `"PUBLIC"`. Hackathon rules require it.
 
 1. Open https://www.kaggle.com/competitions/gemma-4-good-hackathon/writeups
 2. Click **New Writeup**.
-3. **Title:** `GemmaForge — Catch Vulnerabilities Inside Gemma 4, Before the Token Lands`
-4. **Track:** **Main Track**. Also tick **Safety & Trust** and **Ollama** if the UI lets you stack the impact/special-tech prizes.
+3. **Title:** `GemmaForge — Two Gemmas, One Laptop: Local Repo-Wide Vulnerability Auditing`
+4. **Tracks:** **Main Track** · **Impact: Safety & Trust** · **Special Tech: Ollama** (matches the heading line in `WRITEUP.md`; tick all three if the UI permits stacking).
 5. Paste the full content of `WRITEUP.md` into the body.
 6. Attach:
-   - Cover image: `web/cover.svg`
-   - Code repo URL: `https://github.com/peaktwilight/gemmaforge`
-   - Video URL: YouTube link (unlisted-to-public on submission day)
+   - Cover image: `web/cover.svg` (PNG fallback if Kaggle rejects SVG: `web/screenshot-demo.png`)
+   - Code repo URL: `https://github.com/peaktwilight/gemmaforge` (must be public — runbook flips it at T-15 min)
+   - Video URL: YouTube link (unlisted-to-public on submission day). Placeholder until ready: `https://youtube.com/watch?v=TODO`.
    - Live demo URL: `https://huggingface.co/spaces/peaktwilight/gemma4ge`
 
 ## T-5 min — hit Submit on Kaggle

@@ -5,11 +5,11 @@
 
 ## Required artefacts
 
-- [ ] **Kaggle Writeup** — `WRITEUP.md` content pasted into a new Kaggle Writeup, Track selected: **Main Track** (+ Safety & Trust + Ollama for stacking)
-- [ ] **Public Code Repository** — pushed to `https://github.com/peaktwilight/gemmaforge` (public)
-- [ ] **Public Video** — YouTube (unlisted → public on submission day), duration ≤ 3:00, embedded link in writeup
-- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemma4ge`
-- [ ] **Cover image + media gallery** — `web/cover.svg` + screenshot of running UI
+- [ ] **Kaggle Writeup** (≤1500 words) — `WRITEUP.md` content pasted into a new Kaggle Writeup. Tracks: **Main Track** · **Impact: Safety & Trust** · **Special Tech: Ollama**.
+- [ ] **Public Code Repository** — pushed to `https://github.com/peaktwilight/gemmaforge` (flip to public at T-15 min, see runbook)
+- [ ] **Public Video** (≤3 min, YouTube, no login required) — unlisted → public on submission day, link pasted into writeup. Placeholder: `https://youtube.com/watch?v=TODO` — replace before clicking Submit.
+- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemma4ge` (CPU-basic, must read `RUNNING` at T-30 min)
+- [ ] **Cover image + media gallery** — primary: `web/cover.svg`; PNG fallback if Kaggle rejects SVG: `web/screenshot-demo.png` (or `web/auc-ladder.png`, `web/demo-grid.png`)
 
 ## Order of operations on submission day
 
@@ -28,7 +28,7 @@
 GemmaForge — Two Gemmas, One Laptop: Local Repo-Wide Vulnerability Auditing
 
 ### Subtitle
-Small Gemma (E2B) plus a linear probe on its hidden state triages a whole repo in one forward pass; big Gemma (27B) via Ollama verifies each lead with tool use. End-to-end local. Built by a security researcher (Doruk) and an ETH interpretability researcher (Efe).
+Small Gemma (E2B) plus a linear probe on its hidden state triages a whole repo in one forward pass; big Gemma (8B, `gemma4:latest` via Ollama) verifies each lead with tool use. End-to-end local. Built by a security researcher (Doruk) and an ETH interpretability researcher (Efe).
 
 ### Tags
 gemma, gemma-4, ollama, security, ai-safety, interpretability, linear-probe, vulnerability-detection, agentic-verification, local-first

@@ -84,10 +84,11 @@ This project can't be built on a closed model:
 
 ## Limitations (honest)
 
+- **Length artefact in the dataset.** Positives are truncated *after* the vulnerable line, negatives *before* — so positives are systematically longer (mean 396 vs 200 chars). A length-only baseline gets AUC **0.883** on the cross-language Py→JS split, only **0.024** behind our 0.907 probe. On `CWE-328` a regex baseline (0.991) actually *beats* the probe (0.944). The probe is doing real semantic work but a meaningful share of the AUC is structural. Mitigation tracked in #22; the headline numbers above are unchanged but **report delta-over-length-baseline alongside absolute AUC** going forward.
 - **Probes classify representation, not ground truth.** A high score means *"looks like code I was trained on as vulnerable,"* not *"is exploitable."*
-- **Train-inference distribution gap.** Probe trained on last-token of *complete* snippets; at inference reads every *intermediate* position. Mitigated with 8-token sliding-window mean; proper fix needs per-token labels.
-- **Surface-form sensitivity.** Full T1–T5 adversarial suite on 20 positives ([Bailey et al. ICLR 2026](https://arxiv.org/abs/2412.09565), [RL-Obfuscation, 2025](https://arxiv.org/abs/2506.14261)): identifier renames, source renames, SQL case/concat all shift mean score by ≤0.007 — *refutes* the "probe detects API names" worry. Only **T3 (comment+reindent)** dominates at Δ −0.089. **Max-pool** flattens all 5 transforms to |Δ| ≤ 0.005 (22× T3 robustness), at −0.031 clean AUC (0.963 → 0.932). Streaming UI ships max-pool; offline eval reports last-token.
-- **Per-size retraining + uneven cross-language coverage.** Python/JS well-covered; C/C++ less; Rust/Zig noisy until targeted pairs.
+- **Train-inference distribution gap.** Probe trained on last-token of complete snippets; inference reads intermediate positions. Mitigated with 8-token mean; proper fix needs per-token labels (Efe's parallel track).
+- **Surface-form sensitivity.** Full T1–T5 adversarial suite ([Bailey et al. ICLR 2026](https://arxiv.org/abs/2412.09565), [RL-Obfuscation, 2025](https://arxiv.org/abs/2506.14261)): identifier/source renames + SQL case shift mean score ≤0.007 — refutes "probe detects API names." Only **T3 (comment+reindent)** dominates at Δ −0.089. **Max-pool** flattens all 5 to |Δ|≤0.005 (22× T3 robustness) at −0.031 clean AUC. Streaming UI ships max-pool; offline eval reports last-token.
+- **Coverage.** Python/JS well-covered; C/C++ less; Rust/Zig noisy until targeted pairs. Per-size retraining needed for 26B-A4B.
 
 ## Bonus: LoRA-augmented safe-code generation
 

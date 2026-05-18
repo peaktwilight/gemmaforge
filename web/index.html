@@ -181,8 +181,9 @@
   }
   .stats {
     margin-top: 12px;
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
   }
+  .stat.maxpool .v { color: var(--accent); }
   .stat {
     background: #060a10; border: 1px solid var(--border);
     border-radius: 7px; padding: 9px 11px;
@@ -290,6 +291,7 @@
       <div class="stat"><div class="v" id="stat-tokens">0</div><div class="l">tokens streamed</div></div>
       <div class="stat"><div class="v" id="stat-peak">0%</div><div class="l">peak risk</div></div>
       <div class="stat"><div class="v" id="stat-avg">0%</div><div class="l">mean risk</div></div>
+      <div class="stat maxpool"><div class="v" id="stat-maxpool">0%</div><div class="l">max-pool</div></div>
       <div class="stat"><div class="v cwe" id="stat-top-cwe">—</div><div class="l">top cwe</div></div>
     </div>
   </section>
@@ -314,16 +316,17 @@
   }
 
   let evt = null;
-  let stats = { n: 0, peak: 0, sum: 0, cweCounts: {} };
+  let stats = { n: 0, peak: 0, sum: 0, maxpool: 0, cweCounts: {} };
 
   function startRun(prompt) {
     if (evt) { try { evt.close(); } catch(_) {} evt = null; }
     out.innerHTML = "";
     out.classList.remove("empty");
-    stats = { n: 0, peak: 0, sum: 0, cweCounts: {} };
+    stats = { n: 0, peak: 0, sum: 0, maxpool: 0, cweCounts: {} };
     $("stat-tokens").textContent = "0";
     $("stat-peak").textContent = "0%";
     $("stat-avg").textContent = "0%";
+    $("stat-maxpool").textContent = "0%";
     $("stat-top-cwe").innerHTML = "&mdash;";
 
     const url = `http://localhost:8787/stream?prompt=${encodeURIComponent(prompt)}&max_tokens=250`;
@@ -334,13 +337,23 @@
       try {
         const e = JSON.parse(msg.data);
         if (e.event === "token") {
+          // Server now emits risk_smoothed (sliding-window mean) and
+          // risk_maxpool (running max). Token color uses max-pool — it's
+          // ~22x more robust to comment+reindent attacks and more
+          // confident on positives. The meter uses smoothed — visually
+          // it's still the better stream-y signal. Both fields fall
+          // back to `risk` for any older server still on the wire.
+          const rSmooth = (typeof e.risk_smoothed === "number") ? e.risk_smoothed : e.risk;
+          const rMax = (typeof e.risk_maxpool === "number") ? e.risk_maxpool : e.risk;
           stats.n += 1;
-          stats.sum += e.risk;
-          if (e.risk > stats.peak) stats.peak = e.risk;
+          stats.sum += rSmooth;
+          if (rSmooth > stats.peak) stats.peak = rSmooth;
+          if (rMax > stats.maxpool) stats.maxpool = rMax;
           $("stat-tokens").textContent = String(stats.n);
           $("stat-peak").textContent = (stats.peak * 100).toFixed(0) + "%";
           $("stat-avg").textContent = ((stats.sum / stats.n) * 100).toFixed(0) + "%";
-          needle.style.left = (e.risk * 100).toFixed(1) + "%";
+          $("stat-maxpool").textContent = (stats.maxpool * 100).toFixed(0) + "%";
+          needle.style.left = (rSmooth * 100).toFixed(1) + "%";
 
           // Track per-CWE argmax across the run (only when probe attached).
           if (typeof e.top_cwe === "string") {
@@ -356,14 +369,17 @@
 
           const span = document.createElement("span");
           span.className = "tok";
-          span.style.backgroundColor = riskColor(e.risk);
+          // Color cells by max-pool: fewer false negatives on attacked
+          // code (last-token crashed 0.927 → 0.008 on adversarial row 74,
+          // max-pool stayed 0.995 → 0.968).
+          span.style.backgroundColor = riskColor(rMax);
           const rawPct = (typeof e.risk_raw === "number")
             ? (e.risk_raw * 100).toFixed(1) + "%"
             : "—";
           const cweHint = (typeof e.top_cwe === "string" && typeof e.top_cwe_score === "number")
             ? `  ·  ${e.top_cwe} ${(e.top_cwe_score * 100).toFixed(0)}%`
             : "";
-          span.title = `smoothed ${(e.risk * 100).toFixed(1)}%  ·  raw ${rawPct}${cweHint}`;
+          span.title = `max-pool ${(rMax * 100).toFixed(1)}%  ·  smoothed ${(rSmooth * 100).toFixed(1)}%  ·  raw ${rawPct}${cweHint}`;
           span.textContent = e.token;
           // Tiny subscript CWE tag when the per-CWE head fires confidently.
           if (typeof e.top_cwe === "string"

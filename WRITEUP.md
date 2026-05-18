@@ -15,9 +15,9 @@ Security alone gives you a scanner. Interpretability alone gives you a probe. To
 
 ## The problem
 
-AI coding assistants ship roughly 100 million lines of code per day into private repos. A non-trivial fraction is vulnerable: every major assistant has been independently shown to emit SQL injection, path traversal, command injection, weak crypto, and hardcoded credentials as steady-state behavior, not edge cases.
+AI coding assistants ship ~100M lines of code per day into private repos. A non-trivial fraction is vulnerable: every major assistant has been shown to emit SQL injection, path traversal, command injection, weak crypto, and hardcoded credentials as steady-state behavior.
 
-The industry answer is "run a scanner afterwards." Too late. The developer has already seen the insecure suggestion, and most will paste before any scanner fires. Scanners also rely on static rules — they catch what they were told to catch. And they tell you nothing about how confident *the model itself* was when it produced the risky line.
+The industry answer is "scan afterwards." Too late. The developer has already seen the insecure suggestion, and most will paste before any scanner fires. Scanners use static rules — they catch what they were told to catch — and they tell you nothing about how confident *the model itself* was.
 
 We asked a sharper question:
 
@@ -75,10 +75,11 @@ A small HTML page consumes a Server-Sent-Events feed and colors each token: gree
 
 ## Training the probe
 
-1. **Dataset.** ~1,000 (vulnerable, safe) code pairs:
+1. **Dataset.** ~1,050 examples:
    - Doruk's published CVE corpus (`node-forge`, `picomatch`, two more).
    - `CyberNative/Code_Vulnerability_Security_DPO` — paired vulnerable/patched code across Python, JS, C, Java, 1:1 balanced.
-   - Hand-written seeds covering CWE-22, 78, 79, 89, 94, 295, 327, 330, 352, 502, 798, 918, 1333, so coverage doesn't tilt to whatever the public dataset over-represents.
+   - Hand-written seeds covering CWE-22, 78, 79, 89, 94, 295, 327, 330, 352, 502, 798, 918, 1333.
+   - **~55 natural-language / non-code "safe" examples** (chat greetings, markdown documentation, README prose, JSON, comments). Without these, an early version of the probe scored every chat-style sentence as vulnerable because it had never seen one — the probe was effectively a "code detector," not a "vulnerability detector." Including non-code negatives forced the probe to learn the actual signal.
 2. **Activation capture.** Forward-pass each example through Gemma 4 with `output_hidden_states=True`. Record the last-token hidden state at layers 25%, 50%, 75%, 100%.
 3. **Probe training.** Per layer: 80/20 stratified split, `sklearn.linear_model.LogisticRegression(C=1.0)`. Pick the layer with best held-out AUC. Save `(w, b, layer)` as a 10 KB `.npz`.
 
@@ -113,22 +114,22 @@ Tractable with time and data, not blockers on the technique.
 
 ## What we'd build next
 
-- **Per-CWE heads.** Replace the single "vulnerable" axis with multi-head output (`CWE-89` vs `CWE-22` vs `CWE-78` …) so the UI names the bug class.
-- **LoRA-augmented probes.** Section 3 of Obeso et al. reports clear AUC gains from a small joint LoRA adapter — straightforward to add.
-- **VS Code extension.** The streaming layer is already SSE; wiring it into an editor is a week of polish.
-- **Hook into pwnkit.** Doruk's pentest framework already drives Gemma 4 through CVE-hunting workflows. Adding the probe as a confidence filter — "Gemma claims this is SQLi *and* the activations match the SQLi training pattern" — closes the loop.
+- **Per-CWE heads.** Multi-head output (CWE-89 vs CWE-22 vs CWE-78 …) so the UI names the bug class.
+- **LoRA-augmented probes.** Obeso et al. §3 reports clear AUC gains from a small joint adapter.
+- **VS Code extension.** The streaming layer is already SSE; an editor plugin is a week of polish.
+- **Hook into pwnkit.** Doruk's pentest framework drives Gemma 4 through CVE-hunting workflows. Adding the probe as a confidence filter — "Gemma claims this is SQLi *and* the activations match the SQLi training pattern" — closes the loop.
 
 ## License & ethics
 
-- Code, probe weights, and training-data manifest: **Apache-2.0**, all in the repo.
-- The training set uses only patterns from **already-public CVE disclosures**. None of Doruk's currently-embargoed disclosures were used — that would have been a responsible-disclosure violation.
+- Code, probe weights, training-data manifest: **Apache-2.0**, all in the repo.
+- Training set uses **only patterns from already-public CVE disclosures**. Doruk's embargoed disclosures were excluded — that would have been a responsible-disclosure violation.
 - No user data leaves the laptop at inference time.
 
 ## Acknowledgements
 
-- The Gemma team at Google DeepMind, for shipping a frontier model whose weights open cleanly in a debugger.
-- [Obeso, Arditi, Ferrando, Freeman, Holmes, and Nanda (2025)](https://arxiv.org/abs/2509.03531) — the streaming-probe paper this project directly adapts.
-- The `CyberNative` team for the paired-code DPO dataset.
-- The digitalbazaar/forge security team and the others who triaged Doruk's CVEs — that work is part of the substrate this probe learned from.
+- The Gemma team at Google DeepMind, for shipping a model whose weights open cleanly in a debugger.
+- [Obeso, Arditi, Ferrando, Freeman, Holmes, Nanda (2025)](https://arxiv.org/abs/2509.03531) — the streaming-probe paper this work adapts.
+- `CyberNative` for the paired-code DPO dataset.
+- The digitalbazaar/forge security team and others who triaged Doruk's CVEs.
 
 — Doruk Tan Ozturk & Mehmet Efe Akça, May 2026

@@ -220,11 +220,93 @@ def balance(rows: list[dict], n_per_class: int = 500) -> list[dict]:
     return pos[:n_per_class] + neg[:n_per_class]
 
 
+NEUTRAL_TEXT: list[str] = [
+    # Plain greetings / chat openers — these are what Gemma emits when it
+    # decides to be verbose. They must score *low* or the demo looks broken.
+    "Hello! How can I help you today?",
+    "Sure, here's an example.",
+    "I'd be happy to help with that.",
+    "Below is a complete implementation.",
+    "Let me walk you through the solution step by step.",
+    "Here is a complete example.",
+    "This example assumes you have Node.js installed.",
+    "First, install the required dependencies.",
+    "Of course, here you go.",
+    "Great question. The short answer is: it depends.",
+    # Markdown formatting tokens that Gemma loves to emit.
+    "### Prerequisites\n\nFirst, make sure you have the necessary packages installed:",
+    "## Step 1: Install dependencies\n\nRun the following command in your terminal.",
+    "### Setup\n\n```bash\nnpm install express\n```",
+    "**Note:** this is a simplified example.",
+    "**Warning:** you should adapt this to your environment.",
+    "**Important:** never store secrets in plain text.",
+    "**Tip:** use environment variables for configuration.",
+    "1. **Express** set up.\n2. A **MySQL client**.\n3. A database connection.",
+    "- step one\n- step two\n- step three\n",
+    "# Title\n\nIntroductory paragraph that describes the goal.",
+    # Documentation-style prose
+    "This function returns the requested user record from the database.",
+    "If the user does not exist, an error is thrown.",
+    "Use this endpoint to retrieve user details by their numeric id.",
+    "The handler accepts a single path parameter and returns JSON.",
+    "Refer to the official Express documentation for more details.",
+    "See the README for installation instructions.",
+    "Make sure to handle errors and edge cases in production.",
+    "The code below is intended for educational purposes only.",
+    "This is a minimal example without authentication.",
+    "Authentication should be added before deploying to production.",
+    # General prose
+    "The quick brown fox jumps over the lazy dog.",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "It was the best of times, it was the worst of times.",
+    "The sun rose over the quiet harbor.",
+    "Coffee shops in Zurich open early and close around six.",
+    "Trains in Switzerland are famously punctual.",
+    "Yesterday I read a paper about neural network interpretability.",
+    "Thank you for taking the time to review this work.",
+    "Please let me know if you need any clarification.",
+    "I hope this helps! Let me know if you have other questions.",
+    # JSON / configuration snippets (data, not code logic)
+    '{"name": "example", "version": "1.0.0", "description": "demo"}',
+    '{"users": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]}',
+    '{"status": "ok", "timestamp": "2026-05-18T10:00:00Z"}',
+    '{"port": 3000, "host": "localhost", "debug": true}',
+    "# config.yaml\nport: 3000\nhost: localhost\ndebug: true",
+    "[server]\nport = 3000\nhost = 'localhost'\ndebug = true",
+    # Doc-style code with comments (no actual vulnerability)
+    "// returns the next id in a monotonically increasing sequence\nfunction nextId() { return ++counter; }",
+    "// add a delay before retry — caller is expected to await\nfunction delay(ms) { return new Promise(r => setTimeout(r, ms)); }",
+    "// pure helper: map a list of users to their names\nfunction names(users) { return users.map(u => u.name); }",
+    "# pure helper: convert celsius to fahrenheit\ndef c_to_f(c: float) -> float:\n    return c * 9.0 / 5.0 + 32.0",
+    "# format an iso8601 timestamp for the audit log\ndef ts() -> str:\n    return datetime.utcnow().isoformat() + 'Z'",
+    # Imports + package descriptions
+    "import express from 'express';\nimport mysql from 'mysql2/promise';",
+    "import { Router } from 'express';\nimport { db } from './db.js';",
+    "from typing import Optional\nfrom dataclasses import dataclass",
+    "use std::collections::HashMap;\nuse std::error::Error;",
+    "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n)",
+]
+
+
+def make_neutral_rows() -> list[dict]:
+    out: list[dict] = []
+    for txt in NEUTRAL_TEXT:
+        out.append({
+            "code": txt, "label": 0, "cwe": None, "cve": None,
+            "source": "neutral-seed", "lang": "natural-language",
+            "vuln_type": None,
+        })
+    return out
+
+
 def main() -> None:
     rows: list[dict] = list(SEED_PAIRS)
     enriched = try_huggingface_dataset(max_pairs=int(os.environ.get("GF_MAX", "800")))
     rows.extend(enriched)
     rows = balance(rows, n_per_class=int(os.environ.get("GF_PER_CLASS", "500")))
+    # Add neutral / non-code examples as extra safe label so the probe
+    # learns "vulnerable code", not just "is this code".
+    rows.extend(make_neutral_rows())
     random.shuffle(rows)
 
     with OUT.open("w", encoding="utf-8") as f:

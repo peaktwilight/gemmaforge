@@ -8,7 +8,7 @@ GemmaForge is a two-tier, fully-local pipeline built on the Gemma 4 family.
 - **`weak-probe`** — Gemma 4 E2B backbone, bounded line/token windows, high recall, **laptop-class**. Default; what the metrics below validate.
 - **`strong-probe`** — larger Gemma checkpoint as the probe backbone, larger windows, more repo context, better ranking. **Workstation-class.** Same `gemmaforge.leads/v1` schema.
 
-**Tier 2 — pwnkit verifier.** Gemma 4 27B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://github.com/0sec-labs/pwnkit/pull/371)) that consumes the leads as its **primary worklist**, reads files, greps call sites, and produces tool-grounded audit verdicts. Consumes leads from either probe.
+**Tier 2 — pwnkit verifier.** Gemma 4 8B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://github.com/0sec-labs/pwnkit/pull/371)) that consumes the leads as its **primary worklist**, reads files, greps call sites, and produces tool-grounded audit verdicts. Consumes leads from either probe.
 
 Nothing leaves the laptop. The probe is what the metrics below validate. The agent verifier is shipped end-to-end at the CLI + runtime + dashboard layer in two merged pwnkit PRs: [`#371`](https://github.com/0sec-labs/pwnkit/pull/371) (CLI, Ollama runtime, three-lane dashboard) and [`#372`](https://github.com/0sec-labs/pwnkit/pull/372) (seed-findings worklist injection, streaming Ollama tool-calls, live Hunt lane). Both merged 2026-05-18.
 
@@ -32,7 +32,7 @@ Full audit trail: [`RESULTS.md`](RESULTS.md). Submission write-up: [`WRITEUP.md`
 Two demo flows:
 
 1. **IDE-mode (Tier 1 only)** — the probe rides every token Gemma 4 emits. Green (<0.4), yellow (0.4–0.7), red (>0.7). The red cluster above — `db.query(\`SELECT * FROM users WHERE id = ${id}\`)` — is a CWE-89 SQL-injection pattern. This is the streaming UI in `src/stream_with_probe.py` and the HuggingFace Space below.
-2. **Repo-audit mode (Tier 1 → leads → Tier 2)** — `python -m src.scan ./repo --events live.ndjson > leads.jsonl` walks the codebase, emits ranked `gemmaforge.leads/v1` JSONL, streams `gemmaforge.events/v1` to the [pwnkit `/live` dashboard](https://github.com/0sec-labs/pwnkit/pull/371) (Lane 1 · Probe, Lane 2 · Leads), then hands the leads to `pwnkit review --seed-findings ... --runtime ollama` for Gemma 4 27B agentic verification.
+2. **Repo-audit mode (Tier 1 → leads → Tier 2)** — `python -m src.scan ./repo --events live.ndjson > leads.jsonl` walks the codebase, emits ranked `gemmaforge.leads/v1` JSONL, streams `gemmaforge.events/v1` to the [pwnkit `/live` dashboard](https://github.com/0sec-labs/pwnkit/pull/371) (Lane 1 · Probe, Lane 2 · Leads), then hands the leads to `pwnkit review --seed-findings ... --runtime ollama` for Gemma 4 8B agentic verification.
 
 **Live HF Space:** [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge) (HuggingFace Space, ZeroGPU).
 
@@ -69,10 +69,10 @@ In parallel we are training a **token-level** path — per-token spans (`evidenc
 
 ## Why this is novel
 
-- **A model-size family as the architecture.** `weak-probe` (Gemma 4 E2B) does cheap whole-repo triage on a laptop; `strong-probe` (larger Gemma checkpoint) does the same with bigger windows and richer context on a workstation; the `pwnkit verifier` (Gemma 4 27B via Ollama) does deep agentic auditing with tool use. Same model family, same tokenizer, same function-calling protocol, same license, same lead schema flowing between stages — that combination doesn't exist outside Gemma 4.
+- **A model-size family as the architecture.** `weak-probe` (Gemma 4 E2B) does cheap whole-repo triage on a laptop; `strong-probe` (larger Gemma checkpoint) does the same with bigger windows and richer context on a workstation; the `pwnkit verifier` (Gemma 4 8B via Ollama) does deep agentic auditing with tool use. Same model family, same tokenizer, same function-calling protocol, same license, same lead schema flowing between stages — that combination doesn't exist outside Gemma 4.
 - **Domain transfer of streaming probes from hallucination → security.** Vulnerability likelihood is fuzzier than entity hallucination; a single linear probe still hits AUC 0.907 cross-language on a 2B model with no LoRA, ~1k pairs.
 - **Author-informed training data.** Doruk's CVE-finding work — including the `node-forge` patch (CVE-2026-33896) — informed which CWE classes the dataset emphasises and how the probe was evaluated. Canonical training metrics are on CyberSecEval `pairs_v2` (`data/pairs_v2.jsonl`); Doruk's embargoed disclosures are deliberately excluded.
-- **Runs locally, no network.** The probe path runs on laptop-class hardware. The 27B verifier needs a 24GB-class GPU or 32GB-class M-series Mac — the same tier that runs Stable Diffusion. Anyone Snyk-priced-out gets the same audit capability as a Fortune 500.
+- **Runs locally, no network.** The probe path runs on laptop-class hardware. The Gemma 4 8B verifier (Q4_K_M via Ollama) fits in ~10GB of VRAM — laptop GPUs and M-series Macs handle it comfortably. Anyone Snyk-priced-out gets the same audit capability as a Fortune 500.
 - **Honest OOD reporting.** We lead with the cross-language number, not the in-distribution one, because Python→JavaScript brings a near-disjoint CWE basket and tests language-portability of the underlying representation.
 
 ## Limitations (honest)
@@ -122,7 +122,7 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
                                             --seed-only --runtime ollama
                                                                      │
                                                                      ▼
-                              Gemma 4 27B (Ollama /api/chat + tools[],
+                              Gemma 4 8B (Ollama /api/chat + tools[],
                               streaming tool-calls per pwnkit#372)
                               read_file · grep · follow-call-site
                                                                      │
@@ -148,15 +148,15 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
 
 **Tier 2 (pwnkit#371, merged 2026-05-18):**
 - `--seed-findings <path|->` — parses our `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s and threads them through the pipeline. Stable wire format.
-- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:27b`. **Streaming tool-calls** ship in [pwnkit#372](https://github.com/0sec-labs/pwnkit/pull/372).
+- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:latest`. **Streaming tool-calls** ship in [pwnkit#372](https://github.com/0sec-labs/pwnkit/pull/372).
 - `/live` dashboard — three lanes (Probe / Leads / Hunt), all live-wired via SSE. The Hunt lane subscribes to `pwnkit.events/v1`, click-to-highlight resolves a verdict back to its originating lead.
 - **Worklist injection.** `pwnkit#372` converts each `SeedFinding` into a `SemgrepFinding`-shaped record (severity bucketed from probe confidence, `ruleId` prefixed with the source + CWE for visible provenance, full payload preserved in `metadata`) and prepends it to the agent's worklist so the agent sees probe leads first. `--seed-only` honours that by skipping the static-scan pass entirely.
 
 ## Tracks targeted
 
-- **Main Track** — A novel two-tier architecture that uses the Gemma 4 family across model sizes in a single product: `weak-probe` (E2B) on a laptop or `strong-probe` (larger Gemma) on a workstation for whole-repo triage; the `pwnkit verifier` (27B + tools) for deep agentic corroboration.
+- **Main Track** — A novel two-tier architecture that uses the Gemma 4 family across model sizes in a single product: `weak-probe` (E2B) on a laptop or `strong-probe` (larger Gemma) on a workstation for whole-repo triage; the `pwnkit verifier` (Gemma 4 8B + tools) for deep agentic corroboration.
 - **Impact / Safety & Trust** — Tier 1 peers literally *inside* the model (hidden-state introspection); Tier 2 produces auditable, tool-grounded verdicts a human can re-check. Both halves are explainability in two complementary senses.
-- **Special Tech / Ollama** — Tier 2's agentic verifier runs on `gemma4:27b` via Ollama `/api/chat` with `tools[]`. Tier 1's probe variants both run locally. Zero data leaves the laptop.
+- **Special Tech / Ollama** — Tier 2's agentic verifier runs on `gemma4:latest` (Gemma 4 8B Q4_K_M) via Ollama `/api/chat` with `tools[]`. Tier 1's probe variants both run locally. Zero data leaves the laptop.
 
 ## Team
 
@@ -185,7 +185,7 @@ python -m src.stream_with_probe --serve     # loads shipped data/probe.npz
 
 Or visit the hosted Space: [`peaktwilight/gemma4ge`](https://huggingface.co/spaces/peaktwilight/gemma4ge).
 
-**Tier 1 + 2 — whole-repo audit (requires Ollama with `gemma4:27b` pulled):**
+**Tier 1 + 2 — whole-repo audit (requires Ollama with `gemma4:latest` pulled):**
 
 ```bash
 # 1a. weak-probe (default) — laptop-class, shipped probe weights
@@ -201,7 +201,7 @@ python -m src.scan ./your-repo \
     --top-k 25 --languages py,js \
     --events live.ndjson > leads.jsonl
 
-# 2. hand the leads to pwnkit's agentic auditor driving Gemma 4 27B locally
+# 2. hand the leads to pwnkit's agentic auditor driving Gemma 4 8B locally
 #    (install pwnkit from https://github.com/0sec-labs/pwnkit)
 pwnkit review ./your-repo \
     --seed-findings leads.jsonl \
@@ -219,14 +219,14 @@ The probe doesn't have to stop at "this looks risky" — it can hand findings to
 # 1. scan a repo with the probe → ND-JSON leads (gemmaforge.leads/v1)
 python -m src.scan examples/vuln-express-app --top-k 10 > /tmp/leads.jsonl
 
-# 2. hand the leads to pwnkit; agent loop runs on local Gemma 4 27B via Ollama
+# 2. hand the leads to pwnkit; agent loop runs on local Gemma 4 8B via Ollama
 pwnkit-cli review examples/vuln-express-app \
     --seed-findings /tmp/leads.jsonl \
     --runtime ollama \
     --model gemma4:latest
 ```
 
-Same Gemma family, two roles: small 8B probe finds, big 27B agent hunts. Zero cloud spend, zero data leaving the laptop. Schema contracts at [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md). Pre-computed [`examples/leads.jsonl`](examples/leads.jsonl) is shipped so judges without local Gemma weights can run step 2 alone. The pwnkit side landed in [PR #371](https://github.com/0sec-labs/pwnkit/pull/371) and [PR #372](https://github.com/0sec-labs/pwnkit/pull/372).
+Same Gemma family, two roles: small E2B probe finds, Gemma 4 8B agent hunts. Zero cloud spend, zero data leaving the laptop. Schema contracts at [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md). Pre-computed [`examples/leads.jsonl`](examples/leads.jsonl) is shipped so judges without local Gemma weights can run step 2 alone. The pwnkit side landed in [PR #371](https://github.com/0sec-labs/pwnkit/pull/371) and [PR #372](https://github.com/0sec-labs/pwnkit/pull/372).
 
 ## How to reproduce the headline numbers
 
@@ -330,10 +330,10 @@ Even when the binary probe has never seen *any* example of the held-out CWE clas
 This is the load-bearing argument. No closed model and no open non-Gemma model gives all of:
 
 - **Raw hidden states at every layer** — required for Tier 1. GPT-5 / Claude don't expose them. Open-weight Llama / Qwen do, but only Gemma 4 gives you this *plus* the rest below.
-- **A model-size family — three slots, one architecture.** `weak-probe` (E2B), `strong-probe` (larger Gemma), and the `pwnkit verifier` (27B) share the same vocabulary, the same hidden-state geometry conventions, and the same tool schema. The same `gemmaforge.leads/v1` schema flows between stages. Mixing a Llama probe with a Qwen verifier would mean two licenses, two prompt formats, and no guarantee the small model's notion of "vulnerable-looking" state maps to anything the big model's reasoning prior cares about.
-- **Native function-calling + 131k context** — required for the verifier. Gemma 4 27B reads files, greps call sites, and asks follow-up questions inside a 131k-token window.
+- **A model-size family — three slots, one architecture.** `weak-probe` (E2B), `strong-probe` (larger Gemma), and the `pwnkit verifier` (Gemma 4 8B) share the same vocabulary, the same hidden-state geometry conventions, and the same tool schema. The same `gemmaforge.leads/v1` schema flows between stages. Mixing a Llama probe with a Qwen verifier would mean two licenses, two prompt formats, and no guarantee the small model's notion of "vulnerable-looking" state maps to anything the big model's reasoning prior cares about.
+- **Native function-calling + 131k context** — required for the verifier. Gemma 4 8B reads files, greps call sites, and asks follow-up questions inside a 131k-token window.
 - **Apache-2.0–licensed project code; Gemma weights under the Gemma Terms of Use** (open weights, commercial use permitted). One legal review, not two.
-- **Laptop-sized at the weak end, workstation-sized at the strong end.** E2B (`weak-probe`) comfortably fits on any modern MacBook; the larger checkpoints (`strong-probe`, verifier) fit on a 24GB-class GPU or a 32GB-class M-series Mac at Q4. The user picks their slot by hardware; the pipeline is the same. No cloud step is forced anywhere.
+- **Laptop-sized at the weak end, workstation-sized at the strong end.** E2B (`weak-probe`) comfortably fits on any modern MacBook; the 8B verifier (Q4_K_M via Ollama) fits in ~10GB and runs on most laptop GPUs and M-series Macs; `strong-probe` scales up to a 24GB-class GPU when richer context is desired. The user picks their slot by hardware; the pipeline is the same. No cloud step is forced anywhere.
 
 ## What we'd build next
 

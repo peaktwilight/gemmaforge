@@ -47,7 +47,7 @@ A linear classifier on a Gemma 4 hidden state. Binary label: *"the code is the v
 **Two probe variants, same scoring contract:**
 
 - **`weak-probe` (shipped today, what the metrics below validate).** Backbone: `google/gemma-4-E2B-it`, layer 17. Bounded line/token windows over the repo; aggregated with `top-k mean` over per-position scores. Designed for high recall on laptop-class hardware.
-- **`strong-probe` (supported configuration).** Same scan code path (`python -m src.scan --model-id <larger-gemma>`), same probe head architecture, but the probe is re-trained against a larger Gemma checkpoint's hidden states. Larger token windows give it more repo context per chunk and better ranking quality. Workstation-class hardware. Not yet trained at the scale `weak-probe` is; supported by the pipeline today, validated metrics will come from a follow-up training run.
+- **`strong-probe` (shipped, Gemma 4 E4B, layer 10).** Same code path, larger backbone. Head-to-head on `data/pairs.jsonl` (group-split, n=1198, 95% bootstrap CI): strong wins **group_repo 0.969 vs 0.960** (+0.009), **CWE-78 0.998 vs 0.986** (+0.012), **lang=python 0.998 vs 0.991** (+0.007); loses CWE-95 by −0.009; deltas all inside the CIs — both probes saturate this corpus near 0.99x. **Structural finding:** best layer drops from **L17/35 (49% depth)** to **L10/42 (24% depth)** on E4B — the linear vuln direction lives earlier in the bigger model. Receipts: `data/eval/strong_vs_weak_probe.md`, `data/probe_strong.npz`.
 
 Both variants emit `gemmaforge.leads/v1` JSONL — the downstream `pwnkit verifier` doesn't care which probe produced the leads.
 
@@ -183,7 +183,7 @@ Obeso §3 also trains a LoRA alongside the probe. We wired the analogue (`script
 ## What we'd build next
 
 Tracked as open GitHub issues. Highlights:
-- **`strong-probe` validation run.** Train the linear head against a larger Gemma checkpoint's hidden states and publish the same metric table for it.
+- **Token-level strong-probe.** Re-extract per-token activations on E4B (~30 GB) and retrain `train_probe_spanmax.py` against them. The sample-level head-to-head saturates the current corpus; the token-level path is where the bigger backbone should still have headroom.
 - **Token-level probe head-to-head vs sample-level.** Both trainers are live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces sample-level as the shipped probe.
 - **Full DPO LoRA on dedicated GPU.** The script supports `--max_steps 500`; we need a clean MPS slot or a single CUDA box. Stretch goal: re-train the probe *jointly* with the LoRA in the Obeso §3 setup.
 - **VS Code extension** (scaffolded in `extensions/vscode/`).

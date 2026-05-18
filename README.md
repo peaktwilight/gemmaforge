@@ -69,6 +69,42 @@ python -m src.stream_with_probe --serve
 # then open http://localhost:8787/
 ```
 
+## Colab training
+
+To train and publish the probe from a fresh GPU Colab runtime, open
+[`notebooks/colab_train_gemma4_probe.ipynb`](notebooks/colab_train_gemma4_probe.ipynb).
+The notebook clones this repo, installs the Hugging Face stack, builds the dataset,
+trains/evaluates a frozen-model token-level value head on a Gemma 4 decoder layer,
+and uploads the resulting bundle to Hugging Face Hub.
+
+Before running it, add a Colab Secret named `HF_TOKEN` or `HF_WRITE_TOKEN` with write
+access to the destination model repo, then update `HF_REPO_ID` in the first settings
+cell.
+
+The notebook supports the rebuilt SVEN before/after dataset format from
+`scripts/build_dataset.py`. Leave `DATASET_PATH = None` to build `data/dataset.jsonl`,
+or point `DATASET_PATH` at an existing JSONL file with rows like:
+
+```json
+{"code": "db.query(`SELECT * FROM users WHERE id=${id}`)", "label": 1, "token_labels": {"sink": [[0, 8]], "source": [[38, 40]], "sanitizer": [], "evidence": [[0, 40]], "vulnerable_line": [[0, 40]]}}
+```
+
+Rows with `token_labels` train on the annotated token activations. Positive ranges
+come from `evidence`, `vulnerable_line`, `sink`, and `source`; `sanitizer` ranges are
+treated as negative. Safe after-patch rows from the rebuilt builder have empty
+`token_labels` and train as negative examples.
+
+Required tokens/secrets:
+
+- `HF_TOKEN` or `HF_WRITE_TOKEN` is required for Colab upload. Give it Hugging Face
+  write access to the target `HF_REPO_ID`, and read access to the Gemma 4 model if
+  that model repo is gated for your account.
+- `GITHUB_TOKEN` is optional. It is only needed if `REPO_URL` points to a private
+  GitHub repo; public clones do not need it.
+
+If you later run the notebook flow from GitHub Actions, add the same names as repo
+secrets under **Settings -> Secrets and variables -> Actions**.
+
 The streaming web UI uses the Server-Sent-Events feed at `/stream?prompt=…`. The CLI mode (`--prompt "…"`) renders the same risk-coloured stream in your terminal with ANSI colour codes.
 
 ## Repository layout

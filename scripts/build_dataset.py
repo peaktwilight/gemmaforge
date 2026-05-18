@@ -1,322 +1,255 @@
-"""Build a vulnerable / safe code-pair dataset for probe training.
+#!/usr/bin/env python3
+"""Build a vulnerability dataset from SVEN with diff-derived token labels.
 
-Strategy: pull from HuggingFace's `bstee615/bigvul` (or similar) which has
-patched/vulnerable C/C++ function pairs labeled with CVE/CWE. Filter to a
-balanced ~500 vuln + ~500 safe sample. Write as JSONL with fields:
-  { "code": "...", "label": 0|1, "cwe": "...", "cve": "...", "source": "..." }
+One upstream SVEN row -> two output rows:
 
-Falls back to a small built-in seed dataset (built from the author's own
-CVEs) if HuggingFace isn't reachable — the demo can still run.
+  VULN (label=1): the full `func_src_before` (the buggy function).
+                  token_labels.vulnerable_line / .evidence cover every
+                  character the human-authored patch removed or changed.
+  SAFE (label=0): the full `func_src_after` (the patched function).
+                  token_labels are all empty -- the bug is literally
+                  diffed away in this version.
+
+Both rows share `_func_name` + `_file_name`, so leakage-aware splits
+can keep paired before/after together. All labels are
+`label_confidence: "diff_oracle"` -- they come from a real commit,
+not from regex.
+
+Output schema (one JSON object per line)
+----------------------------------------
+{
+  "code":  "<full function source>",
+  "label": 1 | 0,
+  "is_completion_vulnerable": true | false,
+  "cwe":   "CWE-089" | null,
+  "lang":  "python" | "c" | "cpp" | ...,
+  "source": "SVEN-before" | "SVEN-after",
+  "vuln_type": "cwe-089",
+  "token_labels": {
+    "sink":            [[start, end], ...],   # always empty for now
+    "source":          [[start, end], ...],
+    "sanitizer":       [[start, end], ...],
+    "evidence":        [[start, end], ...],   # = vulnerable_line for SVEN
+    "vulnerable_line": [[start, end], ...]    # char offsets into `code`
+  },
+  "label_confidence": "diff_oracle",
+  "_func_name":   "<function>",
+  "_file_name":   "<source path>"
+}
+
+Usage
+-----
+    uv run scripts/build_dataset.py                       # default out
+    uv run scripts/build_dataset.py --out data/foo.jsonl
+    uv run scripts/build_dataset.py --max-rows 100 --seed 7
+    uv run scripts/build_dataset.py --lang python --cwe CWE-089
 """
 from __future__ import annotations
+
+import argparse
 import json
-import os
 import random
 import sys
 from pathlib import Path
+from typing import Iterable
 
-OUT = Path(__file__).parent.parent / "data" / "pairs.jsonl"
-OUT.parent.mkdir(parents=True, exist_ok=True)
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_OUT = REPO_ROOT / "data" / "dataset.jsonl"
 
-random.seed(7)
+EMPTY_TOKEN_LABELS = {
+    "sink": [],
+    "source": [],
+    "sanitizer": [],
+    "evidence": [],
+    "vulnerable_line": [],
+}
 
-
-SEED_PAIRS: list[dict] = [
-    # CVE-2026-33896 style — certificate verification bug pattern
-    {
-        "code": "function verifyCert(cert) {\n  if (!cert) return true;\n  return cert.subject === cert.issuer;\n}",
-        "label": 1, "cwe": "CWE-295", "cve": "CVE-2026-33896-style",
-        "source": "doruk-cve-corpus",
-        "note": "Pattern: trivially-accepted certificate verification — every self-signed cert passes.",
-    },
-    {
-        "code": "function verifyCert(cert, trustedCAs) {\n  if (!cert) throw new Error('missing certificate');\n  return trustedCAs.some(ca => pki.verifyCertificateChain(ca, cert));\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "doruk-cve-corpus",
-    },
-    # CWE-22 path traversal
-    {
-        "code": "function readUserFile(filename) {\n  return fs.readFileSync('/var/data/' + filename, 'utf8');\n}",
-        "label": 1, "cwe": "CWE-22", "cve": None, "source": "synthetic-seed",
-        "note": "Concatenated user path — '../../etc/passwd' wins.",
-    },
-    {
-        "code": "function readUserFile(filename) {\n  const safe = path.resolve('/var/data', path.basename(filename));\n  if (!safe.startsWith('/var/data/')) throw new Error('bad path');\n  return fs.readFileSync(safe, 'utf8');\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-89 SQL injection
-    {
-        "code": "function getUserById(id) {\n  return db.query(`SELECT * FROM users WHERE id=${id}`);\n}",
-        "label": 1, "cwe": "CWE-89", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function getUserById(id) {\n  return db.query('SELECT * FROM users WHERE id=?', [id]);\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-94 code injection / eval
-    {
-        "code": "function runRule(expr, data) {\n  return eval(expr);\n}",
-        "label": 1, "cwe": "CWE-94", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function runRule(expr, data) {\n  return jsonLogic.apply(expr, data);\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-1333 ReDoS — the picomatch pattern Doruk found
-    {
-        "code": "const RE = /^(a+)+$/;\nfunction isMatch(input) { return RE.test(input); }",
-        "label": 1, "cwe": "CWE-1333", "cve": "picomatch-style",
-        "source": "doruk-cve-corpus",
-        "note": "Nested-quantifier regex — exponential backtracking.",
-    },
-    {
-        "code": "const RE = /^a+$/;\nfunction isMatch(input) {\n  if (input.length > 1024) return false;\n  return RE.test(input);\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "doruk-cve-corpus",
-    },
-    # CWE-78 OS command injection
-    {
-        "code": "function runDiag(host) {\n  return execSync(`ping -c 1 ${host}`).toString();\n}",
-        "label": 1, "cwe": "CWE-78", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function runDiag(host) {\n  if (!/^[a-z0-9.-]+$/.test(host)) throw new Error('bad host');\n  return execFileSync('ping', ['-c', '1', host]).toString();\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-798 hardcoded credentials
-    {
-        "code": "const API_KEY = 'sk-prod-9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c';\nfunction client() { return new SDK({ apiKey: API_KEY }); }",
-        "label": 1, "cwe": "CWE-798", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function client() {\n  const key = process.env.API_KEY;\n  if (!key) throw new Error('API_KEY not set');\n  return new SDK({ apiKey: key });\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-352 CSRF: token comparison vs no token
-    {
-        "code": "app.post('/transfer', (req, res) => {\n  bank.transfer(req.user, req.body.to, req.body.amount);\n  res.send('ok');\n});",
-        "label": 1, "cwe": "CWE-352", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "app.post('/transfer', csrfCheck, (req, res) => {\n  bank.transfer(req.user, req.body.to, req.body.amount);\n  res.send('ok');\n});",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-918 SSRF
-    {
-        "code": "app.get('/fetch', async (req, res) => {\n  const r = await fetch(req.query.url);\n  res.send(await r.text());\n});",
-        "label": 1, "cwe": "CWE-918", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "const ALLOWED = ['https://api.example.com/'];\napp.get('/fetch', async (req, res) => {\n  if (!ALLOWED.some(p => req.query.url.startsWith(p))) return res.status(400).end();\n  const r = await fetch(req.query.url);\n  res.send(await r.text());\n});",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-330 weak randomness for secrets
-    {
-        "code": "function newToken() {\n  return Math.random().toString(36).slice(2);\n}",
-        "label": 1, "cwe": "CWE-330", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function newToken() {\n  return crypto.randomBytes(32).toString('hex');\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-327 broken crypto
-    {
-        "code": "function hashPassword(pw) {\n  return crypto.createHash('md5').update(pw).digest('hex');\n}",
-        "label": 1, "cwe": "CWE-327", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "async function hashPassword(pw) {\n  return await argon2.hash(pw, { type: argon2.argon2id });\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-79 XSS
-    {
-        "code": "app.get('/greet', (req, res) => {\n  res.send(`<h1>Hi ${req.query.name}</h1>`);\n});",
-        "label": 1, "cwe": "CWE-79", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "app.get('/greet', (req, res) => {\n  res.send(`<h1>Hi ${escapeHtml(req.query.name)}</h1>`);\n});",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-    # CWE-502 unsafe deserialization
-    {
-        "code": "function load(buf) {\n  return JSON.parse(buf.toString(), reviver);\n}\nfunction reviver(k, v) {\n  if (v && v.__type) return new (global[v.__type])(v.value);\n  return v;\n}",
-        "label": 1, "cwe": "CWE-502", "cve": None, "source": "synthetic-seed",
-    },
-    {
-        "code": "function load(buf) {\n  return JSON.parse(buf.toString());\n}",
-        "label": 0, "cwe": None, "cve": None, "source": "synthetic-seed",
-    },
-]
+EXT_TO_LANG = {
+    "py": "python", "js": "javascript", "ts": "typescript",
+    "c": "c", "cc": "cpp", "cpp": "cpp", "cxx": "cpp", "h": "c", "hpp": "cpp",
+    "java": "java", "go": "go", "rb": "ruby", "php": "php", "rs": "rust",
+}
 
 
-def try_huggingface_dataset(max_pairs: int = 800) -> list[dict]:
-    """Pull paired vulnerable/safe examples from HF.
+def infer_lang(file_name: str | None) -> str:
+    if not file_name or "." not in file_name:
+        return "c"
+    return EXT_TO_LANG.get(file_name.rsplit(".", 1)[-1].lower(), "c")
 
-    The DPO datasets are ideal: each row has `chosen` (safe) and `rejected`
-    (vulnerable) for the same prompt → perfectly balanced labels for free.
+
+def normalize_cwe(raw: str | None) -> str:
+    if not raw:
+        return ""
+    return raw.upper() if raw.lower().startswith("cwe-") else raw
+
+
+def merge_overlapping(spans: Iterable[list[int]]) -> list[list[int]]:
+    out: list[list[int]] = []
+    for s, e in sorted([list(x) for x in spans if x[0] < x[1]]):
+        if out and s <= out[-1][1]:
+            out[-1][1] = max(out[-1][1], e)
+        else:
+            out.append([s, e])
+    return out
+
+
+def clip(s: int, e: int, lo: int, hi: int) -> tuple[int, int] | None:
+    a, b = max(s, lo), min(e, hi)
+    return (a, b) if a < b else None
+
+
+def vuln_spans_in_before(src: str, char_changes: dict, line_changes: dict) -> list[list[int]]:
+    """Char ranges within `func_src_before` that the patch removed.
+
+    Prefers char-level diff. Falls back to line-level diff (converted to
+    char offsets) when char info is missing. Returns merged non-overlapping
+    spans, clipped to `len(src)`.
     """
-    try:
-        from datasets import load_dataset  # type: ignore
-    except ImportError:
-        print("[dataset] datasets library not installed — using seed only", file=sys.stderr)
-        return []
+    n = len(src)
+    spans: list[list[int]] = []
 
-    out: list[dict] = []
+    for entry in (char_changes or {}).get("deleted") or []:
+        s, e = entry.get("char_start"), entry.get("char_end")
+        if isinstance(s, int) and isinstance(e, int):
+            c = clip(s, e, 0, n)
+            if c:
+                spans.append([c[0], c[1]])
+    if spans:
+        return merge_overlapping(spans)
 
-    # 1) CyberNative DPO: chosen=safe, rejected=vulnerable, paired by prompt.
-    try:
-        print("[dataset] CyberNative/Code_Vulnerability_Security_DPO…", file=sys.stderr)
-        ds = load_dataset("CyberNative/Code_Vulnerability_Security_DPO", split="train", streaming=True)
-        count = 0
+    # No char-level diff -> fall back to line-level diff.
+    line_offsets = [0]
+    for i, ch in enumerate(src):
+        if ch == "\n":
+            line_offsets.append(i + 1)
+
+    for entry in (line_changes or {}).get("deleted") or []:
+        ln = entry.get("line_no")
+        if not isinstance(ln, int) or ln < 1:
+            continue
+        if ln - 1 >= len(line_offsets):
+            continue
+        ls = line_offsets[ln - 1]
+        le = line_offsets[ln] if ln < len(line_offsets) else n
+        c = clip(ls, le, 0, n)
+        if c:
+            spans.append([c[0], c[1]])
+
+    return merge_overlapping(spans)
+
+
+def emit_pairs(max_rows: int | None) -> Iterable[dict]:
+    """Yield (vuln_row, safe_row) for each usable SVEN upstream pair."""
+    from datasets import load_dataset  # type: ignore
+
+    emitted = 0
+    for split in ("train", "val"):
+        ds = load_dataset("bstee615/sven", split=split)
         for row in ds:
-            chosen = row.get("chosen")
-            rejected = row.get("rejected")
-            if not chosen or not rejected:
+            before = row.get("func_src_before") or ""
+            after = row.get("func_src_after") or ""
+            if not before or not after:
                 continue
-            lang = row.get("lang") or row.get("language") or "unknown"
-            vuln_type = row.get("vulnerability") or row.get("vuln_type")
-            out.append({
-                "code": str(rejected), "label": 1, "cwe": None, "cve": None,
-                "source": "CyberNative-DPO", "lang": lang, "vuln_type": vuln_type,
-            })
-            out.append({
-                "code": str(chosen), "label": 0, "cwe": None, "cve": None,
-                "source": "CyberNative-DPO", "lang": lang, "vuln_type": vuln_type,
-            })
-            count += 1
-            if count >= max_pairs:
-                break
-        print(f"[dataset] CyberNative-DPO: {count} pairs", file=sys.stderr)
-    except Exception as e:
-        print(f"[dataset] CyberNative-DPO failed: {e}", file=sys.stderr)
 
-    # 2) Fallback: DiverseVul, paired by `func_before` (vuln) vs `func_after` (safe)
-    if not out:
-        try:
-            print("[dataset] DiverseVul fallback…", file=sys.stderr)
-            ds = load_dataset("bstee615/diversevul", split="train", streaming=True)
-            count = 0
-            for row in ds:
-                before = row.get("func_before") or row.get("func")
-                after = row.get("func_after")
-                if not before:
-                    continue
-                if after and after.strip() and after != before:
-                    out.append({"code": str(before), "label": 1, "cwe": row.get("CWE_ID"), "cve": row.get("CVE_ID"), "source": "DiverseVul"})
-                    out.append({"code": str(after), "label": 0, "cwe": None, "cve": None, "source": "DiverseVul-patched"})
-                    count += 1
-                if count >= max_pairs:
-                    break
-            print(f"[dataset] DiverseVul: {count} pairs", file=sys.stderr)
-        except Exception as e:
-            print(f"[dataset] DiverseVul failed: {e}", file=sys.stderr)
+            cwe_raw = row.get("vul_type") or ""
+            cwe = normalize_cwe(cwe_raw) or None
+            lang = infer_lang(row.get("file_name"))
+            func_name = row.get("func_name") or None
+            file_name = row.get("file_name") or None
 
-    return out
+            spans = vuln_spans_in_before(
+                before,
+                row.get("char_changes") or {},
+                row.get("line_changes") or {},
+            )
+            if not spans:
+                # No usable diff info -> can't supervise tokens, skip.
+                continue
 
-
-def balance(rows: list[dict], n_per_class: int = 500) -> list[dict]:
-    pos = [r for r in rows if r["label"] == 1]
-    neg = [r for r in rows if r["label"] == 0]
-    random.shuffle(pos)
-    random.shuffle(neg)
-    return pos[:n_per_class] + neg[:n_per_class]
-
-
-NEUTRAL_TEXT: list[str] = [
-    # Plain greetings / chat openers — these are what Gemma emits when it
-    # decides to be verbose. They must score *low* or the demo looks broken.
-    "Hello! How can I help you today?",
-    "Sure, here's an example.",
-    "I'd be happy to help with that.",
-    "Below is a complete implementation.",
-    "Let me walk you through the solution step by step.",
-    "Here is a complete example.",
-    "This example assumes you have Node.js installed.",
-    "First, install the required dependencies.",
-    "Of course, here you go.",
-    "Great question. The short answer is: it depends.",
-    # Markdown formatting tokens that Gemma loves to emit.
-    "### Prerequisites\n\nFirst, make sure you have the necessary packages installed:",
-    "## Step 1: Install dependencies\n\nRun the following command in your terminal.",
-    "### Setup\n\n```bash\nnpm install express\n```",
-    "**Note:** this is a simplified example.",
-    "**Warning:** you should adapt this to your environment.",
-    "**Important:** never store secrets in plain text.",
-    "**Tip:** use environment variables for configuration.",
-    "1. **Express** set up.\n2. A **MySQL client**.\n3. A database connection.",
-    "- step one\n- step two\n- step three\n",
-    "# Title\n\nIntroductory paragraph that describes the goal.",
-    # Documentation-style prose
-    "This function returns the requested user record from the database.",
-    "If the user does not exist, an error is thrown.",
-    "Use this endpoint to retrieve user details by their numeric id.",
-    "The handler accepts a single path parameter and returns JSON.",
-    "Refer to the official Express documentation for more details.",
-    "See the README for installation instructions.",
-    "Make sure to handle errors and edge cases in production.",
-    "The code below is intended for educational purposes only.",
-    "This is a minimal example without authentication.",
-    "Authentication should be added before deploying to production.",
-    # General prose
-    "The quick brown fox jumps over the lazy dog.",
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    "It was the best of times, it was the worst of times.",
-    "The sun rose over the quiet harbor.",
-    "Coffee shops in Zurich open early and close around six.",
-    "Trains in Switzerland are famously punctual.",
-    "Yesterday I read a paper about neural network interpretability.",
-    "Thank you for taking the time to review this work.",
-    "Please let me know if you need any clarification.",
-    "I hope this helps! Let me know if you have other questions.",
-    # JSON / configuration snippets (data, not code logic)
-    '{"name": "example", "version": "1.0.0", "description": "demo"}',
-    '{"users": [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]}',
-    '{"status": "ok", "timestamp": "2026-05-18T10:00:00Z"}',
-    '{"port": 3000, "host": "localhost", "debug": true}',
-    "# config.yaml\nport: 3000\nhost: localhost\ndebug: true",
-    "[server]\nport = 3000\nhost = 'localhost'\ndebug = true",
-    # Doc-style code with comments (no actual vulnerability)
-    "// returns the next id in a monotonically increasing sequence\nfunction nextId() { return ++counter; }",
-    "// add a delay before retry — caller is expected to await\nfunction delay(ms) { return new Promise(r => setTimeout(r, ms)); }",
-    "// pure helper: map a list of users to their names\nfunction names(users) { return users.map(u => u.name); }",
-    "# pure helper: convert celsius to fahrenheit\ndef c_to_f(c: float) -> float:\n    return c * 9.0 / 5.0 + 32.0",
-    "# format an iso8601 timestamp for the audit log\ndef ts() -> str:\n    return datetime.utcnow().isoformat() + 'Z'",
-    # Imports + package descriptions
-    "import express from 'express';\nimport mysql from 'mysql2/promise';",
-    "import { Router } from 'express';\nimport { db } from './db.js';",
-    "from typing import Optional\nfrom dataclasses import dataclass",
-    "use std::collections::HashMap;\nuse std::error::Error;",
-    "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n)",
-]
+            yield {
+                "code": before,
+                "label": 1,
+                "is_completion_vulnerable": True,
+                "cwe": cwe,
+                "lang": lang,
+                "source": "SVEN-before",
+                "vuln_type": cwe_raw or None,
+                "token_labels": {
+                    **EMPTY_TOKEN_LABELS,
+                    "vulnerable_line": spans,
+                    "evidence": spans,
+                },
+                "label_confidence": "diff_oracle",
+                "_func_name": func_name,
+                "_file_name": file_name,
+            }
+            yield {
+                "code": after,
+                "label": 0,
+                "is_completion_vulnerable": False,
+                "cwe": cwe,                # informative for stratified eval
+                "lang": lang,
+                "source": "SVEN-after",
+                "vuln_type": cwe_raw or None,
+                "token_labels": {k: [] for k in EMPTY_TOKEN_LABELS},
+                "label_confidence": "diff_oracle",
+                "_func_name": func_name,
+                "_file_name": file_name,
+            }
+            emitted += 2
+            if max_rows and emitted >= max_rows:
+                return
 
 
-def make_neutral_rows() -> list[dict]:
-    out: list[dict] = []
-    for txt in NEUTRAL_TEXT:
-        out.append({
-            "code": txt, "label": 0, "cwe": None, "cve": None,
-            "source": "neutral-seed", "lang": "natural-language",
-            "vuln_type": None,
-        })
-    return out
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument(
+        "--out", type=Path, default=DEFAULT_OUT,
+        help="Output JSONL path (default: data/dataset.jsonl).",
+    )
+    ap.add_argument(
+        "--max-rows", type=int, default=None,
+        help="Cap total emitted rows (positives + negatives combined).",
+    )
+    ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument(
+        "--lang", action="append", default=None,
+        help="Restrict to these langs (repeatable).",
+    )
+    ap.add_argument(
+        "--cwe", action="append", default=None,
+        help="Restrict to these CWEs (repeatable).",
+    )
+    args = ap.parse_args()
 
+    rng = random.Random(args.seed)
+    rows: list[dict] = []
+    for r in emit_pairs(args.max_rows):
+        if args.lang and r["lang"] not in args.lang:
+            continue
+        if args.cwe and r["cwe"] not in args.cwe:
+            continue
+        rows.append(r)
 
-def main() -> None:
-    rows: list[dict] = list(SEED_PAIRS)
-    enriched = try_huggingface_dataset(max_pairs=int(os.environ.get("GF_MAX", "800")))
-    rows.extend(enriched)
-    rows = balance(rows, n_per_class=int(os.environ.get("GF_PER_CLASS", "500")))
-    # Add neutral / non-code examples as extra safe label so the probe
-    # learns "vulnerable code", not just "is this code".
-    rows.extend(make_neutral_rows())
-    random.shuffle(rows)
-
-    with OUT.open("w", encoding="utf-8") as f:
+    rng.shuffle(rows)
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    with args.out.open("w", encoding="utf-8") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     pos = sum(1 for r in rows if r["label"] == 1)
     neg = len(rows) - pos
-    print(f"[dataset] wrote {OUT} — {pos} vulnerable / {neg} safe", file=sys.stderr)
+    by_lang: dict[str, int] = {}
+    by_cwe: dict[str, int] = {}
+    for r in rows:
+        by_lang[r["lang"]] = by_lang.get(r["lang"], 0) + 1
+        by_cwe[r["cwe"] or "-"] = by_cwe.get(r["cwe"] or "-", 0) + 1
+    print(f"[ds] wrote {args.out}: {len(rows)} rows ({pos} pos / {neg} neg)", file=sys.stderr)
+    print(f"[ds] by lang: {by_lang}", file=sys.stderr)
+    top_cwes = sorted(by_cwe.items(), key=lambda kv: -kv[1])[:8]
+    print(f"[ds] top CWEs: {top_cwes}", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

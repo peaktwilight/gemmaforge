@@ -1,0 +1,13 @@
+{
+  "probe_layer": 17,
+  "seed": 7,
+  "n_heldout_full": 240,
+  "n_subset_reforwarded": 240,
+  "baseline_last_token_auc_full_heldout": 0.9633333333333333,
+  "subset_last_token_auc": 0.9633333333333333,
+  "subset_max_pool_auc": 0.9322222222222222,
+  "delta_auc_subset": -0.03111111111111109,
+  "model": "google/gemma-4-E2B-it",
+  "max_length": 512,
+  "note": "FULL held-out re-forward: every example in the 20% stratified held-out split (random_state=7, matches src/train_probe.py) is re-forwarded through Gemma to capture per-token activations. subset_* AUCs are therefore on the FULL split \u2014 they are no longer a subset estimate. Use --limit N to fall back to a capped stratified sub-sample (matches scripts/eval_maxpool.py)."
+}

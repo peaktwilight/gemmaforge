@@ -8,7 +8,7 @@
 
 ## Team — security meets interpretability
 
-- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher with four published CVEs in widely-used npm packages, including [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge` (33M weekly downloads). Builder of [`pwnkit`](https://github.com/PwnKit-Labs/pwnkit), an agentic AI pentest framework. Knows what a bug looks like in source.
+- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. **10+ CVE-grade vulnerabilities discovered in npm packages with 200M+ combined monthly downloads**, including [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`. Builder of [`pwnkit`](https://github.com/PwnKit-Labs/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source.
 - **Mehmet Efe Akça** — MSc Data Science, ETH Zürich. Coursework in *Reliable and Trustworthy AI*, *Probabilistic AI*, *Large-Scale AI*. TA for *Mathematics of Signals, Networks, and Learning*. Knows how to read what a neural network is thinking.
 
 Security alone gives you a scanner. Interpretability alone gives you a probe. Together you get **a probe that knows about danger** — trained partly on bugs one of us personally disclosed.

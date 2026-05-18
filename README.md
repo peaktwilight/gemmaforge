@@ -41,7 +41,7 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 
 ## Team
 
-**Doruk Tan Ozturk** — [@peaktwilight](https://github.com/peaktwilight) · [doruk.ch](https://doruk.ch) · security researcher. Discovered CVE-2026-33896 (`node-forge`) and three other CVEs in widely-used npm packages. The vulnerable functions from those disclosures are part of this probe's training set.
+**Doruk Tan Ozturk** — [@peaktwilight](https://github.com/peaktwilight) · [doruk.ch](https://doruk.ch) · security researcher, ex-ETH Zürich, building [0sec.ai](https://0sec.ai). **10+ CVE-grade vulnerabilities discovered in npm packages with 200M+ combined monthly downloads**, including CVE-2026-33896 in `node-forge`. The vulnerable functions from those disclosures are part of this probe's training set.
 
 **Mehmet Efe Akça** — MSc Data Science @ **ETH Zürich** · TA for *Mathematics of Signals, Networks, and Learning*. Coursework: *Reliable and Trustworthy AI: interpretability & verifiability*, *Probabilistic AI*, *Large-Scale AI*. Brings the interpretability-research side of the project — the linear-probe technique adopted here sits directly in his area of study.
 

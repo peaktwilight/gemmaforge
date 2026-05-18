@@ -1,4 +1,4 @@
-Last month I disclosed CVE-2026-33896 in node-forge, a certificate-forgery bug sitting in a package with 33M weekly downloads.
+In the last few months I have disclosed CVE-2026-33896 in node-forge and found 10+ more CVE-grade bugs across npm packages that get over 200 million combined monthly downloads.
 
 The whole time I kept thinking: if a human reviewer almost missed this, what chance does an LLM have when it cheerfully writes the same pattern at 80 tokens per second?
 

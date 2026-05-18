@@ -20,7 +20,7 @@
 **Visual:** Doruk on camera, sitting at desk. Code editor barely visible behind him.
 
 **Doruk (to camera):**
-> "Two months ago I published CVE-2026-33896 — a certificate-forgery bug in node-forge, an npm package with 33 million weekly downloads. I find bugs like that for a living. But here is what bothers me: an AI assistant could have written that exact pattern this morning, and nobody would have caught it until it shipped."
+> "Two months ago I published CVE-2026-33896 in node-forge. Since then I have found ten more CVE-grade bugs across npm packages that get over 200 million combined downloads a month. I find bugs like that for a living. But here is what bothers me: an AI assistant could have written any of those patterns this morning, and nobody would have caught it until it shipped."
 
 **Cut to:** title card. White on black:
 

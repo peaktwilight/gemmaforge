@@ -1,0 +1,7 @@
+gradio>=4.36.0
+spaces
+transformers>=4.45
+torch
+numpy
+accelerate
+huggingface_hub

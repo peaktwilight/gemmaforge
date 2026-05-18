@@ -28,7 +28,7 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
                               ("SQL injection imminent")
 ```
 
-- **Model:** `gemma4:8b` (8B params, 2560-dim hidden states, 131k context, native function-calling)
+- **Model:** `gemma4:8b` (8B params, 1536-dim hidden states, 131k context, native function-calling)
 - **Probe:** a 2560-input linear classifier (~10KB) on the hidden state at each generated token
 - **Training data:** patched/vulnerable function pairs from GHSA advisories, BigVul, and the author's CVE corpus
 - **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
@@ -46,6 +46,59 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 **Mehmet Efe Akça** — MSc Data Science @ **ETH Zürich** · TA for *Mathematics of Signals, Networks, and Learning*. Coursework: *Reliable and Trustworthy AI: interpretability & verifiability*, *Probabilistic AI*, *Large-Scale AI*. Brings the interpretability-research side of the project — the linear-probe technique adopted here sits directly in his area of study.
 
 Together: a security researcher who knows what danger looks like in source code + an interpretability researcher who knows how to read what neural networks are thinking. The whole point of GemmaForge is that those two skills only become useful when you put them together.
+
+## Quick start
+
+```bash
+git clone https://github.com/peaktwilight/gemmaforge
+cd gemmaforge
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+# 1. build the vulnerable/safe pair dataset (uses CyberNative DPO + seed CVEs)
+python scripts/build_dataset.py
+# 2. extract Gemma 4 hidden states  (~10 min on M1 Max, ~5 min on a 3090)
+python -m src.extract_activations
+# 3. train the linear probe  (~90 seconds)
+python -m src.train_probe
+# 4. run the streaming demo with web UI
+python -m src.stream_with_probe --serve
+# then open http://localhost:8787/
+```
+
+The streaming web UI uses the Server-Sent-Events feed at `/stream?prompt=…`. The CLI mode (`--prompt "…"`) renders the same risk-coloured stream in your terminal with ANSI colour codes.
+
+## Repository layout
+
+```
+src/
+  extract_activations.py  ── forward-pass Gemma 4 over the labelled dataset,
+                              capture per-layer hidden state at the last token.
+  train_probe.py          ── per-layer logistic-regression probe, pick best
+                              AUC, export (w, b, layer) to data/probe.npz.
+  stream_with_probe.py    ── token-by-token streaming inference with the
+                              trained probe + an HTTP/SSE server for the UI.
+
+hfspace/
+  app.py                  ── HuggingFace Spaces deployment (Gradio + ZeroGPU).
+  requirements.txt
+  README.md               ── space metadata.
+
+web/
+  index.html              ── single-file streaming UI (vanilla JS + SSE).
+  cover.svg               ── submission cover image.
+
+scripts/
+  build_dataset.py        ── assemble vulnerable/safe code pairs from
+                              CyberNative DPO + a hand-curated seed set
+                              covering CWE-22/78/79/89/94/295/327/330/352/
+                              502/798/918/1333.
+  smoke_probe.py          ── write a placeholder probe so the UI is
+                              demo-able while real training is in flight.
+
+WRITEUP.md                ── Kaggle submission writeup (~1400 words).
+VIDEO_SCRIPT.md           ── 2:50 video script for the two-person team.
+LINKEDIN.md               ── launch post.
+```
 
 ## License
 

@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 
 def fit_layer(X: np.ndarray, y: np.ndarray, seed: int = 7) -> dict:
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=seed, stratify=y)
-    clf = LogisticRegression(max_iter=1000, C=1.0, n_jobs=-1)
+    clf = LogisticRegression(max_iter=1000, C=1.0)
     clf.fit(Xtr, ytr)
     yhat_prob = clf.predict_proba(Xte)[:, 1]
     yhat_cls = clf.predict(Xte)

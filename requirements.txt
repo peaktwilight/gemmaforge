@@ -1,0 +1,15 @@
+# GemmaForge runtime — Python 3.10+
+# Tested on Python 3.13 / 3.14, macOS (M1/M2/M3 via MPS) and Linux (CUDA).
+
+# Hidden-state extraction + streaming inference
+transformers>=4.45
+torch>=2.4
+accelerate>=0.34
+
+# Probe training
+scikit-learn>=1.5
+numpy>=1.26
+
+# Dataset assembly
+datasets>=2.20
+huggingface_hub>=0.24

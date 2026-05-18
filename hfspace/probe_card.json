@@ -1,0 +1,36 @@
+{
+  "best_layer": 8,
+  "best_auc": 0.8316,
+  "best_acc": 0.725,
+  "all_layers": [
+    {
+      "layer": 8,
+      "auc": 0.8316,
+      "acc": 0.725,
+      "n_train": 800,
+      "n_test": 200
+    },
+    {
+      "layer": 17,
+      "auc": 0.7888999999999999,
+      "acc": 0.735,
+      "n_train": 800,
+      "n_test": 200
+    },
+    {
+      "layer": 26,
+      "auc": 0.7938,
+      "acc": 0.715,
+      "n_train": 800,
+      "n_test": 200
+    },
+    {
+      "layer": 34,
+      "auc": 0.7885,
+      "acc": 0.725,
+      "n_train": 800,
+      "n_test": 200
+    }
+  ],
+  "pos_rate": 0.5
+}

@@ -87,24 +87,29 @@ def stream(
         formatted = prompt
 
     input_ids = tokenizer.encode(formatted, return_tensors="pt").to(device)
-    cur_ids = input_ids
-
     eos_id = tokenizer.eos_token_id
+
+    # KV-cached streaming: prime the cache with the full prompt once, then
+    # feed one token at a time and keep the cache alive. Cuts per-token cost
+    # from O(seq_len) to O(1) attention ops. Without this, 200 tokens of
+    # streaming on M1 Max is unwatchably slow.
     with torch.inference_mode():
+        out = model(input_ids, output_hidden_states=True, use_cache=True)
+        past_kv = out.past_key_values
+        logits = out.logits[0, -1, :]
+
         for step in range(max_new_tokens):
-            out = model(cur_ids, output_hidden_states=True, use_cache=False)
-            logits = out.logits[0, -1, :]
             if temperature <= 0:
                 next_id = int(torch.argmax(logits).item())
             else:
                 probs = torch.softmax(logits / temperature, dim=-1)
                 next_id = int(torch.multinomial(probs, 1).item())
 
-            hs = out.hidden_states  # tuple (n_layers+1)
+            # Risk score from the hidden state at the position we just predicted
+            # FROM (i.e. the last position before sampling).
+            hs = out.hidden_states  # tuple length = n_layers + 1 (embedding included)
             h = hs[layer + 1][0, -1, :].detach().to("cpu").float().numpy()
             risk = _sigmoid(float(np.dot(w, h) + b))
-
-            cur_ids = torch.cat([cur_ids, torch.tensor([[next_id]], device=device)], dim=1)
 
             try:
                 tok_text = tokenizer.decode([next_id])
@@ -116,6 +121,17 @@ def stream(
             if eos_id is not None and next_id == eos_id:
                 yield {"event": "done", "reason": "eos"}
                 return
+
+            # Feed the new token alone with the kept cache.
+            step_ids = torch.tensor([[next_id]], device=device)
+            out = model(
+                step_ids,
+                past_key_values=past_kv,
+                output_hidden_states=True,
+                use_cache=True,
+            )
+            past_kv = out.past_key_values
+            logits = out.logits[0, -1, :]
 
     yield {"event": "done", "reason": "max_tokens"}
 

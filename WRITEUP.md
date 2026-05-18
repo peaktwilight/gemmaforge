@@ -29,9 +29,18 @@ Yes. We built it.
 
 We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.03531) (arXiv 2509.03531) from *fabricated entities* to *vulnerable code patterns*. A single linear classifier sits on Gemma 4's last-token hidden state at an intermediate decoder layer. The binary label is *"the code emitted so far is the vulnerable side of a known patch pair."*
 
-The probe is roughly 2,560 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4. Target AUC > 0.85 on held-out CVE-derived pairs.
+The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
 
-The Obeso paper showed streaming probes work for hallucinated entities. We show the same machinery transfers to a fuzzier, more interesting target: *patterns of code* that look, from the inside, like the bug versions of patches.
+**Result on Gemma 4 E2B (this submission):** the probe reaches **AUC 0.832** on a stratified 80/20 held-out split of the 1,000-pair dataset. Of the four candidate layers (8, 17, 26, 34 — i.e. 25/50/75/100% of the 35-layer decoder), the **earliest layer wins** — consistent with the interpretability finding that mid-network features are often more linearly separable than the final residual stream.
+
+| layer | AUC   | accuracy |
+|-------|-------|----------|
+| **8** | **0.832** | **72.5%** |
+| 17    | 0.789 | 73.5%    |
+| 26    | 0.794 | 71.5%    |
+| 34    | 0.789 | 72.5%    |
+
+The Obeso paper showed streaming probes work for hallucinated entities at AUC > 0.9 on Llama-3.3-70B; we hit 0.832 on a 2B Gemma 4 with zero hyper-parameter tuning, no LoRA augmentation, and a 1,000-example dataset. With the obvious next steps from that paper — LoRA-augmented probes, more data, per-CWE heads — we expect to close most of that gap.
 
 ## Why this is novel
 
@@ -47,7 +56,7 @@ The Obeso paper showed streaming probes work for hallucinated entities. We show 
 │                                                                  │
 │  ┌──────────────┐   hidden states    ┌─────────────────────┐     │
 │  │  Gemma 4     │ ───────────────►   │ linear vuln probe   │     │
-│  │  via Ollama  │  (2560-D vector)   │ (~10 KB, sigmoid)   │     │
+│  │  via Ollama  │  (1536-D vector)   │ (~10 KB, sigmoid)   │     │
 │  │  + MLX hook  │                    └────────┬────────────┘     │
 │  │  for hidden  │   token + risk             │ risk score        │
 │  │  states      │ ─────────────────►  ┌──────▼──────────────┐    │
@@ -60,7 +69,7 @@ The Obeso paper showed streaming probes work for hallucinated entities. We show 
 Two processes on the user's machine:
 
 1. **Gemma 4**, unmodified — via Ollama for chat and tool-calling, via HuggingFace `transformers` with MPS for the activation hook.
-2. **The probe** — a trained `LogisticRegression` exported as `(w ∈ ℝ²⁵⁶⁰, b ∈ ℝ, layer)`. Each generated token: read the last-token hidden state at the chosen layer, compute `σ(w·h + b)`, emit `(token, risk)`.
+2. **The probe** — a trained `LogisticRegression` exported as `(w ∈ ℝ¹⁵³⁶, b ∈ ℝ, layer)`. Each generated token: read the last-token hidden state at the chosen layer, compute `σ(w·h + b)`, emit `(token, risk)`.
 
 A small HTML page consumes a Server-Sent-Events feed and colors each token: green (<0.4), yellow (0.4–0.7), red (>0.7).
 

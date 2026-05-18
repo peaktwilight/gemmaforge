@@ -16,14 +16,26 @@ CPU only: sklearn + numpy + json. Does not touch torch / transformers.
 """
 from __future__ import annotations
 
+import argparse
+import datetime as _dt
 import json
+import os
+import sys
 from collections import Counter
 from pathlib import Path
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
 from sklearn.model_selection import train_test_split
+
+# Lazy + guarded wandb import.
+try:
+    import wandb  # type: ignore
+    _HAS_WANDB = True
+except Exception:
+    wandb = None  # type: ignore
+    _HAS_WANDB = False
 
 ROOT = Path(__file__).resolve().parents[1]
 ACT_PATH = ROOT / "data" / "activations_v2" / "activations_layer17.npz"
@@ -83,6 +95,7 @@ def train_head(X, y, cwes, target_cwe, seed=SEED):
     pred = (proba >= 0.5).astype(np.int8)
     auc = float(roc_auc_score(y_te, proba))
     acc = float(accuracy_score(y_te, pred))
+    cm = confusion_matrix(y_te, pred, labels=[0, 1])  # 2x2: tn, fp / fn, tp
 
     return {
         "clf": clf,
@@ -92,15 +105,86 @@ def train_head(X, y, cwes, target_cwe, seed=SEED):
         "n_neg": int(neg_mask.sum()),
         "n_train": int(len(y_tr)),
         "n_test": int(len(y_te)),
+        "tn": int(cm[0, 0]),
+        "fp": int(cm[0, 1]),
+        "fn": int(cm[1, 0]),
+        "tp": int(cm[1, 1]),
     }
 
 
+def _wandb_init(args):
+    """Init wandb if --wandb-project was passed; gracefully no-op otherwise."""
+    if not args.wandb_project:
+        return None
+    if not _HAS_WANDB:
+        print("[train_per_cwe] wandb not installed, skipping logging", file=sys.stderr)
+        return None
+    try:
+        mode = "online" if os.environ.get("WANDB_API_KEY") else "offline"
+        ts = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
+        run_name = f"probe-per-cwe-L{LAYER}-k{TOP_K}-{ts}"
+        run = wandb.init(
+            project=args.wandb_project,
+            name=run_name,
+            mode=mode,
+            config={**vars(args), "layer": LAYER, "top_k": TOP_K, "seed": SEED},
+            job_type="per-cwe-probe",
+        )
+        print(f"[train_per_cwe] wandb run: {run_name} (mode={mode})", file=sys.stderr)
+        return run
+    except Exception as e:
+        print(f"[train_per_cwe] wandb init failed: {e}", file=sys.stderr)
+        return None
+
+
+def _wandb_log(run, payload, step=None):
+    if run is None:
+        return
+    try:
+        if step is not None:
+            wandb.log(payload, step=step)
+        else:
+            wandb.log(payload)
+    except Exception as e:
+        print(f"[train_per_cwe] wandb.log failed: {e}", file=sys.stderr)
+
+
+def _wandb_artifact(run, path: Path, name: str, art_type: str, metadata: dict):
+    if run is None or not path.exists():
+        return
+    try:
+        art = wandb.Artifact(name=name, type=art_type, metadata=metadata)
+        art.add_file(str(path))
+        run.log_artifact(art)
+    except Exception as e:
+        print(f"[train_per_cwe] wandb artifact failed: {e}", file=sys.stderr)
+
+
+def _wandb_finish(run):
+    if run is None:
+        return
+    try:
+        wandb.finish()
+    except Exception:
+        pass
+
+
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--wandb-project",
+        default=None,
+        help="W&B project name; omit to disable wandb logging",
+    )
+    args = ap.parse_args()
+
     X, y, cwes = load_data()
     print(f"loaded activations: X={X.shape}  y={y.shape}  layer={LAYER}")
 
     targets = top_cwes(cwes, y, TOP_K)
     print(f"top-{TOP_K} CWEs (by positive count): {targets}")
+
+    run = _wandb_init(args)
 
     W = np.zeros((len(targets), X.shape[1]), dtype=np.float32)
     b = np.zeros((len(targets),), dtype=np.float32)
@@ -123,9 +207,30 @@ def main():
                 "n_neg": r["n_neg"],
                 "n_train": r["n_train"],
                 "n_test": r["n_test"],
+                "tn": r["tn"],
+                "fp": r["fp"],
+                "fn": r["fn"],
+                "tp": r["tp"],
             }
         )
         print(f"{cwe:12s}  {r['n_pos']:6d}  {r['n_neg']:6d}  {r['auc']:6.3f}  {r['acc']:6.3f}")
+        # Per-head log row, keyed by head index for a stable x-axis.
+        _wandb_log(
+            run,
+            {
+                "head/cwe": cwe,
+                "head/auc": r["auc"],
+                "head/acc": r["acc"],
+                "head/n_pos": r["n_pos"],
+                "head/n_neg": r["n_neg"],
+                "head/tp": r["tp"],
+                "head/fp": r["fp"],
+                "head/tn": r["tn"],
+                "head/fn": r["fn"],
+                "head_idx": i,
+            },
+            step=i,
+        )
 
     macro_auc = float(np.mean(aucs))
     print("-" * 48)
@@ -154,6 +259,35 @@ def main():
     }
     OUT_CARD.write_text(json.dumps(card, indent=2))
     print(f"saved card:    {OUT_CARD}")
+
+    # Final summary: macro-AUC + a per-CWE table + a confusion-matrix table.
+    if run is not None:
+        try:
+            per_cwe_tbl = wandb.Table(
+                columns=["cwe", "auc", "acc", "n_pos", "n_neg", "n_train", "n_test"]
+            )
+            for row in per_cwe:
+                per_cwe_tbl.add_data(
+                    row["cwe"], row["auc"], row["acc"],
+                    row["n_pos"], row["n_neg"], row["n_train"], row["n_test"],
+                )
+            cm_tbl = wandb.Table(columns=["cwe", "tn", "fp", "fn", "tp"])
+            for row in per_cwe:
+                cm_tbl.add_data(row["cwe"], row["tn"], row["fp"], row["fn"], row["tp"])
+            wandb.log({"per_cwe_table": per_cwe_tbl, "confusion_matrix": cm_tbl})
+            wandb.summary["macro_auc"] = macro_auc
+            wandb.summary["n_heads"] = len(targets)
+        except Exception as e:
+            print(f"[train_per_cwe] wandb summary failed: {e}", file=sys.stderr)
+
+    _wandb_artifact(
+        run,
+        OUT_NPZ,
+        name="probe-per-cwe-weights",
+        art_type="model",
+        metadata={"layer": LAYER, "top_k": TOP_K, "macro_auc": macro_auc, "cwes": targets},
+    )
+    _wandb_finish(run)
 
 
 if __name__ == "__main__":

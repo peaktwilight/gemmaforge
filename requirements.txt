@@ -17,3 +17,6 @@ huggingface_hub>=0.24
 # LoRA fine-tuning (scripts/train_lora.py, scripts/eval_lora.py)
 peft>=0.13
 trl>=0.11
+
+# Optional: experiment tracking for training scripts (lazy-imported)
+wandb>=0.17

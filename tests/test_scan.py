@@ -25,10 +25,12 @@ from src.scan import (
     Chunk,
     EventSink,
     Lead,
+    SCAN_PROFILES,
     SCHEMA_EVENTS,
     SCHEMA_LEADS,
     _chunk_lines,
     _iter_files,
+    build_parser,
     lead_to_record,
     scan,
 )
@@ -114,6 +116,18 @@ def test_rank_score_prefers_cwe_match():
     a = Lead(Chunk("x.py", 1, 5, "x"), confidence=0.8, top_cwe="CWE-89", layer=17, model_id="m")
     b = Lead(Chunk("x.py", 6, 10, "x"), confidence=0.8, top_cwe=None, layer=17, model_id="m")
     assert a.rank_score() > b.rank_score()
+
+
+def test_probe_profiles_have_distinct_context_budgets():
+    weak = SCAN_PROFILES["weak-probe"]
+    strong = SCAN_PROFILES["strong-probe"]
+    assert strong["window"] > weak["window"]
+    assert strong["max_tokens"] > weak["max_tokens"]
+
+
+def test_parser_accepts_probe_profile(tmp_path: Path):
+    args = build_parser().parse_args([str(tmp_path), "--probe-profile", "strong-probe"])
+    assert args.probe_profile == "strong-probe"
 
 
 # ---------------- end-to-end ---------------- #

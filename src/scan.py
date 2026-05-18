@@ -30,6 +30,24 @@ from src.events import SCHEMA_EVENTS, EventSink
 
 SCHEMA_LEADS = "gemmaforge.leads/v1"
 
+SCAN_PROFILES = {
+    # Laptop/default mode: smaller chunks, more overlap, cheap high-recall scan.
+    "weak-probe": {
+        "window": 30,
+        "stride": 20,
+        "max_tokens": 512,
+        "token_stride": 256,
+    },
+    # Larger initial probe mode: wider code regions and token windows. Use with
+    # a matching larger-model probe via --model-id/--probe-path when available.
+    "strong-probe": {
+        "window": 120,
+        "stride": 80,
+        "max_tokens": 2048,
+        "token_stride": 1024,
+    },
+}
+
 # Extension → language family. Used by the --languages filter and for
 # selecting reasonable chunking defaults. Conservative on purpose: probe
 # was trained on Python / JS / C / C++; languages outside that get scored
@@ -79,6 +97,13 @@ class Lead:
     top_cwe: Optional[str]
     layer: int
     model_id: str
+    scan_profile: str = "weak-probe"
+    confidence_robust: Optional[float] = None
+    top_cwe_score: Optional[float] = None
+    scoring_mode: str = "last-token"
+    token_count: Optional[int] = None
+    windows_scored: Optional[int] = None
+    max_tokens: Optional[int] = None
 
     def rank_score(self) -> float:
         bonus = 0.5 if self.top_cwe else 0.0
@@ -154,7 +179,9 @@ def scan(
         repo=str(root),
         model_id=gf.model_id,
         layer=int(gf._layer),
-        chunker=f"sliding-window:{window}/{stride}",
+        scan_profile=getattr(gf, "scan_profile", "weak-probe"),
+        chunker=f"line-window:{window}/{stride}",
+        scorer=f"token-window:{getattr(gf, 'max_tokens', None)}/{getattr(gf, 'token_stride', None)}",
     )
 
     for path in _iter_files(root, languages):
@@ -176,6 +203,9 @@ def scan(
                 "probe.score",
                 file=ch.file, start_line=ch.start_line, end_line=ch.end_line,
                 confidence=conf, top_cwe=top_cwe,
+                confidence_robust=scored.get("gemmaforge_confidence_robust"),
+                token_count=scored.get("token_count"),
+                windows_scored=scored.get("windows_scored"),
             )
             if conf < min_confidence:
                 continue
@@ -185,6 +215,28 @@ def scan(
                 top_cwe=top_cwe,
                 layer=int(scored["gemmaforge_layer"]),
                 model_id=str(scored["model_id"]),
+                scan_profile=str(scored.get("scan_profile") or getattr(gf, "scan_profile", "weak-probe")),
+                confidence_robust=(
+                    float(scored["gemmaforge_confidence_robust"])
+                    if scored.get("gemmaforge_confidence_robust") is not None else None
+                ),
+                top_cwe_score=(
+                    float(scored["gemmaforge_top_cwe_score"])
+                    if scored.get("gemmaforge_top_cwe_score") is not None else None
+                ),
+                scoring_mode=str(scored.get("scoring_mode") or "last-token"),
+                token_count=(
+                    int(scored["token_count"])
+                    if scored.get("token_count") is not None else None
+                ),
+                windows_scored=(
+                    int(scored["windows_scored"])
+                    if scored.get("windows_scored") is not None else None
+                ),
+                max_tokens=(
+                    int(scored["max_tokens"])
+                    if scored.get("max_tokens") is not None else None
+                ),
             ))
 
     leads.sort(key=lambda lead: lead.rank_score(), reverse=True)
@@ -218,9 +270,21 @@ def lead_to_record(lead: Lead, rank: int) -> dict:
         "gemmaforge_layer": lead.layer,
         "model_id": lead.model_id,
         "rank": rank,
+        "scan_profile": lead.scan_profile,
+        "scoring_mode": lead.scoring_mode,
     }
     if lead.top_cwe is not None:
         rec["gemmaforge_top_cwe"] = lead.top_cwe
+    if lead.confidence_robust is not None:
+        rec["gemmaforge_confidence_robust"] = round(lead.confidence_robust, 6)
+    if lead.top_cwe_score is not None:
+        rec["gemmaforge_top_cwe_score"] = round(lead.top_cwe_score, 6)
+    if lead.token_count is not None:
+        rec["token_count"] = lead.token_count
+    if lead.windows_scored is not None:
+        rec["windows_scored"] = lead.windows_scored
+    if lead.max_tokens is not None:
+        rec["max_tokens"] = lead.max_tokens
     return rec
 
 
@@ -234,6 +298,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ap.add_argument("repo", type=Path, help="Path to the repo to scan.")
     ap.add_argument(
+        "--probe-profile",
+        choices=sorted(SCAN_PROFILES),
+        default="weak-probe",
+        help=(
+            "Initial probe-scan profile. weak-probe uses small overlapping ranges; "
+            "strong-probe uses larger ranges and token windows. For strong-probe "
+            "with a larger model, pass a matching --model-id and --probe-path."
+        ),
+    )
+    ap.add_argument(
         "--top-k", type=int, default=25,
         help="Keep only the top-K leads after ranking. 0 means keep all.",
     )
@@ -246,12 +320,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Comma-separated language tags to keep (py,js,ts,c,cpp,...). Default: all known.",
     )
     ap.add_argument(
-        "--window", type=int, default=30,
-        help="Chunk window size in lines.",
+        "--window", type=int, default=None,
+        help="Chunk window size in lines. Defaults come from --probe-profile.",
     )
     ap.add_argument(
-        "--stride", type=int, default=20,
-        help="Chunk stride in lines (overlap = window - stride).",
+        "--stride", type=int, default=None,
+        help="Chunk stride in lines (overlap = window - stride). Defaults come from --probe-profile.",
     )
     ap.add_argument(
         "--probe-path", type=str, default="data/probe.npz",
@@ -264,6 +338,14 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument(
         "--model-id", type=str, default="google/gemma-4-E2B-it",
         help="HuggingFace model id for the LM used to extract activations.",
+    )
+    ap.add_argument(
+        "--max-tokens", type=int, default=None,
+        help="Token budget per probe forward pass. Defaults come from --probe-profile.",
+    )
+    ap.add_argument(
+        "--token-stride", type=int, default=None,
+        help="Stride for long-snippet token windows. Defaults come from --probe-profile.",
     )
     ap.add_argument(
         "--events", type=str, default=None,
@@ -289,11 +371,19 @@ def main(argv: Optional[list[str]] = None) -> int:
         languages = {tag.strip() for tag in args.languages.split(",") if tag.strip()}
 
     top_k: Optional[int] = None if args.top_k == 0 else args.top_k
+    profile = SCAN_PROFILES[args.probe_profile]
+    window = args.window or int(profile["window"])
+    stride = args.stride or int(profile["stride"])
+    max_tokens = args.max_tokens or int(profile["max_tokens"])
+    token_stride = args.token_stride or int(profile["token_stride"])
 
     gf = GemmaForgeFilter(
         probe_path=args.probe_path,
         per_cwe_probe_path=args.per_cwe_probe_path,
         model_id=args.model_id,
+        max_tokens=max_tokens,
+        token_stride=token_stride,
+        scan_profile=args.probe_profile,
     )
 
     events = EventSink(args.events)
@@ -303,8 +393,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             root,
             gf=gf,
             languages=languages,
-            window=args.window,
-            stride=args.stride,
+            window=window,
+            stride=stride,
             min_confidence=args.min_confidence,
             top_k=top_k,
             events=events,

@@ -24,7 +24,9 @@ Public API:
 Design notes
 ------------
 - The probe is a single (w, b) logistic regression over Gemma 4 layer-17
-  hidden states at the last input token (see src/train_probe.py).
+  hidden states (see src/train_probe.py). Repo scanning scores every token
+  position in overlapping token windows, then reports max + robust top-k
+  confidence for the chunk.
 - The per-CWE probe is K=5 stacked one-vs-rest heads for the top 5 CWEs
   in the training set: CWE-78, CWE-338, CWE-95, CWE-94, CWE-328.
 - The Gemma 4 LM is heavy (>1GB) so it is loaded lazily on the FIRST
@@ -48,6 +50,52 @@ def _sigmoid(x: float) -> float:
     return e / (1.0 + e)
 
 
+def _sigmoid_array(x: np.ndarray) -> np.ndarray:
+    """Numerically stable sigmoid for a vector of logits."""
+    out = np.empty_like(x, dtype=np.float64)
+    pos = x >= 0
+    out[pos] = 1.0 / (1.0 + np.exp(-x[pos]))
+    e = np.exp(x[~pos])
+    out[~pos] = e / (1.0 + e)
+    return out
+
+
+def _topk_mean(values: np.ndarray, *, min_k: int = 3, frac: float = 0.02) -> float:
+    """Robust high-risk aggregate for per-token probe scores.
+
+    Raw max keeps recall high but can be driven by one unstable token. This
+    aggregate is useful for reporting and ranking diagnostics because it asks
+    whether the top of the score distribution is consistently high.
+    """
+    if values.size == 0:
+        return 0.0
+    k = min(values.size, max(min_k, int(np.ceil(values.size * frac))))
+    if k <= 1:
+        return float(values.max())
+    top = np.partition(values, values.size - k)[values.size - k:]
+    return float(top.mean())
+
+
+def _token_windows(input_ids: list[int], max_tokens: int, stride: int) -> list[tuple[int, list[int]]]:
+    """Return overlapping token windows as (global_start_token, token_ids)."""
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive")
+    if stride <= 0:
+        raise ValueError("stride must be positive")
+    if len(input_ids) <= max_tokens:
+        return [(0, input_ids)]
+
+    windows: list[tuple[int, list[int]]] = []
+    start = 0
+    while start < len(input_ids):
+        end = min(start + max_tokens, len(input_ids))
+        windows.append((start, input_ids[start:end]))
+        if end == len(input_ids):
+            break
+        start += stride
+    return windows
+
+
 class GemmaForgeFilter:
     """Score pwnkit findings with GemmaForge's vulnerability probes."""
 
@@ -57,11 +105,15 @@ class GemmaForgeFilter:
         per_cwe_probe_path: str = "data/probe_per_cwe.npz",
         model_id: str = "google/gemma-4-E2B-it",
         max_tokens: int = 512,
+        token_stride: Optional[int] = None,
+        scan_profile: str = "weak-probe",
     ) -> None:
         self.probe_path = Path(probe_path)
         self.per_cwe_probe_path = Path(per_cwe_probe_path)
         self.model_id = model_id
         self.max_tokens = max_tokens
+        self.token_stride = token_stride or max(1, max_tokens // 2)
+        self.scan_profile = scan_profile
 
         # Eager-load the tiny probes so we fail fast on bad paths.
         bp = np.load(self.probe_path)
@@ -77,6 +129,10 @@ class GemmaForgeFilter:
             assert int(pc["layer"]) == self._layer, (
                 "binary and per-CWE probes were trained on different layers; "
                 f"binary={self._layer} per-cwe={int(pc['layer'])}"
+            )
+            assert self._W_cwe.shape[1] == self._w.shape[0], (
+                "binary and per-CWE probe dimensions differ; "
+                f"binary={self._w.shape[0]} per-cwe={self._W_cwe.shape[1]}"
             )
         else:
             self._cwes = []
@@ -117,19 +173,79 @@ class GemmaForgeFilter:
 
     # ---------------- core: snippet → hidden state ---------------- #
 
-    def _hidden_state(self, snippet: str) -> np.ndarray:
-        """Run the LM on the snippet, return layer-N last-token hidden state."""
+    def _hidden_states_for_ids(self, input_ids: list[int]) -> np.ndarray:
+        """Run the LM on token ids and return layer-N hidden states for every token."""
         import torch
 
         self._ensure_model()
-        ids = self._tokenizer.encode(
-            snippet, return_tensors="pt", truncation=True, max_length=self.max_tokens
-        ).to(self._device)
+        ids = torch.tensor([input_ids], dtype=torch.long, device=self._device)
         with torch.inference_mode():
             out = self._model(ids, output_hidden_states=True, use_cache=False)
         # hidden_states[0] is the embedding output; layer L -> index L+1.
-        h = out.hidden_states[self._layer + 1][0, -1, :]
-        return h.detach().to("cpu").float().numpy()
+        h = out.hidden_states[self._layer + 1][0, :, :]
+        mat = h.detach().to("cpu").float().numpy()
+        if mat.shape[-1] != self._w.shape[0]:
+            raise ValueError(
+                f"probe dim {self._w.shape[0]} != hidden dim {mat.shape[-1]} "
+                f"for model {self.model_id} layer {self._layer}. "
+                "Use a probe trained on this model/profile."
+            )
+        return mat
+
+    def _score_snippet_tokens(self, snippet: str) -> dict:
+        """Score a snippet using all token positions across sliding token windows."""
+        self._ensure_model()
+        input_ids = self._tokenizer.encode(snippet, add_special_tokens=True)
+        windows = _token_windows(input_ids, self.max_tokens, self.token_stride)
+
+        # Store one score per original token. Overlapped tokens keep the max
+        # score seen across windows so robust aggregation does not double-count.
+        per_token = np.full(len(input_ids), -np.inf, dtype=np.float64)
+        h_at_max: Optional[np.ndarray] = None
+        max_prob = -1.0
+
+        for start, ids in windows:
+            h = self._hidden_states_for_ids(ids)
+            probs = _sigmoid_array(h @ self._w + self._b)
+            end = start + len(ids)
+            per_token[start:end] = np.maximum(per_token[start:end], probs)
+
+            idx = int(np.argmax(probs))
+            p = float(probs[idx])
+            if p > max_prob:
+                max_prob = p
+                h_at_max = h[idx]
+
+        valid_scores = per_token[np.isfinite(per_token)]
+        if valid_scores.size == 0 or h_at_max is None:
+            raise ValueError("snippet produced no tokens")
+
+        top_cwe: Optional[str] = None
+        top_cwe_score: Optional[float] = None
+        cwe_ranking: list[str] = []
+        if self._W_cwe is not None and self._b_cwe is not None:
+            logits = self._W_cwe @ h_at_max + self._b_cwe
+            order = np.argsort(-logits)
+            cwe_ranking = [self._cwes[int(i)] for i in order.tolist()]
+            top_idx = int(order[0])
+            top_cwe = self._cwes[top_idx]
+            top_cwe_score = _sigmoid(float(logits[top_idx]))
+
+        return {
+            "gemmaforge_confidence": float(max_prob),
+            "gemmaforge_confidence_robust": _topk_mean(valid_scores),
+            "gemmaforge_top_cwe": top_cwe,
+            "gemmaforge_top_cwe_score": top_cwe_score,
+            "gemmaforge_cwe_ranking": cwe_ranking,
+            "gemmaforge_layer": self._layer,
+            "model_id": self.model_id,
+            "scan_profile": self.scan_profile,
+            "scoring_mode": "token-window-max",
+            "token_count": int(len(input_ids)),
+            "windows_scored": int(len(windows)),
+            "max_tokens": int(self.max_tokens),
+            "token_stride": int(self.token_stride),
+        }
 
     # ---------------- public ---------------- #
 
@@ -143,18 +259,7 @@ class GemmaForgeFilter:
         """
         if not snippet.strip():
             raise ValueError("snippet must be a non-empty string")
-        h = self._hidden_state(snippet)
-        confidence = _sigmoid(float(np.dot(self._w, h) + self._b))
-        top_cwe: Optional[str] = None
-        if self._W_cwe is not None:
-            logits = self._W_cwe @ h + self._b_cwe
-            top_cwe = self._cwes[int(np.argmax(logits))]
-        return {
-            "gemmaforge_confidence": confidence,
-            "gemmaforge_top_cwe": top_cwe,
-            "gemmaforge_layer": self._layer,
-            "model_id": self.model_id,
-        }
+        return self._score_snippet_tokens(snippet)
 
     def score_finding(self, finding: dict) -> dict:
         """Score a pwnkit finding.
@@ -169,19 +274,16 @@ class GemmaForgeFilter:
         if not snippet.strip():
             raise ValueError("finding['snippet'] must be a non-empty string")
 
-        h = self._hidden_state(snippet)
-        confidence = _sigmoid(float(np.dot(self._w, h) + self._b))
+        scored = self._score_snippet_tokens(snippet)
 
         cwe_match: Optional[float] = None
-        top_cwe: Optional[str] = None
+        top_cwe: Optional[str] = scored.get("gemmaforge_top_cwe")
         claimed = finding.get("cwe")
         if claimed and self._W_cwe is not None:
             if claimed in self._cwes:
-                logits = self._W_cwe @ h + self._b_cwe  # (K,)
-                order = np.argsort(-logits)  # descending
-                top1 = self._cwes[int(order[0])]
-                top2 = self._cwes[int(order[1])] if len(order) > 1 else None
-                top_cwe = top1
+                ranking = scored.get("gemmaforge_cwe_ranking") or []
+                top1 = ranking[0] if len(ranking) >= 1 else top_cwe
+                top2 = ranking[1] if len(ranking) >= 2 else None
                 if claimed == top1:
                     cwe_match = 1.0
                 elif claimed == top2:
@@ -192,8 +294,7 @@ class GemmaForgeFilter:
 
         return {
             **finding,
-            "gemmaforge_confidence": confidence,
+            **scored,
             "gemmaforge_cwe_match": cwe_match,
             "gemmaforge_top_cwe": top_cwe,
-            "gemmaforge_layer": self._layer,
         }

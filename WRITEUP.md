@@ -40,7 +40,7 @@ The probe is roughly 1,536 weights — under 10 KB — and scores a token in wel
 | Held-out CWE | 0.92–0.96 | 83–91% | unseen vuln class |
 | **Cross-language (Py→JS)** | **0.907** | **81.9%** | **honest headline** |
 
-Best layer: **17 of 35** (mid-network). **0.907 cross-language** is the honest headline. Two cheap follow-up ablations: uniform-mean ensemble across all 4 captured layers → **0.976** (+0.013), and a (128, 64) MLP head → 0.919 cross-language (+0.012, closes ~30% of the gap). The remaining 70% lives in the representation, not the classifier.
+Best layer: **17 of 35** (mid-network). **0.907 cross-language** is the honest headline. Cheap ablations: uniform-mean ensemble across 4 layers → **0.976** (+0.013); (128, 64) MLP head → 0.919 cross-language (+0.012, closes ~30% of the gap). The remaining 70% lives in the representation, not the classifier.
 
 **Per-CWE multi-head probe** — 5 logits (CWE-78 / 338 / 95 / 94 / 328) on the same layer 17, trained one-vs-rest. **Macro AUC 0.9726, top-1 routing 94.7%**. The off-diagonal of the confusion matrix is near-zero, which means the heads are doing real per-class work — not five copies of a binary "danger" detector. Comparable to Obeso's >0.9 on Llama-3.3-70B for hallucinations, on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
 

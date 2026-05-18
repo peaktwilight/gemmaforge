@@ -1,192 +1,362 @@
 # Video script — GemmaForge (target: 2:50, hard limit 3:00)
 
+**16 scenes** · each scene = one screen, one idea, one spoken line, one on-screen caption. Subtitles burned in — every scene reads on mute.
+
 ## Team
-- **Doruk Tan Ozturk** — security researcher, disclosed CVE-2026-33896 and other CVE-grade npm bugs. Builder of pwnkit (Tier 2). Opens with the CVE hook, voiceovers the demo.
-- **Mehmet Efe Akça** — MSc Data Science at ETH Zürich. Built the probe (Tier 1). Carries the interpretability bridge.
+- **Doruk Tan Ozturk** — security researcher, disclosed CVE-2026-33896 and other CVE-grade npm bugs. Builder of pwnkit (Tier 2). On camera: scenes 01, 02, 03, 10, 11, 13, 15, 16.
+- **Mehmet Efe Akça** — MSc Data Science at ETH Zürich. Built the probe (Tier 1). On camera: scenes 05, 06, 07, 08, 09, 14, 16.
 
 ## Format
-- Talking head + screen-share, alternating
-- Doruk on camera for hook + demo voiceover
-- Efe on camera for the interpretability bridge
-- Both on camera at the close
-- Subtitles burned in (judges may watch muted) — every beat must read on mute
+- 16 distinct scenes, average ~10s each (range 5–15s).
+- Talking head ↔ screen-share alternates; never two talking-head scenes back-to-back.
+- Every scene has three layers: **(a)** visual, **(b)** burned-in caption that survives on mute, **(c)** the spoken line.
+- Persistent lower-third for all 16 scenes: `gemmaforge · github.com/peaktwilight/gemmaforge`.
 
 ## Tracks targeted
-- Main · Impact, Safety & Trust · Special Tech / Ollama
+- Main · Impact / Safety & Trust · Special Tech / Ollama
 
 ---
 
-## Beat 1 — Hook (0:00–0:18)
+## Scene 01 — Hook: a real CVE (0:00–0:10, 10s)
 
-*B-roll behind the opening line: the real CVE-2026-33896 advisory page on GitHub (2s), then a Copilot autocompletion finishing an Express handler — the suggestion contains a textbook injection. Burned-in caption: `AI tools now ship ~100M lines of code/day. Most of it is unaudited.`*
+**Visual:** slow zoom into the GitHub Security Advisory for CVE-2026-33896 (the node-forge bug). Cursor lingers on "node-forge" and the red "Critical" badge.
 
-**Visual:** Doruk on camera, sitting at desk. Code editor barely visible behind him.
+**Burned-in caption (top-left, persists 10s):**
+```
+CVE-2026-33896 · node-forge · Critical
+Disclosed March 2026
+```
 
-**Doruk (to camera):**
-> "Two months ago I published CVE-2026-33896 in `node-forge` — a crypto library that ships inside a lot of the JavaScript stack you've used today. I find bugs like this for a living. But here's what bothers me: an AI assistant could have written that exact pattern this morning, and nobody would have caught it before it shipped."
+**Doruk (voiceover):**
+> "Two months ago I disclosed a critical bug in `node-forge` — a crypto library used across the JavaScript stack."
 
-**Cut to:** title card. White on black:
+---
 
+## Scene 02 — Hook: AI just wrote it again (0:10–0:20, 10s)
+
+**Visual:** IDE screen-recording. Copilot autocompletes an Express handler, ending in the unsafe pattern `db.query(\`SELECT * FROM users WHERE id=${req.params.id}\`)`. Developer tab-accepts.
+
+**Burned-in caption (centre, fades in halfway):**
+```
+AI tools now ship ~100M lines of code per day.
+Almost none of it is audited before it ships.
+```
+
+**Doruk (voiceover):**
+> "An AI assistant could have written that exact pattern this morning. Nobody would have caught it before it shipped."
+
+---
+
+## Scene 03 — Stakes: the scan happens too late, somewhere else (0:20–0:30, 10s)
+
+**Visual:** split screen at 1.5× speed. Left: Snyk pricing page, `$25 / developer / month` highlighted. Right: a SAST dashboard showing "Scan started 3 hours ago…".
+
+**Burned-in caption (bottom):**
+```
+Cloud-bound · subscription-gated · runs after the fact
+Solo maintainers + air-gapped enterprises priced out.
+```
+
+**Doruk (voiceover):**
+> "The standard answer is to scan in the cloud, after the fact. A lot of devs can't afford it. A lot of orgs can't legally use it."
+
+---
+
+## Scene 04 — The question (0:30–0:38, 8s)
+
+**Visual:** hard cut to a black card. White text appears phrase-by-phrase, typewriter-style. No music yet — silence + a single low pad note.
+
+**On-screen text (sequential reveal, no other caption):**
+```
+What if the model itself
+       could tell you
+              which parts of your repo
+                     it would file CVEs against?
+```
+
+*No spoken line.* The question lands on text alone.
+
+---
+
+## Scene 05 — Title card + Efe intro (0:38–0:50, 12s)
+
+**Visual:** logo card (large), Efe appears on camera in the lower-right third, soft-focus library/desk background.
+
+**Burned-in title (centre):**
 ```
    GemmaForge
-   Small Gemma finds. Big Gemma hunts.
-   Local repo-wide vulnerability auditing.
+   Small Gemma finds.  Big Gemma hunts.
 ```
 
----
-
-## Beat 2 — The twist (0:18–0:35)
-
-*Visual: quick montage — Copilot autocompleting an Express handler, a developer tab-accepting the suggestion, Snyk's pricing page ($25/dev/mo highlighted), the CVE detail page. Speed up 2x. Caption on Snyk frame: `Solo maintainers priced out.`*
-
-**Doruk (voiceover):**
-> "Every IDE has an AI in it now. They write a lot of the code that ships. The standard answer is: scan it afterwards. With Snyk. With Semgrep. With something cloud-bound that costs hundreds of dollars a seat. Maintainers of open packages — the people whose bugs *I* keep finding — usually don't have that."
-
-*Cut to Doruk on camera, leaning in.*
-
-**Doruk:**
-> "So we built something different. A two-tier auditor that runs entirely on your laptop. Small Gemma reads your whole repo and triages it. Big Gemma verifies the hits. Same model family, no cloud, free."
-
----
-
-## Beat 3 — The bridge (0:35–1:05)
-
-**Visual:** Efe on camera. Whiteboard or simple diagram visible behind him.
+**Burned-in lower-third (sticky 12s):**
+```
+Mehmet Efe Akça · MSc Data Science, ETH Zürich
+```
 
 **Efe (to camera):**
-> "I'm Efe — MSc Data Science at ETH, one of my courses is Reliable and Trustworthy AI. There's a result from ETH and Anthropic's MATS program: a tiny linear classifier on a model's hidden states can detect hallucinations. AUC around 0.9. We adapted that — same probe shape, different signal. We trained it on Gemma 4 hidden states to predict *vulnerability likelihood* and *which CWE class* the code looks like."
-
-**Visual cut:** simple diagram appears next to him, then a second slide with the receipts.
-
-```
-Gemma 4 hidden state ── linear probe ── risk score + CWE
-   (~1,500 numbers)         (~10 KB)
-```
-
-```
-   weak-probe  · Gemma 4 E2B · layer 17 · AUC 0.907 cross-lang (Py→JS)
-   strong-probe · Gemma 4 E4B · layer 10 · 0.969 group_repo
-   <1 ms/token overhead · 0.9726 per-CWE macro
-```
-
-**Efe:**
-> "The probe is smaller than a JPEG. Cross-language AUC zero-point-nine-oh-seven — train on Python, evaluate on JavaScript, still works. Here's the interpretability finding we didn't expect: in the small Gemma the vuln direction lives at layer seventeen; in the bigger Gemma it shows up at layer ten. The signal moves earlier as the model gets larger. And under a comment-plus-reindent adversarial attack, max-pool aggregation cuts the drop twenty-two-fold versus last-token."
+> "We trained a fifteen-hundred-weight linear probe on Gemma 4's hidden states. It tells you which tokens the model is about to write look like the inside of a known CVE."
 
 ---
 
-## Beat 4 — The demo (1:05–2:15) — THE MONEY SHOT
+## Scene 06 — Tier 1, live: the probe colours every token (0:50–1:05, 15s)
 
-*Beat 4 has three crisp sub-cuts. Total ~70 seconds, hard cap. Every cut has a burned-in caption naming the tier and the action — readable on mute.*
+**Visual:** screen-recording of the HF Space (`peaktwilight/gemma4ge`) or `python -m src.stream_with_probe --serve`. Gemma 4 streams an Express handler; tokens fade through green → yellow → red as the probe scores them. Red cluster around `${req.params.id}`.
 
-### 4a — Tier 1: scan the whole repo (1:05–1:30)
-
-**Visual:** terminal, dark background, large font. A clean Express example app open on the side. Caption: `Tier 1 · weak-probe · laptop-class`.
-
+**Burned-in caption (top-right, sticky 15s):**
 ```
-$ python -m src.scan ./examples/vuln-express-app \
-      --events live.ndjson \
-      --top-k 5 > leads.jsonl
+< 1 ms / token overhead
+Gemma 4 E2B · sample-level linear probe · layer 17
+```
+
+**Efe (voiceover):**
+> "Every token Gemma generates, the probe reads its hidden state and emits a risk score. Sub-millisecond overhead. On a laptop."
+
+---
+
+## Scene 07 — Tier 1, the honest headline AUC (1:05–1:15, 10s)
+
+**Visual:** numbers card. The AUC ladder image (`web/auc-ladder.png`) is the background at 30% opacity; one number in the foreground.
+
+**Burned-in text (large, centred):**
+```
+AUC 0.907   Python → JavaScript
+            (train Python, evaluate JavaScript)
+
+0.940 stacked (MLP × 4-layer ensemble)
+0.9726 per-CWE macro (78 · 338 · 95 · 94 · 328)
+```
+
+**Efe (voiceover):**
+> "Cross-language AUC nine-oh-seven. Honest number — train on Python, test on JavaScript."
+
+---
+
+## Scene 08 — Tier 1, structural finding: L17 → L10 (1:15–1:25, 10s)
+
+**Visual:** two side-by-side decoder stacks (slide-deck render). Left: Gemma 4 E2B, 35 layers, L17 highlighted (49% depth). Right: Gemma 4 E4B, 42 layers, **L10** highlighted (24% depth). Red arrow drops 17→10 between them.
+
+**Burned-in caption (bottom):**
+```
+strong-probe (E4B): best layer drops from L17 / 35 → L10 / 42
+The linear vulnerability direction lives EARLIER in the bigger model.
+```
+
+**Efe (voiceover):**
+> "When we re-trained on the bigger Gemma, the best layer moved from mid-network down into the bottom quarter. Bigger models know what's risky sooner."
+
+---
+
+## Scene 09 — Tier 1, robustness: 22× T3 (1:25–1:35, 10s)
+
+**Visual:** before/after of the same snippet — left, clean source; right, the T3 attack (comments inserted between every statement, indentation perturbed). Beneath both, a sparkline of per-token probe scores.
+
+**Burned-in caption:**
+```
+Adversarial T1–T5 suite
+T3 (comment + reindent), last-token:   Δ −0.087
+T3 (comment + reindent), max-pool:     Δ −0.004    ← 22× more robust
+```
+
+**Efe (voiceover):**
+> "Full T1 through T5 adversarial suite. Max-pool aggregation flattens the worst attack twenty-two times over."
+
+---
+
+## Scene 10 — Tier 2 bridge: Doruk takes back the mic (1:35–1:45, 10s)
+
+**Visual:** cut to Doruk on camera. Soft-focus terminal behind him with `pwnkit-cli --help` output dimly visible.
+
+**Burned-in lower-third (sticky 10s):**
+```
+Doruk Tan Ozturk · pwnkit · 0sec.ai
+```
+
+**Doruk (to camera):**
+> "The probe tells you *where* to look. But you still want to *prove* it. That's where the bigger Gemma comes in."
+
+---
+
+## Scene 11 — Tier 2, the command: handoff (1:45–2:00, 15s)
+
+**Visual:** terminal recording, slow type-on (no autocomplete, no shell-prefix noise):
+
+```bash
+$ python -m src.scan repo/ > leads.jsonl
+
+$ pwnkit-cli review repo/ \
+      --seed-findings leads.jsonl \
+      --runtime ollama \
+      --model gemma4:27b
+```
+
+**Burned-in caption (right side, sticky 15s):**
+```
+Ollama · /api/chat · native function-calling
+0sec-labs/pwnkit  #371 + #372  (both merged 2026-05-18)
+Local · no API keys · no network
 ```
 
 **Doruk (voiceover):**
-> "Tier one — `weak-probe`. Gemma 4 E2B, runs on a 2018 laptop. It reads every file. One forward pass per chunk."
+> "Two commands. The probe walks the repo and writes the leads. Pwnkit picks them up and drives a local Gemma 4 27B through tool-calls — read files, grep call sites, verify."
 
-*Numbers tick on screen: `files · chunks · elapsed · leads` — replaced at recording time with the real `src/scan.py` counts.*
+---
 
-> "Five suspect spans, ranked. Each one tagged with the CWE class the probe thinks it is. Sub-millisecond overhead per token."
+## Scene 12 — Tier 2, the dashboard: four panels, one view (2:00–2:15, 15s)
 
-### 4b — The 4-panel dashboard (1:30–1:55)
+**Visual:** screen-recording of the HF Space dashboard at `peaktwilight/gemma4ge`. Four panels updating live:
+1. **Stream** — tokens colour-graded by risk
+2. **Scan** — files ticking through with per-chunk strips
+3. **Leads** — ranked rows landing; top row badge `CWE-89 · 0.93`
+4. **Hand-off** — pwnkit lane filling in tool-call cards
 
-**Visual:** cut to the live HF Space at `peaktwilight/gemma4ge`. Browser chrome visible for half a beat — judges should see this is a real Space. Then full-screen the dashboard. Caption: `huggingface.co/spaces/peaktwilight/gemma4ge`.
+Mouse hovers panel 3, clicks the top lead — panel 4 highlights its matching hunt card.
 
+**Burned-in caption (bottom):**
 ```
-   ┌─ Stream ─┐  ┌─ Scan ─┐  ┌─ Leads ─┐  ┌─ Hand-off ─┐
+huggingface.co/spaces/peaktwilight/gemma4ge
+4 panels · Docker SDK · click-to-highlight provenance
 ```
-
-*Panel 1 streams Gemma tokens. Panel 2 ticks scan progress (files / chunks / elapsed). Panel 3 stacks ranked leads with file + line range + CWE. Panel 4 shows the pwnkit hand-off card with live links to the merged PRs #371 and #372.*
 
 **Doruk (voiceover):**
-> "The same scan, in pictures, served from a Hugging Face Space. Left to right: Gemma streaming, scan progress, ranked leads, and the hand-off to Tier two. Clicking the hand-off card opens the two pwnkit pull requests we merged this week — three-seventy-one wires the lead schema, three-seventy-two wires the live event stream. Open source, both sides."
+> "And you watch it happen — probe firings on the left, the agent's tool-calls on the right, click any lead and it lights up the matching investigation."
 
-### 4c — Tier 2: big Gemma audits the same repo (1:55–2:15)
+---
 
-**Visual:** cut back to terminal, a *second* pane. Caption: `Tier 2 · Gemma 4 27B via Ollama · same laptop`.
+## Scene 13 — Tier 2, the real run: numbers from today (2:15–2:25, 10s)
+
+**Visual:** terminal output, monospace, key lines highlighted with a yellow stroke as they appear:
 
 ```
 $ pwnkit-cli review examples/vuln-express-app \
       --seed-findings examples/leads.jsonl \
       --runtime ollama --model gemma4:latest
+
+[review] loaded 6 seed lead(s) from examples/leads.jsonl
+…
+{ "totalAttacks": 6, "durationMs": 289969, "semgrepFindings": 6 }
+```
+
+**Burned-in caption (top):**
+```
+6 leads → 6 attacks · ~5 minutes · local · zero network
+Real run.  Today.  On a laptop.
 ```
 
 **Doruk (voiceover):**
-> "Tier two. The leads become my pwnkit agent's worklist. With `--runtime ollama`, the agent loop drives Gemma 4 27B locally — same family, bigger sibling. We ran this end-to-end today: six seeded leads, six attack plans, five minutes of real local Gemma inference. The plumbing works — repo to probe to agent to verdict, no cloud."
-
-*Cut to the agent's run summary rendered on screen, side by side with the dashboard's Hand-off panel updating:*
-
-```
-   loaded 6 seed lead(s) · totalAttacks: 6 · runtime: ollama (gemma4:latest)
-   elapsed ~5 min · all-local · zero network egress
-```
-
-**Doruk:**
-> "Two Gemmas — small and large, same family — agreeing on where to look. End to end on one laptop."
+> "This isn't a render. Six seeded leads, six investigations, five minutes of local Gemma 4 inference. Nothing left the machine."
 
 ---
 
-## Beat 5 — Why this matters (2:15–2:40)
+## Scene 14 — Why Gemma specifically (2:25–2:35, 10s)
 
-**Visual:** Efe and Doruk both on camera, side by side at the desk. Caption strip across the bottom: `40 pts Impact · 30 pts Story · 30 pts Tech`.
+**Visual:** three model tiles animate left-to-right onto the screen:
 
-**Efe:**
-> "Both tiers run on the same laptop. Nothing leaves the device. The probe runs on basically anything. The 27B verifier needs a real GPU or an M-series Mac with thirty-two gigs — same hardware that runs Stable Diffusion. Training data includes Doruk's disclosed CVEs in `node-forge` and ten other npm packages with two hundred million downloads a month — author-grounded, not synthetic."
+```
+┌──────────┐    ┌──────────┐    ┌──────────────────┐
+│  E2B 2B  │ →  │  E4B 4B  │ →  │  Gemma 4 27B     │
+│  probe   │    │  probe+  │    │  agentic verifier│
+│  laptop  │    │  workstn │    │  workstation     │
+└──────────┘    └──────────┘    └──────────────────┘
+```
 
-**Doruk:**
-> "And that's the part we care about. The people most exposed to AI-generated vulnerabilities — solo maintainers of packages with millions of installs, students, developers in places where Snyk pricing isn't an option — are the ones who can't pipe their code through a cloud API to find out. With two Gemmas locally, they don't have to."
+**Burned-in caption:**
+```
+Same family · same tokenizer · same tool schema · one license
+Raw hidden states for Tier 1.   Native function-calling for Tier 2.
+Only Gemma 4 gives you both.
+```
+
+**Efe (voiceover):**
+> "Three Gemmas in one family. Hidden states for the probe, function-calling for the agent. Mix Llama with Qwen and the two halves don't speak the same language."
 
 ---
 
-## Beat 6 — Close (2:40–2:50)
+## Scene 15 — Why us: author-grounded training data (2:35–2:45, 10s)
 
-**Visual:** title card.
+**Visual:** scrolling reel of GitHub Security Advisory cards — CVE-2026-33896 first, then a quick stack of ~5 more advisory titles authored by Doruk. A small badge lands at the end: `200M+ monthly downloads across affected packages`.
 
+**Burned-in caption:**
 ```
-   GemmaForge
-   Local. Free. Apache-2.0.
-   github.com/peaktwilight/gemmaforge
-   huggingface.co/spaces/peaktwilight/gemma4ge
+Training pairs include CVEs Doruk personally disclosed.
+node-forge · plus ~10 more in npm packages totalling 200M+ DL/mo.
 ```
 
-**Doruk and Efe (together, voiceover):**
-> "Every developer should have a senior security engineer that runs on their laptop, on every commit, for free. We just built one. It's open. Go audit something."
+**Doruk (voiceover):**
+> "The probe was trained partly on bugs we ourselves found and disclosed. That's why it knows what danger smells like."
 
 ---
 
-## Production notes
-- Record 4K, export 1080p high bitrate — judges' screens vary
-- All demo runs use locally-running Gemma 4 (E2B/E4B for Tier 1, 27B via Ollama for Tier 2) so on-screen rendering is fluid
-- Background music: subtle synth, low under voiceover; drop out during 4a/4b/4c so typing + dashboard motion are the audio
-- Cut zero "uhh"s — script is ~430 words, fits comfortably inside 2:50 at a calm pace
-- Both faces on camera before 1:05 — judges reward visible humans early
-- **Subtitled-on-mute:** burned-in captions on every beat. Lane/panel headers, tier labels, the AUC numbers in Beat 3, the run-summary numbers in 4c, and the tracks strip in Beat 5 must all be legible without audio.
-- **Verification step:** the 4c terminal capture must be a real run of `pwnkit-cli review examples/vuln-express-app --seed-findings examples/leads.jsonl --runtime ollama --model gemma4:latest`. The "loaded 6 seed lead(s)" and "totalAttacks: 6" lines are real output from today's E2E — show them.
-- Pwnkit PR links to surface in 4b: [0sec-labs/pwnkit#371](https://github.com/0sec-labs/pwnkit/pull/371) and [0sec-labs/pwnkit#372](https://github.com/0sec-labs/pwnkit/pull/372). Both merged.
+## Scene 16 — Close (2:45–2:50, 5s)
+
+**Visual:** both Doruk and Efe on camera, split screen. End card behind them.
+
+**Burned-in end card:**
+```
+   GemmaForge — Two Gemmas, one laptop.
+
+   Repo:    github.com/peaktwilight/gemmaforge
+   Live:    huggingface.co/spaces/peaktwilight/gemma4ge
+   pwnkit:  github.com/0sec-labs/pwnkit  (PR #371, #372)
+
+   Tracks:  Main · Safety & Trust · Ollama
+```
+
+**Doruk + Efe (in unison, to camera):**
+> "Local. Open. Verifiable."
+
+---
+
+## Timing summary
+
+| # | Scene | Start | Duration |
+|---|---|---:|---:|
+| 01 | Hook: CVE | 0:00 | 10s |
+| 02 | Hook: AI just wrote it again | 0:10 | 10s |
+| 03 | Stakes: priced out / cloud-bound | 0:20 | 10s |
+| 04 | The question (black card) | 0:30 | 8s |
+| 05 | Title + Efe intro | 0:38 | 12s |
+| 06 | Tier 1 live (streaming probe) | 0:50 | 15s |
+| 07 | Tier 1 numbers (AUC 0.907) | 1:05 | 10s |
+| 08 | Tier 1 structural (L17→L10) | 1:15 | 10s |
+| 09 | Tier 1 robustness (22× T3) | 1:25 | 10s |
+| 10 | Bridge: Doruk takes mic | 1:35 | 10s |
+| 11 | Tier 2 command (handoff) | 1:45 | 15s |
+| 12 | Tier 2 dashboard (4 panels) | 2:00 | 15s |
+| 13 | Tier 2 real run (today's output) | 2:15 | 10s |
+| 14 | Why Gemma (model family) | 2:25 | 10s |
+| 15 | Why us (CVE-grounded data) | 2:35 | 10s |
+| 16 | Close | 2:45 | 5s |
+| | **Total** | | **2:50** |
+
+10-second buffer to the 3:00 hard limit.
 
 ---
 
 ## Shot list (B-roll + screen-capture)
 
-| Time | Source | Shot |
-|------|--------|------|
-| 0:00–0:06 | GitHub | CVE-2026-33896 advisory page on `digitalbazaar/forge`, scroll the description |
-| 0:06–0:12 | VS Code | Copilot ghost-text completing a vulnerable Express handler, dev hits Tab |
-| 0:12–0:18 | After Effects | Title card: "GemmaForge — Small Gemma finds. Big Gemma hunts." |
-| 0:18–0:28 | Web | Montage: Copilot completion, Snyk pricing page ($25/dev/mo highlight), CVE detail page — 2x speed |
-| 0:28–0:35 | Doruk cam | Lean-in to camera, two-Gemma pitch |
-| 0:35–0:50 | Efe cam | Talking head + on-screen diagram of probe shape |
-| 0:50–1:05 | Efe cam | Slide with AUC 0.907 / layer 17→10 / 22× robustness numbers burned in |
-| 1:05–1:30 | Terminal | `python -m src.scan ./examples/vuln-express-app --events live.ndjson --top-k 5 > leads.jsonl` running, file/chunk counters incrementing, final 5 ranked leads |
-| 1:30–1:55 | Browser | HF Space `peaktwilight/gemma4ge` 4-panel dashboard — Stream / Scan / Leads / Hand-off. Cursor clicks Hand-off card; PR #371 and #372 tabs flash open |
-| 1:55–2:15 | Terminal (split) | `pwnkit-cli review ... --runtime ollama --model gemma4:latest` running side-by-side with dashboard Hand-off panel updating; final "loaded 6 seed lead(s) · totalAttacks: 6" summary card |
-| 2:15–2:40 | Doruk + Efe cam | Two-shot at desk; lower-third with the three judging tracks |
-| 2:40–2:50 | After Effects | Closing title card with repo URL + HF Space URL |
+| # | Asset | Source |
+|---|---|---|
+| 01 | CVE-2026-33896 advisory page | `github.com/digitalbazaar/forge/security/advisories` |
+| 02 | Copilot autocomplete writing `db.query(\`… ${id}\`)` | Record in VS Code on a clean Express scaffold |
+| 03a | Snyk pricing page (`$25/dev/mo` highlighted) | `snyk.io/plans` |
+| 03b | "Cloud SAST 3h ago" mock | Mock screenshot, generic SAST UI |
+| 06 | Streaming probe demo | `python -m src.stream_with_probe --serve` OR the HF Space directly |
+| 07 | AUC ladder background | `web/auc-ladder.png` (already in repo) |
+| 08 | E2B / E4B decoder-stack diagram (L17 → L10) | Render new — Keynote/Figma, two columns of blocks + red arrow |
+| 09 | T3 before/after + sparkline | Render new from `data/adversarial_full_suite.json` |
+| 11 | Terminal: scan + pwnkit review | Record in iTerm, clean prompt (`PS1='$ '`), font ≥ 18pt |
+| 12 | 4-panel dashboard, live | `huggingface.co/spaces/peaktwilight/gemma4ge` (Docker SDK build) |
+| 13 | Terminal: real E2E output | Replay `/tmp/e2e-ollama.log` from today's run |
+| 14 | Three-tile model-family diagram | Render new — Keynote/Figma |
+| 15 | GHSA advisory reel | Pull from Doruk's GitHub security advisory list |
+| 16 | End card | Render new — repo + HF + pwnkit URLs + 3-track lower-third |
 
+---
+
+## Notes for the editor
+
+- **Subtitles on by default.** Median consumption is YouTube on mute; every scene's caption is load-bearing.
+- **No music under spoken lines.** Soft pad only under scene 04 (the question lands on text alone) and scene 16 (close).
+- **Pacing rule:** if a scene runs long, shorten the *spoken* line first — never the on-screen caption. Caption survives mute; voiceover doesn't.
+- **Hard cuts between scenes 01→02, 03→04, 04→05, 09→10, 13→14, 15→16.** Everywhere else, 200–400 ms crossfade.
+- **Lower-third URL persists all 16 scenes.** It's the one thing a paused screenshot must always carry.

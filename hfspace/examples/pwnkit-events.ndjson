@@ -1,0 +1,23 @@
+{"kind": "pk.log", "message": "preparing target", "level": ""}
+{"kind": "pk.log", "message": "target resolved · source-code", "level": "ok"}
+{"kind": "pk.log", "message": "analyze stage — running semgrep + ingesting seeds", "level": ""}
+{"kind": "pk.log", "message": "ingested 6 seed lead(s) · sources: gemmaforge", "level": "warn"}
+{"kind": "pk.counts", "queued": 6, "exploited": 0, "reported": 0}
+{"kind": "pk.log", "message": "analyze complete · semgrep 6 · npm-audit 0", "level": "ok"}
+{"kind": "pk.log", "message": "research stage — spawning the review agent", "level": ""}
+{"kind": "pk.log", "message": "agent online · session edb26c54 · 20 tools available · Gemma 4 8B via Ollama", "level": ""}
+{"kind": "pk.log", "message": "tool_use · read_file", "level": ""}
+{"kind": "pk.log", "message": "tool_use · save_finding · Critical: Command Injection via Traceroute Endpoint", "level": "ok"}
+{"kind": "pk.counts", "queued": 6, "exploited": 1, "reported": 0}
+{"kind": "pk.log", "message": "tool_use · read_file", "level": ""}
+{"kind": "pk.log", "message": "tool_use · save_finding · High: Path Traversal via File Download Endpoint", "level": "ok"}
+{"kind": "pk.counts", "queued": 6, "exploited": 2, "reported": 0}
+{"kind": "pk.log", "message": "tool_use · read_file", "level": ""}
+{"kind": "pk.log", "message": "tool_use · save_finding · Critical: SQL Injection via User ID Parameter", "level": "ok"}
+{"kind": "pk.counts", "queued": 6, "exploited": 3, "reported": 0}
+{"kind": "pk.log", "message": "agent complete · 1 turn(s) · 3 finding(s)", "level": "ok"}
+{"kind": "pk.log", "message": "research complete · 3 findings drafted", "level": "ok"}
+{"kind": "pk.log", "message": "verify stage — replaying findings against the repo", "level": ""}
+{"kind": "pk.log", "message": "verify complete · 0 confirmed · 3 rejected (static repo, no live target)", "level": "warn"}
+{"kind": "pk.log", "message": "report drafted · pwnkit-report-vuln-express-app.md", "level": "ok"}
+{"kind": "pk.counts", "queued": 6, "exploited": 3, "reported": 6}

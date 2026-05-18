@@ -353,40 +353,57 @@ def tail_events_file(handler: BaseHTTPRequestHandler, path: Path) -> None:
         time.sleep(0.4)
 
 
-def pwnkit_stream(handler: BaseHTTPRequestHandler) -> None:
-    """Synthetic queued → exploit → report cycle. Pure illustration."""
-    queued = 0
-    exploited = 0
-    reported = 0
-    script = [
-        ("queue", "queued lead #0 examples/vuln-express-app/src/ping.js:1 — CWE-78", "warn"),
-        ("queue", "queued lead #1 examples/vuln-express-app/src/users.js:21 — CWE-89", "warn"),
-        ("queue", "queued lead #2 examples/vuln-express-app/src/token.js:1 — CWE-330", "warn"),
-        ("exploit", "triage: spawning sandbox for ping.js…", ""),
-        ("exploit", "exploit verified: GET /ping?host=x;id  →  uid=33(www-data)", "ok"),
-        ("exploit", "triage: spawning sandbox for users.js…", ""),
-        ("exploit", "exploit verified: GET /users/1%20OR%201=1  →  leaks 4 rows", "ok"),
-        ("exploit", "triage: token.js entropy check…", ""),
-        ("exploit", "exploit verified: Math.random()-derived token guessable in 1.2s", "ok"),
-        ("report", "report drafted: pwnkit-report-2026-vuln-express-app.md", "ok"),
-    ]
-    for kind, msg, level in script:
-        if kind == "queue":
-            queued += 1
-        elif kind == "exploit" and level == "ok":
-            exploited += 1
-        elif kind == "report":
-            reported += 1
-        if not _emit(handler, {"kind": "pk.log", "message": msg, "level": level}):
-            return
-        if not _emit(handler, {
-            "kind": "pk.counts",
-            "queued": queued, "exploited": exploited, "reported": reported,
-        }):
-            return
-        time.sleep(1.4)
+PWNKIT_SYNTHETIC_FALLBACK = [
+    # Used only when no recorded pwnkit-events.ndjson is on disk.
+    ("queue", "queued lead #0 examples/vuln-express-app/src/ping.js:1 — CWE-78", "warn"),
+    ("queue", "queued lead #1 examples/vuln-express-app/src/users.js:21 — CWE-89", "warn"),
+    ("exploit", "triage: spawning sandbox for ping.js…", ""),
+    ("exploit", "exploit verified: GET /ping?host=x;id  →  uid=33(www-data)", "ok"),
+    ("report", "report drafted: pwnkit-report-vuln-express-app.md", "ok"),
+]
 
-    # Idle keep-alive afterwards.
+
+def pwnkit_stream(handler: BaseHTTPRequestHandler, replay_path: Path | None = None) -> None:
+    """Stream `pk.log` / `pk.counts` events for Panel 4.
+
+    If ``replay_path`` points at an existing ND-JSON file, replay it
+    verbatim — the file is built from a real ``pwnkit review`` run by
+    ``scripts/build_pwnkit_replay.py`` (pulled out of pwnkit's SQLite
+    db). Falls back to a short synthetic illustration when the recording
+    is absent.
+    """
+    queued = exploited = reported = 0
+
+    if replay_path is not None and replay_path.exists():
+        for line in replay_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not _emit(handler, ev):
+                return
+            # Pacing: ~1.2s per event so the panel reads as live, not as a dump.
+            time.sleep(1.2)
+    else:
+        for kind, msg, level in PWNKIT_SYNTHETIC_FALLBACK:
+            if kind == "queue":
+                queued += 1
+            elif kind == "exploit" and level == "ok":
+                exploited += 1
+            elif kind == "report":
+                reported += 1
+            if not _emit(handler, {"kind": "pk.log", "message": msg, "level": level}):
+                return
+            if not _emit(handler, {
+                "kind": "pk.counts",
+                "queued": queued, "exploited": exploited, "reported": reported,
+            }):
+                return
+            time.sleep(1.4)
+
     while True:
         time.sleep(15)
         try:
@@ -400,6 +417,7 @@ def make_handler(args):
     leads_path = Path(args.leads_file) if args.leads_file else DEFAULT_LEADS
     events_file = Path(args.events_file) if args.events_file else None
     replay_events = Path(args.replay_events) if args.replay_events else None
+    pwnkit_replay = Path(args.pwnkit_replay) if args.pwnkit_replay else None
     speedup = float(args.replay_speedup)
 
     class Handler(BaseHTTPRequestHandler):
@@ -430,7 +448,7 @@ def make_handler(args):
                 return
             if path == "/sse/pwnkit":
                 _sse_headers(self)
-                pwnkit_stream(self)
+                pwnkit_stream(self, pwnkit_replay)
                 return
             self.send_response(404)
             self.end_headers()
@@ -463,6 +481,13 @@ def main(argv=None) -> int:
         type=float,
         default=4.0,
         help="Time-compression factor when --replay-events is set.",
+    )
+    ap.add_argument(
+        "--pwnkit-replay",
+        default=None,
+        help="ND-JSON file of pk.log/pk.counts events for Panel 4. Built by "
+        "scripts/build_pwnkit_replay.py from a real pwnkit review run. When "
+        "omitted, falls back to a short synthetic illustration.",
     )
     ap.add_argument(
         "--leads-file",

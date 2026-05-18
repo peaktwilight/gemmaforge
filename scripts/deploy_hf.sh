@@ -29,6 +29,8 @@ fi
 mkdir -p hfspace/dashboard hfspace/examples
 cp dashboard/index.html dashboard/style.css dashboard/server.py dashboard/__init__.py hfspace/dashboard/
 cp examples/leads.jsonl hfspace/examples/leads.jsonl
+cp examples/events.ndjson hfspace/examples/events.ndjson
+[ -f examples/pwnkit-events.ndjson ] && cp examples/pwnkit-events.ndjson hfspace/examples/pwnkit-events.ndjson || true
 
 # Try create, ignore "already exists".
 hf repo create "${HF_USER}/${SPACE_NAME}" --repo-type space --space-sdk "${SDK}" || true

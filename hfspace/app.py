@@ -158,7 +158,11 @@ _CSS = """
 #tagline { color: #9ca3af; font-size: 13.5px; max-width: 78ch; line-height: 1.55; margin-top: 2px; }
 """
 
-with gr.Blocks(title="GemmaForge — real-time vuln detection in Gemma 4") as demo:
+with gr.Blocks(
+    title="GemmaForge — real-time vuln detection in Gemma 4",
+    css=_CSS,
+    theme=gr.themes.Default(primary_hue="amber", neutral_hue="slate"),
+) as demo:
     gr.HTML(
         '<div id="title"><h1>GemmaForge<span class="pill">Gemma 4 · vulnerability probe</span></h1>'
         '<div id="tagline">A linear probe trained on Gemma 4\'s hidden states. Each generated token is coloured by '
@@ -197,7 +201,4 @@ with gr.Blocks(title="GemmaForge — real-time vuln detection in Gemma 4") as de
 
 
 if __name__ == "__main__":
-    demo.queue().launch(
-        css=_CSS,
-        theme=gr.themes.Default(primary_hue="amber", neutral_hue="slate"),
-    )
+    demo.queue().launch()

@@ -1,7 +1,13 @@
-# Gradio 4.44 imports HfFolder which was removed in huggingface_hub 0.27+.
-# Pin both: keep gradio 4.44 (matches local dev) and an HF Hub that still has HfFolder.
+# HF Space platform force-installs gradio matching sdk_version in README frontmatter (4.44.1).
+# Match it exactly to avoid a ResolutionImpossible conflict.
+# Gradio 4.44 imports HfFolder which was removed in huggingface_hub 0.27+, so pin Hub <0.27.
+# Starlette >=0.40 + newer Jinja2 break gradio 4.44's main route ("unhashable type: 'dict'"
+# in jinja2.utils cache.get because template_context becomes a dict cache key).
+# Pin starlette<0.40 and jinja2<3.2 to keep the legacy TemplateResponse signature working.
 gradio==4.44.1
 huggingface_hub<0.27,>=0.24
+starlette<0.40
+jinja2<3.2
 spaces
 transformers>=4.45
 torch

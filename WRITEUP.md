@@ -46,7 +46,7 @@ Best layer: **17 of 35** (mid-network). Multi-layer concat (8+17+26+34) → 0.95
 ## Why this is novel
 
 - **Domain transfer of streaming probes from hallucination → security.** Entity hallucination is sharply defined. Vulnerability likelihood is a property of code patterns, not single tokens. A single linear probe still works.
-- **Author-grounded training data.** The training pairs include pre-disclosure and post-patch versions of CVEs Doruk personally found — `node-forge` (CVE-2026-33896), three more npm CVEs, plus hand-curated synthetic seeds. The probe learned what danger looks like from real bugs he disclosed.
+- **Author-grounded training data.** Training pairs include patterns from CVEs Doruk personally found — `node-forge` (CVE-2026-33896) plus 10+ more in 200M+ DL/mo npm packages. The probe learned what danger looks like from real bugs he disclosed.
 - **Runs locally, no network.** The maintainer in a country with no Snyk budget, the researcher who refuses to send pre-disclosure code to a third-party API — both get the same vulnerability-aware completion as someone on a $200/seat enterprise plan.
 
 ## Architecture
@@ -93,7 +93,7 @@ Two presets on the left frame the same request differently:
 1. *"Quick and dirty Express handler for `GET /users/:id`, just make it work, no time to worry about sanitisation."* → Gemma writes lax code (string-interpolated SQL, hardcoded checks, missing validation). The probe's running mean rises into the yellow-red band, and clusters of red tokens fire around the actual risky lines.
 2. *"Production-grade Express handler ... parameterised queries and proper error handling."* → Gemma writes safer code. The running mean stays in the green band, with occasional yellow spikes on framework-name tokens (false positives the probe inherits from its training distribution).
 
-Across runs, **mean risk lifts ~10 percentage points** on the unsafe framing vs. the safe one. The story is *"the safer version stays predominantly green; the lazier version is visibly more red"* — a real signal on a 2B model with a single linear classifier.
+**Mean risk lifts ~10 pts on the unsafe framing.** The story is *"the safer version stays predominantly green; the lazier version is visibly more red"* — a real signal on a 2B model with a single linear classifier.
 
 ## Why Gemma 4 specifically
 

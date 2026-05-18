@@ -6,6 +6,7 @@ __pycache__/
 .venv/
 data/activations/
 data/activations_dataset/
+data/activations_e4b/
 data/token_activations/
 data/token_activations_smoke/
 .claude/

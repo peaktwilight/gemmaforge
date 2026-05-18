@@ -90,6 +90,7 @@ def stream(
     max_new_tokens: int = 200,
     temperature: float = 0.7,
     per_cwe_probe_path: Path | None = None,
+    use_max_pool: bool = True,
 ) -> Iterator[dict]:
     model, tokenizer, device = _ensure_model(model_id)
     w, b, layer = _load_probe(probe_path)
@@ -119,12 +120,18 @@ def stream(
     # feed one token at a time and keep the cache alive. Cuts per-token cost
     # from O(seq_len) to O(1) attention ops.
     #
-    # The probe is trained on SNIPPET-LEVEL last-token activations, so
-    # per-token scores during streaming are noisy. We surface BOTH the
-    # raw per-token risk and a sliding-window mean. The UI uses the smoothed
-    # value for coloring (visually stable) and reports the raw for stats.
+    # Aggregation: max-pool over all generated tokens so far is the default
+    # signal (`risk_maxpool`) — verified ~22× more robust than last-token
+    # under T3 comment+reindent attacks (data/adversarial_eval.json:
+    # last-token Δ -0.087 vs max-pool Δ -0.004) while staying within noise
+    # on clean accuracy (0.974 vs 0.972 last-token, data/eval_maxpool.json).
+    # We also emit the sliding-window smoothed score (`risk_smoothed`) for
+    # the UI gradient — visually it's the better stream-y signal.
+    # `risk` is kept as a legacy alias of `risk_smoothed` for any client
+    # that hasn't migrated yet.
     SMOOTH_WIN = 8
     window: list[float] = []
+    running_max: float = 0.0
 
     with torch.inference_mode():
         out = model(input_ids, output_hidden_states=True, use_cache=True)
@@ -146,6 +153,12 @@ def stream(
             if len(window) > SMOOTH_WIN:
                 window.pop(0)
             smooth_risk = sum(window) / len(window)
+            if raw_risk > running_max:
+                running_max = raw_risk
+            # When opted out (`--no-max-pool`), report the smoothed score
+            # as the max-pool field so the wire shape is unchanged but
+            # downstream consumers fall back to last-token-style behaviour.
+            maxpool_risk = running_max if use_max_pool else smooth_risk
 
             top_cwe: str | None = None
             top_cwe_score: float | None = None
@@ -167,13 +180,18 @@ def stream(
             except Exception:
                 tok_text = "?"
 
-            # `risk` is what the UI uses for color; `risk_raw` is per-token.
+            # Emit max-pool (running max across all generated tokens),
+            # smoothed (window mean — UI gradient), and raw per-token.
+            # `risk` is kept as a legacy alias of `risk_smoothed` so any
+            # pre-max-pool clients keep working unchanged.
             # `top_cwe` / `top_cwe_score` are populated only when the
             # per-CWE multi-head probe is loaded; otherwise they're None.
             yield {
                 "event": "token",
                 "token": tok_text,
                 "risk": smooth_risk,
+                "risk_smoothed": smooth_risk,
+                "risk_maxpool": maxpool_risk,
                 "risk_raw": raw_risk,
                 "top_cwe": top_cwe,
                 "top_cwe_score": top_cwe_score,
@@ -212,6 +230,13 @@ def main_cli() -> None:
     ap.add_argument("--max-tokens", type=int, default=150)
     ap.add_argument("--temperature", type=float, default=0.6)
     ap.add_argument("--serve", action="store_true", help="Run as HTTP/SSE server on :8787")
+    ap.add_argument(
+        "--no-max-pool",
+        action="store_true",
+        help="Opt out of running-max aggregation for `risk_maxpool` and fall back to "
+        "the smoothed score in that field (default off; max-pool is the default since "
+        "it's ~22x more robust to comment+reindent attacks — see data/adversarial_eval.json).",
+    )
     args = ap.parse_args()
 
     if args.serve:
@@ -230,9 +255,12 @@ def main_cli() -> None:
         args.max_tokens,
         args.temperature,
         per_cwe_probe_path=pc_path,
+        use_max_pool=not args.no_max_pool,
     ):
         if event.get("event") == "token":
-            risk = event["risk"]
+            # CLI colours by max-pool when enabled (matches new UI),
+            # otherwise by smoothed (legacy behaviour).
+            risk = event.get("risk_maxpool", event["risk"])
             colour = "\033[31m" if risk > 0.7 else "\033[33m" if risk > 0.4 else "\033[32m"
             sys.stdout.write(f"{colour}{event['token']}\033[0m")
             sys.stdout.flush()
@@ -302,6 +330,7 @@ def run_server(args) -> None:
                     max_tokens,
                     args.temperature,
                     per_cwe_probe_path=pc_path,
+                    use_max_pool=not args.no_max_pool,
                 ):
                     self.wfile.write(f"data: {json.dumps(event)}\n\n".encode())
                     self.wfile.flush()

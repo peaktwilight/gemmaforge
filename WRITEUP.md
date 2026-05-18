@@ -27,11 +27,9 @@ Yes. We built it.
 
 ## The technique
 
-**Two paths.** The numbers below are from the **sample-level** path — one label per snippet, linear probe on the last-token hidden state — which is what ships in the demo. In parallel we train a **token-level** value-head probe with per-token spans (BCE + span-max loss) as the intended drop-in replacement once we have evaluated the two head-to-head. Both paths read the same Gemma 4 hidden states; they differ in label granularity and aggregation.
+**Two paths.** Numbers below are from the **sample-level** path (one label per snippet, linear probe on last-token hidden state) — what ships. A **token-level** value-head probe with per-token spans + BCE + span-max loss is in parallel training as the intended replacement.
 
-We adapt the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.03531) (arXiv 2509.03531) from *fabricated entities* to *vulnerable code patterns*. A single linear classifier sits on Gemma 4's last-token hidden state at an intermediate decoder layer. The binary label is *"the code emitted so far is the vulnerable side of a known patch pair."*
-
-The probe is roughly 1,536 weights — under 10 KB — and scores a token in well under a millisecond on the same Apple Silicon laptop that is running Gemma 4.
+Adapts the streaming hallucination-probe of [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.03531) from *fabricated entities* to *vulnerable code patterns*. A linear classifier sits on Gemma 4's last-token hidden state at an intermediate decoder layer; binary label = *"the code emitted so far is the vulnerable side of a known patch pair."* Probe = ~1,536 weights, <10 KB, sub-ms per token on the same laptop as Gemma 4.
 
 **Result on Gemma 4 E2B (layer 17, 1,198 CyberSecEval pairs):**
 
@@ -46,13 +44,13 @@ Best layer: **17 of 35** (mid-network). Honest cross-language headline: **0.907*
 
 ![AUC ladder](web/auc-ladder.png)
 
-**Per-CWE multi-head probe** — 5 logits (CWE-78 / 338 / 95 / 94 / 328) on the same layer 17, trained one-vs-rest. **Macro AUC 0.9726, top-1 routing 94.7%**. The off-diagonal of the confusion matrix is near-zero, which means the heads are doing real per-class work — not five copies of a binary "danger" detector. Comparable to Obeso's >0.9 on Llama-3.3-70B for hallucinations, on a 2B Gemma 4 with no tuning, no LoRA, ~1k examples.
+**Per-CWE multi-head probe** — 5 logits on layer 17 (CWE-78/338/95/94/328), one-vs-rest. **Macro AUC 0.9726, top-1 routing 94.7%**. Near-zero off-diagonal in the confusion matrix → heads do real per-class work, not five copies of one binary detector. Comparable to Obeso's >0.9 on Llama-3.3-70B for hallucinations, on a 2B model with no LoRA, ~1k examples.
 
 ## Why this is novel
 
-- **Domain transfer of streaming probes from hallucination → security.** Entity hallucination is sharply defined. Vulnerability likelihood is a property of code patterns, not single tokens. A single linear probe still works.
-- **Author-grounded training data.** Training pairs include patterns from CVEs Doruk personally found — `node-forge` (CVE-2026-33896) plus 10+ more in 200M+ DL/mo npm packages. The probe learned what danger looks like from real bugs he disclosed.
-- **Runs locally, no network.** The maintainer in a country with no Snyk budget, the researcher who refuses to send pre-disclosure code to a third-party API — both get the same vulnerability-aware completion as someone on a $200/seat enterprise plan.
+- **Domain transfer of streaming probes from hallucination → security.** Vulnerability likelihood is fuzzier than entity hallucination; a single linear probe still works.
+- **Author-grounded training data.** Pairs include CVEs Doruk personally found — `node-forge` (CVE-2026-33896) + 10+ more in 200M+ DL/mo packages.
+- **Runs locally, no network.** A maintainer in a country with no Snyk budget gets the same vulnerability-aware completion as someone on a $200/seat enterprise plan.
 
 ## Architecture
 

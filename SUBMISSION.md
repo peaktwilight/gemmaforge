@@ -8,7 +8,7 @@
 - [ ] **Kaggle Writeup** — `WRITEUP.md` content pasted into a new Kaggle Writeup, Track selected: **Main Track** (+ Safety & Trust + Ollama for stacking)
 - [ ] **Public Code Repository** — pushed to `https://github.com/peaktwilight/gemmaforge` (public)
 - [ ] **Public Video** — YouTube (unlisted → public on submission day), duration ≤ 3:00, embedded link in writeup
-- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemmaforge`
+- [ ] **Live Demo URL** — HuggingFace Space at `https://huggingface.co/spaces/peaktwilight/gemma4ge`
 - [ ] **Cover image + media gallery** — `web/cover.svg` + screenshot of running UI
 
 ## Order of operations on submission day

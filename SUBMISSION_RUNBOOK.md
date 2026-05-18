@@ -11,7 +11,7 @@ Operational drill-down for submission day. `SUBMISSION.md` is the high-level che
    ```
 2. **HF Space is RUNNING.**
    ```bash
-   curl -sL https://huggingface.co/api/spaces/peaktwilight/gemmaforge | jq '.runtime.stage'
+   curl -sL https://huggingface.co/api/spaces/peaktwilight/gemma4ge | jq '.runtime.stage'
    ```
    Expect `"RUNNING"`. Anything else (`BUILDING`, `BUILD_ERROR`, `STOPPED`) → see Failure modes below.
 3. **Local streaming server boots cleanly.**
@@ -45,7 +45,7 @@ The visibility field must read `"PUBLIC"`. Hackathon rules require it.
    - Cover image: `web/cover.svg`
    - Code repo URL: `https://github.com/peaktwilight/gemmaforge`
    - Video URL: YouTube link (unlisted-to-public on submission day)
-   - Live demo URL: `https://huggingface.co/spaces/peaktwilight/gemmaforge`
+   - Live demo URL: `https://huggingface.co/spaces/peaktwilight/gemma4ge`
 
 ## T-5 min — hit Submit on Kaggle
 

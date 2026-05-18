@@ -33,7 +33,7 @@ Gemma 4 generates: "  const q = `SELECT * FROM users WHERE id=${id}`"
 - **Per-CWE multi-head probe:** Macro AUC **0.9726** across CWE-78 / 338 / 95 / 94 / 328, top-1 routing 94.7%. The activations carry distinct per-CWE structure — see `data/probe_per_cwe_card.json`.
 - **Training data:** 1,198 CyberSecEval position-paired rows + 1,560 SVEN char-level rows merged → 2,758 examples covering Python, JS, C, C++. Plus ~55 natural-language negatives so the probe doesn't fire on chat preamble.
 - **Inference:** < 1 ms per token of overhead. Runs on the same M1/M2/M3 laptop as Gemma 4 itself.
-- **Live demo:** [HuggingFace Space](https://huggingface.co/spaces/peaktwilight/gemmaforge) (ZeroGPU). All weights and data in this repo.
+- **Live demo:** [HuggingFace Space](https://huggingface.co/spaces/peaktwilight/gemma4ge) (ZeroGPU). All weights and data in this repo.
 
 **Two probe paths.** Every number above is from the **sample-level** path — one label per snippet, linear probe on the last-token hidden state (`src/extract_activations.py` + `src/train_probe.py`). That is what ships in the demo today. In parallel we are training a **token-level** path — per-token spans (`evidence` / `sink` / `source` / `sanitizer`), value head on every position, BCE + span-max loss — via `notebooks/colab_train_gemma4_probe.py` and `scripts/train_value_head.py`. The intent is for token-level to *replace* sample-level once we have evaluated the two head-to-head; for now it is a candidate, not the shipped probe.
 

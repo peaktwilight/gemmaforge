@@ -25,13 +25,13 @@
 ## Submission text snippets
 
 ### Kaggle writeup title
-GemmaForge — Catch Vulnerabilities Inside Gemma 4, Before the Token Lands
+GemmaForge — Two Gemmas, One Laptop: Local Repo-Wide Vulnerability Auditing
 
 ### Subtitle
-A linear probe on Gemma 4's hidden states detects vulnerable code patterns in real time, mid-generation. Built by a security researcher and an ETH AI-interpretability researcher.
+Small Gemma (E2B) plus a linear probe on its hidden state triages a whole repo in one forward pass; big Gemma (27B) via Ollama verifies each lead with tool use. End-to-end local. Built by a security researcher (Doruk) and an ETH interpretability researcher (Efe).
 
 ### Tags
-gemma, gemma-4, ollama, security, ai-safety, interpretability, linear-probe, vulnerability-detection, supply-chain
+gemma, gemma-4, ollama, security, ai-safety, interpretability, linear-probe, vulnerability-detection, agentic-verification, local-first
 
 ## Backup plan (if X fails)
 

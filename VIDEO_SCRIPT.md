@@ -1,8 +1,8 @@
 # Video script — GemmaForge (target: 2:50, hard limit 3:00)
 
 ## Team
-- **Doruk Tan Ozturk** — security researcher, 4 published CVEs in npm. Opens with the CVE hook, voiceovers the demo.
-- **Mehmet Efe Akça** — MSc Data Science at ETH Zürich, coursework in Reliable and Trustworthy AI. Carries the interpretability bridge.
+- **Doruk Tan Ozturk** — security researcher, disclosed CVE-2026-33896 and other CVE-grade npm bugs. Builder of pwnkit (Tier 2). Opens with the CVE hook, voiceovers the demo.
+- **Mehmet Efe Akça** — MSc Data Science at ETH Zürich. Built the probe (Tier 1). Carries the interpretability bridge.
 
 ## Format
 - Talking head + screen-share, alternating
@@ -15,19 +15,19 @@
 
 ## Beat 1 — Hook (0:00–0:18)
 
-*B-roll behind opening line: the actual CVE-2026-33896 advisory page on GitHub, ~2s, then the npm download counter ticking up on node-forge.*
+*B-roll behind the opening line: the actual CVE-2026-33896 advisory page on GitHub, ~2s, then the `node-forge` repo's `package.json` showing it's used as a dependency by widely-deployed crypto stacks.*
 
 **Visual:** Doruk on camera, sitting at desk. Code editor barely visible behind him.
 
 **Doruk (to camera):**
-> "Two months ago I published CVE-2026-33896 in node-forge. Since then I have found ten more CVE-grade bugs across npm packages that get over 200 million combined downloads a month. I find bugs like that for a living. But here is what bothers me: an AI assistant could have written any of those patterns this morning, and nobody would have caught it until it shipped."
+> "Two months ago I published CVE-2026-33896 in `node-forge` — a crypto library that ships inside a lot of the JavaScript stack you've used today. I find bugs like this for a living. But here's what bothers me: an AI assistant could have written that exact pattern this morning, and nobody would have caught it before it shipped."
 
 **Cut to:** title card. White on black:
 
 ```
    GemmaForge
-   Real-time vulnerability detection
-   inside Gemma 4
+   Two Gemmas, one laptop.
+   Local repo-wide vulnerability auditing.
 ```
 
 ---
@@ -37,12 +37,12 @@
 *Visual: quick montage — Copilot autocompleting an Express handler, a developer tab-accepting the suggestion, a CVE detail page. Speed up 2x.*
 
 **Doruk (voiceover):**
-> "Every IDE has an AI in it now. They ship hundreds of millions of lines a day, and a non-trivial slice is vulnerable. The standard answer is: scan it afterwards. But by then the model has already shown the developer something insecure — and most of them paste before the scanner ever runs."
+> "Every IDE has an AI in it now. They write a lot of the code that ships. The standard answer is: scan it afterwards. With Snyk. With Semgrep. With something cloud-bound that costs $200 a seat. Maintainers of open packages — the people whose bugs *I* keep finding — usually don't have that."
 
 *Cut to Doruk on camera, leaning in.*
 
 **Doruk:**
-> "So we asked a different question. What if the model itself could tell you it is about to write vulnerable code — before the first risky token?"
+> "So we built something different. A two-tier auditor that runs entirely on your laptop. Small Gemma reads your whole repo and triages it. Big Gemma verifies the hits. Same model family, no cloud, free."
 
 ---
 
@@ -51,54 +51,82 @@
 **Visual:** Efe on camera. Whiteboard or simple diagram visible behind him.
 
 **Efe (to camera):**
-> "I am Efe — I do MSc Data Science at ETH, and one of my courses is Reliable and Trustworthy AI. Last year there was a result from ETH and Anthropic's MATS program: a tiny linear classifier, trained on a model's hidden states, can detect hallucinations in real time at near-zero cost. AUC around 0.9. We adapted that idea — same probe, different signal. Instead of hallucinations, we trained it on vulnerability likelihood, on Gemma 4's hidden states."
+> "I'm Efe — I do MSc Data Science at ETH, one of my courses is Reliable and Trustworthy AI. Last year there was a result from ETH and Anthropic's MATS program: a tiny linear classifier on a model's hidden states can detect hallucinations in real time. AUC around 0.9. We adapted that — same probe shape, different signal. We trained it on Gemma 4 E2B's hidden states to predict *vulnerability likelihood* and *which CWE class* the code looks like."
 
 **Visual cut:** simple diagram appears next to him.
 
 ```
-Gemma 4 hidden state ── linear probe ── risk score
-  (2,560 numbers)       (~10 KB)        (0..1)
+Gemma 4 E2B hidden state ── linear probe ── risk score + CWE
+   (~1,500 numbers)         (~10 KB)
 ```
 
 **Efe:**
-> "Twenty-five hundred numbers in, one risk score out. The probe is smaller than a JPEG. It runs in the same forward pass as the model — you pay nothing for it."
+> "The probe is smaller than a JPEG. Inference is one extra dot product per chunk. Cross-language AUC zero-point-nine-oh-seven — train on Python, evaluate on JavaScript, still works. The signal lives in the hidden state. We ship two variants — `weak-probe` on a small Gemma for laptops, `strong-probe` on a larger Gemma for workstations. Same scan tool, same lead schema."
 
 ---
 
 ## Beat 4 — The demo (1:05–2:15) — THE MONEY SHOT
 
-**Visual:** Full-screen screen capture of the GemmaForge web UI on a clean dark background. Cursor poised over the preset list. No talking head.
+*Beat 4 has three crisp sub-cuts. Total ~70 seconds, hard cap.*
+
+### 4a — Tier 1: scan the whole repo (1:05–1:30)
+
+**Visual:** terminal, dark background, large font. A clean example Express app open on the side.
+
+```
+$ python -m src.scan ./example-app \
+      --events live.ndjson \
+      --top-k 5 > leads.jsonl
+```
 
 **Doruk (voiceover):**
-> "One click. SQL injection preset. Gemma 4 is going to write an Express handler."
+> "Tier one — `weak-probe`. A small Gemma, two billion parameters, runs on a 2018 laptop. It reads every file. One forward pass per chunk."
 
-*Click. Tokens stream in. Boilerplate is green. Risk meter on the right stays low.*
+*Numbers tick: `files: ⟨N⟩ · chunks: ⟨M⟩ · elapsed: ⟨T⟩ · leads: ⟨K⟩` — replaced at recording time with the real `src/scan.py` counts on the demo repo.*
 
-> "Watch the meter."
+> "Five suspect spans, ranked. Each one tagged with the CWE class the probe thinks it is."
 
-*The moment Gemma writes ``return db.query(`SELECT * FROM users WHERE id=${id}`)``, the meter swings hard right, the tokens light up red, peak-risk jumps to 91%.*
+### 4b — The /live dashboard (1:30–1:55)
 
-> "There. The probe fired the moment Gemma decided to interpolate a user-controlled id into a SQL string — before the closing backtick was even emitted. It does not see the SQL. It sees the shape of Gemma's internal state that produces this kind of SQL."
+**Visual:** cut to the pwnkit `/live` dashboard. Three lanes, headers burned-in as on-screen text:
 
-*Cut. Click second preset: path traversal.*
+```
+   ┌─ Lane 1 · Probe ─┐  ┌─ Lane 2 · Leads ─┐  ┌─ Lane 3 · Hunt ─┐
+```
 
-> "Path traversal."
+*Lane 1 streams probe.alarm events as they arrive. Lane 2 stacks the leads with file + line range + CWE. Lane 3 shows "Waiting for pwnkit scan events…" — leave it visible, don't pretend.*
 
-*Tokens stream. The moment `fs.readFileSync('/var/data/' + filename` appears, red.*
+**Doruk (voiceover):**
+> "The same scan in pictures. Left lane: the probe firing on internal hidden states. Middle lane: the leads that crossed threshold. Click any lead — it lights up the probe firing that produced it. Provenance, end to end, on one screen."
 
-*Cut. Click third: weak randomness.*
+### 4c — Tier 2: big Gemma audits the same repo (1:55–2:15)
 
-> "Math.random instead of crypto.randomBytes."
+**Visual:** cut back to the terminal, a *second* pane this time:
 
-*Red.*
+```
+$ pwnkit review ./example-app \
+      --seed-findings leads.jsonl \
+      --runtime ollama
+```
 
-*Cut. Type custom prompt: "Now write the SAME endpoint safely with parameterized queries."*
+**Doruk (voiceover):**
+> "Tier two. We hand the leads file to my pwnkit framework. With `--runtime ollama`, the agent loop drives **Gemma 4 27B** — same family, bigger sibling — running locally through Ollama with native function calling. It reads files, greps for call sites, asks itself follow-up questions, and writes a structured audit of the repo."
 
-> "And when we ask Gemma to write the same endpoint safely —"
+*Cut to one of the agent's findings rendered as a card, with the matching lead visible underneath:*
 
-*Tokens stream. Green throughout. Peak risk: 8%.*
+```
+   ▶ src/router.js:38–52  CWE-89 (SQL injection)
+     verdict: confirmed
+     evidence: req.params.id interpolated into a tagged-template SQL string,
+               no parameterised execute, no input validation upstream
+     mitigation: use db.prepare(...) with bound parameters
 
-> "Eight percent. Same model, same prompt skeleton, different internal state. The probe sees it."
+   ── matched probe lead ──
+   confidence 0.93 · top_cwe CWE-89 · rank 0
+```
+
+**Doruk:**
+> "The agent's verdict lines up with the probe's top lead. Two Gemmas — small and large, same family — agreeing on where the bug is. End to end on one laptop. Promoting the probe leads to the agent's primary worklist is the next follow-up issue."
 
 ---
 
@@ -107,10 +135,10 @@ Gemma 4 hidden state ── linear probe ── risk score
 **Visual:** Efe and Doruk both on camera, side by side at the desk.
 
 **Efe:**
-> "This runs entirely on the laptop. Gemma 4 local, probe local. Nothing leaves the device."
+> "Both tiers run on the same laptop. Nothing leaves the device. Probe runs on basically anything. The 27B verifier needs a real GPU or an M-series Mac with thirty-two gigs — same hardware that runs Stable Diffusion."
 
 **Doruk:**
-> "And that is the part we care about. The people most exposed to AI-generated vulnerabilities — solo maintainers, students, developers in regions where a Snyk seat is a month of rent — are the people who cannot pipe pre-disclosure code through a cloud API. With Gemma 4, they do not have to. The whole thing fits on a thumb drive."
+> "And that's the part we care about. The people most exposed to AI-generated vulnerabilities — solo maintainers of packages with millions of installs, students, developers in places where Snyk pricing isn't an option — are the people who can't pipe their code through a cloud API to find out. With two Gemmas locally, they don't have to."
 
 ---
 
@@ -125,14 +153,16 @@ Gemma 4 hidden state ── linear probe ── risk score
 ```
 
 **Doruk and Efe (together, voiceover):**
-> "Thanks for watching."
+> "Every developer should have a senior security engineer that runs on their laptop, on every commit, for free. We just built one. It's open. Go audit something."
 
 ---
 
 ## Production notes
-- Record 4K, export 1080p with high bitrate — judges' screens will vary
-- All demo runs use the local Gemma 4 model so on-screen rendering is fluid
-- Background music: subtle synth, low under voiceover, drop out during demo so the typing/probe-flash is the audio
-- Cut zero "uhh" — script is ~330 words, fits cleanly inside 2:50 at a calm pace
-- B-roll: CVE-2026-33896 advisory page (2s) + node-forge npm download counter behind the opening line
+- Record 4K, export 1080p with high bitrate — judges' screens vary
+- All demo runs use locally-running Gemma 4 (E2B for Tier 1, 27B via Ollama for Tier 2) so on-screen rendering is fluid
+- Background music: subtle synth, low under voiceover; drop out during 4a/4b/4c so the typing + dashboard motion are the audio
+- Cut zero "uhh"s — script is ~370 words, fits comfortably inside 2:50 at a calm pace
+- B-roll: CVE-2026-33896 advisory page (2s) behind the opening line
 - Both faces on camera before 1:05 — judges reward visible humans early
+- Burned-in subtitles for the lane headers (Lane 1/2/3) and the agent verdict card — judges may watch muted
+- **Honesty constraint:** Lane 3 in the dashboard is still a placeholder in pwnkit#371 — leave its "Waiting for pwnkit scan events…" text on screen. Verdicts are shown from the terminal output of `pwnkit review`, not from Lane 3. Do not fake the Hunt lane.

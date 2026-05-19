@@ -23,7 +23,8 @@ data/dataset.jsonl            probe.npz                    token-level extractor
                                     v
                 src/eval/token_protocol._collect_for_indices
                                     v
-            three aggregation levels: {all, span, span_max}
+   four scope levels: {tokens, tokens_code, tokens_annotated_negative, example_max}
+   orthogonal axis:    proximity_window W ≥ 0  (preprocessing of positive labels)
                                     v
               src/eval/metrics.py: AUC + bootstrap CI + Brier + ECE
                                     v
@@ -51,7 +52,8 @@ Keys partition into two label classes (`src/eval/token_data.py:46`):
   paired safe files.
 
 Tokens *outside* the union of all annotated spans are treated as label 0 at
-the `all` aggregation level and are excluded from `span` / `span_max` entirely.
+the `tokens` and `tokens_code` levels, and are excluded entirely from
+`tokens_annotated_negative` (annotation-only scoping).
 
 ### 2.2 Deduplication: `parse_spans`
 
@@ -101,83 +103,155 @@ materialises the per-token target vector $\mathbf{y} \in \{0,1\}^T$ and the
 boolean `in_span` mask. Out-of-span tokens get $y_i = 0$ and $\text{mask}_i =
 \text{False}$.
 
-## 3. The three aggregation levels
+## 3. The four scope levels and the proximity axis
 
 Let example $i$ contribute the score-label arrays
-$(\mathbf{p}^{(i)}, \mathbf{y}^{(i)}) \in [0,1]^{T_i} \times \{0,1\}^{T_i}$
-and an in-span mask $\mathbf{m}^{(i)} \in \{0,1\}^{T_i}$. Let $\mathcal{I}$ be
-the test indices for a split.
+$(\mathbf{p}^{(i)}, \mathbf{y}^{(i)}) \in [0,1]^{T_i} \times \{0,1\}^{T_i}$,
+an in-annotated-span mask $\mathbf{m}^{(i)} \in \{0,1\}^{T_i}$, and a
+live-code mask $\mathbf{c}^{(i)} \in \{0,1\}^{T_i}$
+(`src/eval/code_mask.py`). Let $\mathcal{I}$ be the test indices for a
+split. Let $W \ge 0$ be the orthogonal preprocessing knob
+(`--proximity-window`, default 0); when $W > 0$, the positive label
+$y_t^{(i)}$ is replaced by its $\pm W$-token dilation $\tilde y_t^{(i)}$
+for the `tokens` and `tokens_code` levels only.
 
-### 3.1 `all` — every token of every test example
+### 3.1 `tokens` — every token of every test example
 
 $$
-\text{AUC}_{\text{all}} = \text{AUC}\big(\{(y_t^{(i)}, p_t^{(i)}) : i \in \mathcal{I},\, t \in [T_i]\}\big).
+\text{AUC}_{\text{tokens}} = \text{AUC}\big(\{(\tilde y_t^{(i)}, p_t^{(i)}) : i \in \mathcal{I},\, t \in [T_i]\}\big).
 $$
 
-Concatenate every token's score and label across the test set. Out-of-span
-tokens count as negatives. This is the eval level dominated by the long tail
-of safe code, so accuracy looks high (mid-90s on the example report) while F1
-stays low.
+Concatenate every token's score and label across the test set. The negative
+class is the complement of the (possibly dilated) positive mask — so it
+includes comments, signatures, whitespace, imports, and everything else
+outside the labelled diff region. This level is dominated by the long tail
+of trivial negatives: accuracy looks high (mid-90s) while F1 stays low and
+AUC is *inflated* relative to a probe's real ability to discriminate hard
+cases inside live code.
 
 ```text
-all_p, all_y <- concat([token_probs[i], token_labels_array(...)[0] for i in test_idx])
+y_used     <- dilated_pos_labels(W) if W > 0 else exact_pos_labels
+tokens_y   <- concat([y_used[i] for i in test_idx])
+tokens_p   <- concat([token_probs[i] for i in test_idx])
 auc, ci_lo, ci_hi <- compute_auc + bootstrap CI
-brier, ece <- calibration_metrics(all_y, all_p)
+brier, ece <- calibration_metrics(tokens_y, tokens_p)
 ```
 
-Well-defined iff $\{0, 1\} \subseteq \{y_t^{(i)} : i \in \mathcal{I}, t\}$.
+Well-defined iff $\{0, 1\} \subseteq \{\tilde y_t^{(i)} : i \in \mathcal{I}, t\}$.
 Single-class test sets (e.g. `heldout_source::SVEN-after` is all-negative)
 return NaN AUC.
 
-### 3.2 `span` — tokens inside annotated spans only
+### 3.2 `tokens_code` — live-code tokens only
 
 $$
-\text{AUC}_{\text{span}} = \text{AUC}\big(\{(y_t^{(i)}, p_t^{(i)}) : i \in \mathcal{I},\, t \in [T_i],\, m_t^{(i)} = 1\}\big).
+\text{AUC}_{\text{tokens\_code}} = \text{AUC}\big(\{(\tilde y_t^{(i)}, p_t^{(i)}) : i \in \mathcal{I},\, t \in [T_i],\, c_t^{(i)} = 1\}\big).
 $$
 
-Restrict to tokens inside *any* span (positive or negative). In the current
-dataset, sanitizer spans are extremely sparse: in every shipped split, every
-in-span token is positive (see `n_pos == n_total` for every `span` row in
-`data/eval/token_report.md` lines 10-43). With only one class present, AUC is
-undefined and the metric reports NaN; precision / recall against the threshold
-0.5 still compute and appear in the JSON. Until the dataset grows negative
-(sanitizer) annotations, `span` is effectively a positive-recall reporter.
+Same scoring as `tokens`, but tokens with $c_t^{(i)} = 0$ (comments,
+imports, def/class/namespace signatures keeping bodies, decorators, C/C++
+preprocessor) are *dropped from both classes entirely* — they contribute
+neither positive nor negative weight. The live-code mask is built by
+`src/eval/code_mask.py` using `tree_sitter` + `tree_sitter_{python,c,cpp}`.
+
+This is the level that strips out the "trivial negatives" inflation
+described in §3.1. The remaining negative class is live-code-but-not-vuln
+tokens — actual statements, expressions, calls, returns — i.e. the
+distribution a deployed probe must discriminate against. Reported
+`dropped_fraction` tells you how much of the original token mass the mask
+excluded.
 
 ```text
-span_p, span_y <- all_p[mask], all_y[mask]
-auc <- AUC(span_y, span_p)  # NaN unless mask covers both classes
+co_mask    <- concat([code_only_masks[i] for i in test_idx])
+y_used     <- dilated_pos_labels(W) if W > 0 else exact_pos_labels
+tokens_p   <- concat([token_probs[i] for i in test_idx])
+auc        <- AUC(y_used[co_mask], tokens_p[co_mask])
+dropped_fraction <- 1 - co_mask.mean()
 ```
 
-### 3.3 `span_max` — one decision per example
+When `code_only_masks` aren't supplied, or `tree_sitter` / a grammar is
+missing, the level falls back to `{n_total: 0}` (skipped in tables).
+
+### 3.3 `tokens_annotated_negative` — annotation-only scoping
+
+$$
+\text{AUC}_{\text{tokens\_annot\_neg}} = \text{AUC}\big(\{(y_t^{(i)}, p_t^{(i)}) : i \in \mathcal{I},\, t \in [T_i],\, m_t^{(i)} = 1\}\big).
+$$
+
+Restrict to tokens inside *any* annotated span. Crucially, the complement
+is **not** inferred as negative — only sanitizer-annotated tokens count
+as negatives here, so this level reports AUC for the explicitly-labelled
+positive-vs-explicitly-labelled-negative discrimination. Proximity dilation
+does not apply (annotation is the unit of inclusion).
+
+In the current SVEN dataset, sanitizer spans are extremely sparse: every
+in-span token is positive (`n_pos == n_total`), so AUC is undefined and
+reports NaN. Until the dataset grows negative annotations,
+`tokens_annotated_negative` is effectively a positive-recall reporter; once
+sanitizer coverage lands it becomes the cleanest "is the labelled hunk
+risky?" metric.
+
+```text
+annot_p, annot_y <- all_p[in_annotated_span], all_y[in_annotated_span]
+auc <- AUC(annot_y, annot_p)  # NaN unless both classes present
+```
+
+### 3.4 `example_max` — one decision per example
 
 For each test example with at least one token,
 
 $$
-\text{AUC}_{\text{span\_max}} = \text{AUC}\big(\{(Y_i,\, \max_{t \in [T_i]} p_t^{(i)}) : i \in \mathcal{I}\}\big),
+\text{AUC}_{\text{example\_max}} = \text{AUC}\big(\{(Y_i,\, \max_{t \in [T_i]} p_t^{(i)}) : i \in \mathcal{I}\}\big),
 $$
 
-where $Y_i$ is the row-level label from `row["label"]`. This is the operational
-rule the streaming UI uses ("the file is risky iff any token's prob is high")
-and the same aggregation `src/train_probe_spanmax.py` reports as `ex_AUC`.
+where $Y_i$ is the row-level label from `row["label"]`. The annotated spans
+are **not** consulted at score time — only `row.label` and the per-token
+probabilities. This makes `example_max` the only level that has a clean
+deployment interpretation: it's exactly the rule the streaming UI uses
+("the file is risky iff any token's prob crosses threshold") and matches
+the `ex_AUC` reported by `src/train_probe_spanmax.py`. Proximity dilation
+does not apply (no per-token positive mask is built).
 
 ```text
-span_max_pairs <- [(row.label, max(token_probs[i])) for i in test_idx if T_i > 0]
-sm_y, sm_p <- unzip(span_max_pairs)
+example_max_pairs <- [(row.label, max(token_probs[i])) for i in test_idx if T_i > 0]
+em_y, em_p <- unzip(example_max_pairs)
 auc, ci_lo, ci_hi <- compute_auc + bootstrap CI
 ```
 
-**Recent fix (commit `e2606b9`, `src/eval/token_protocol.py:103-126`).** The
-prior code emitted one pair per char-range span for positives (max over ~2
-tokens) but one max-over-whole-file pair for negatives. With noisy probes,
-max-over-many wins on noise: $\mathbb{E}[\max_{t \le n} \epsilon_t] \propto
-\sqrt{2 \ln n}$. Pos pool $n \approx 2$, neg pool $n \approx 500$ → negatives'
-expected max dominates, inverting $\text{AUC}_{\text{span\_max}}$ below 0.5
-on every split. The fix imposes symmetric per-example aggregation (pool size
-$T_i$ on both sides), restoring monotonicity in probe quality.
+**Symmetry-fix history.** An earlier version emitted one pair per
+char-range span for positives (max over ~2 tokens) but one
+max-over-whole-file pair for negatives. With noisy probes,
+$\mathbb{E}[\max_{t \le n} \epsilon_t] \propto \sqrt{2 \ln n}$, so a small
+positive pool ($n \approx 2$) is dominated by a large negative pool
+($n \approx 500$), inverting AUC below 0.5. The current per-example
+aggregation has symmetric pool sizes $T_i$ on both sides, restoring
+monotonicity in probe quality. An earlier `dilated_span_max` level
+attempted to restore positive-side resolution by restricting the
+positive's max to a ±W-token halo around annotated spans — that variant
+has been **removed** because it requires reading ground-truth labels at
+score time, which is incompatible with the deployment interpretation
+above.
 
 Well-defined iff at least one row of each class survives the
-$T_i > 0$ filter. Otherwise NaN (see `heldout_source::*` rows in the example
-report).
+$T_i > 0$ filter. Otherwise NaN (see `heldout_source::*` rows in the
+example report).
+
+### 3.5 Orthogonal axis: `proximity_window`
+
+`proximity_window W` (CLI: `--proximity-window`, default 0) is a
+preprocessing knob, not a level. When $W > 0$, the positive token labels
+fed into `tokens` and `tokens_code` are dilated by $\pm W$ tokens around
+each annotated positive span — the probe gets credit for firing in the
+halo around the diff anchor (median annotated span is ~2 tokens, so an
+exact-match metric punishes any firing one line away from the anchor).
+
+`W` is stamped into each scope-level metrics dict as
+`proximity_window`. To compare exact-vs-proximal numbers, run the eval
+twice with different `W` values; the four scope levels report
+side-by-side in each run, so the diff is in the row, not the column.
+
+`tokens_annotated_negative` and `example_max` are unaffected by `W`
+(neither builds a per-token positive mask the way `tokens` /
+`tokens_code` do).
 
 ## 4. Metrics computed at each level
 
@@ -323,10 +397,11 @@ plumbing rather than generalisation.
 ## 6. Baselines
 
 All baselines score one float per example, then `evaluate_token_split`
-(`src/eval/token_protocol.py:202`) *broadcasts* that scalar to every token in
-the row. This gives a flat baseline against which token-resolution probes have
-to beat at `all` and `span` levels; at `span_max` the comparison collapses
-to one-score-per-example, the natural setting for a sample-level model.
+*broadcasts* that scalar to every token in the row. This gives a flat
+baseline against which token-resolution probes have to beat at the `tokens`,
+`tokens_code`, and `tokens_annotated_negative` levels; at `example_max` the
+comparison collapses to one-score-per-example, the natural setting for a
+sample-level model.
 
 ### 6.1 `RandomBaseline`
 
@@ -376,49 +451,56 @@ CyberSecEval and the token eval lives on SVEN (corpus mismatch).
 
 ## 7. Known limitations
 
-1. **SVEN char ranges are diff-derived and surgical.** Median char-range width
-   is 3 chars, p90 is 28. After char→token mapping the median positive span
-   is ~2 tokens. Everything outside is treated as a negative, which punishes
-   any probe that fires "near" the bug rather than "on" the bug.
-   Proximity-aware soft labels (Gaussian decay over distance to nearest
-   positive token, or IoU-based credit) are the right fix; until then the
-   `all`-level numbers under-estimate semantically-correct firing.
+1. **SVEN char ranges are diff-derived and surgical.** Median char-range
+   width is 3 chars, p90 is 28. After char→token mapping the median
+   positive span is ~2 tokens. Under `tokens` with exact-span labels
+   ($W=0$), everything outside is a negative, which punishes any probe
+   that fires "near" the bug rather than "on" the bug. The
+   `proximity_window` axis (§3.5) is the in-protocol mitigation; soft
+   labels (Gaussian decay, IoU-credit) would be a more principled fix.
 
-2. **Sample-level probe at AUC ≈ 0.5 when broadcast** to token-level data is
-   not a probe-quality result, it's a corpus-mismatch result. The sample
-   probe was trained on `data/pairs.jsonl` (CyberSecEval lineage); the token
-   eval runs on `data/dataset.jsonl` (SVEN). It establishes that the new
-   token probe is doing something the old probe wasn't, not that the old
-   probe is bad.
+2. **`tokens` AUC is inflated by trivial negatives.** Comments,
+   signatures, whitespace and imports make up ~98% of the negative class
+   under `tokens`, and any probe trivially rejects them. The `tokens_code`
+   level (§3.2) is the in-protocol mitigation — it drops those tokens from
+   both classes via tree-sitter so the negative class becomes hard
+   live-code-but-not-vuln tokens. The same mask is a candidate for
+   training-time use to drop trivial negatives from the span-max loss; see
+   the NOTE in `src/eval/code_mask.py`.
 
-3. **Length confound (#22)** inflates sample-level numbers on
+3. **Sample-level probe at AUC ≈ 0.5 when broadcast** to token-level data
+   is not a probe-quality result, it's a corpus-mismatch result. The
+   sample probe was trained on `data/pairs.jsonl` (CyberSecEval lineage);
+   the token eval runs on `data/dataset.jsonl` (SVEN). It establishes
+   that the new token probe is doing something the old probe wasn't, not
+   that the old probe is bad.
+
+4. **Length confound (#22)** inflates sample-level numbers on
    `data/pairs.jsonl`. On token-level `data/dataset.jsonl` it's weaker:
    `length` AUC is 0.20-0.39 across splits vs probe 0.75-0.93. Closed via
-   length-matched eval (commits `498005e`, `95c29db`); watch on future
-   corpus additions.
+   length-matched eval; watch on future corpus additions.
 
-4. **`span_max` brittleness.** Even after the symmetry fix, median-2-token
-   positive spans against $T_i \approx 500$-token negative pools is tight
-   SNR: max of 500 noisy negatives often matches max of 2 noisy positives.
-   CIs reflect this — $\pm 0.07$ half-widths on `span_max` AUC are common.
-   Proximity-aware metrics or learned aggregation (mean-top-k,
-   attention-pool) would stabilise the level.
+5. **`example_max` brittleness.** Median-2-token positive spans against
+   $T_i \approx 500$-token negative pools is tight SNR: max of 500 noisy
+   negatives often matches max of 2 noisy positives. CIs reflect this —
+   $\pm 0.07$ half-widths on `example_max` AUC are common. Learned
+   aggregation (mean-top-k, attention-pool) would stabilise the level.
 
-5. **`span` level is positive-only** on the current dataset (every shipped
-   split has $n_{\text{pos}} = n_{\text{total}}$ at `span`, AUC = NaN).
-   Needs more sanitizer annotations, or a redefinition as "in-span positive
-   vs out-of-span negative subset".
+6. **`tokens_annotated_negative` is positive-only** on the current
+   dataset (every shipped split has $n_{\text{pos}} = n_{\text{total}}$,
+   AUC = NaN). Needs more sanitizer annotations to become a useful
+   level.
 
-6. **`heldout_source::SVEN-*` AUCs are structurally NaN** (each half is
+7. **`heldout_source::SVEN-*` AUCs are structurally NaN** (each half is
    single-class). Plumbing smoke test, not a generalisation metric.
 
 ## 8. References
 
 - **Obeso, Arditi, et al. 2025.** "On the language-model side of hallucination
-  probes." arXiv:2509.03531. The span-max loss in §3 (per-example
+  probes." arXiv:2509.03531. The span-max training loss (per-example
   $\max$-aggregation with a per-token logistic backbone) is what
-  `src/train_probe_spanmax.py` implements; the three aggregation levels here
-  follow §4 of the same paper.
+  `src/train_probe_spanmax.py` implements; the `example_max` eval level
+  here is the matching deployment-time aggregation rule.
 
 - **He & Vechev 2023.** "Large Language Models for Code: Security Hardening
   and Adversarial Testing" (SVEN). arXiv:2302.05319. Source of the

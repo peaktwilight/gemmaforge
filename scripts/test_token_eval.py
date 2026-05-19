@@ -3,8 +3,9 @@
 Synthesises per-token probability arrays and offsets aligned to the
 *real* `data/dataset.jsonl` token_labels, then runs the full token
 report. The synthetic probe is a noisy oracle: it puts P=0.9 on every
-token inside a positive span, P=0.1 elsewhere. AUC at all/span/span_max
-levels should be near 1.0 if the eval plumbing is wired correctly.
+token inside a positive span, P=0.1 elsewhere. AUC at tokens /
+tokens_code / example_max should be near 1.0 if the eval plumbing is
+wired correctly.
 
 Run:
     uv run --with scikit-learn --with numpy python scripts/test_token_eval.py
@@ -84,8 +85,10 @@ def main() -> int:
     rows = [rows[i] for i in idx.tolist()]
     print(f"using {len(rows)}-row subsample")
 
+    from src.eval.code_mask import code_only_mask
     token_spans_per_row: list[list[tuple[int, int, int]]] = []
     token_probs_per_row: list[np.ndarray] = []
+    code_only_masks: list[np.ndarray] = []
     rng2 = np.random.default_rng(13)
     for r in rows:
         offs = _synthetic_offsets(r["code"])
@@ -93,45 +96,53 @@ def main() -> int:
         tspans = char_spans_to_token_spans(char_spans, offs)
         token_spans_per_row.append(tspans)
         token_probs_per_row.append(_oracle_probs(len(offs), tspans, noise=0.15, rng=rng2))
+        code_only_masks.append(
+            code_only_mask(r.get("code", ""), r.get("lang", "") or "", offs)
+        )
 
     full = token_protocol.full_token_report(
         rows, token_probs_per_row, token_spans_per_row,
         dataset_path=str(dataset_path),
         bootstrap_n=100,
         baselines=bl_mod.all_baselines(),
+        code_only_masks=code_only_masks,
     )
 
-    # Pretty print summary.
-    print(f"\n{'split':32s}  {'level':10s}  {'AUC':>6s}  {'F1':>6s}  {'n_tot':>7s}  {'n_pos':>6s}")
+    level_pairs = (
+        ("tokens", "tokens_metrics"),
+        ("tokens_code", "tokens_code_metrics"),
+        ("tokens_annotated_negative", "tokens_annotated_negative_metrics"),
+        ("example_max", "example_max_metrics"),
+    )
+    print(f"\n{'split':32s}  {'level':26s}  {'AUC':>6s}  {'F1':>6s}  {'n_tot':>7s}  {'n_pos':>6s}")
     for sp in full.splits:
-        for level_name, m in (("all", sp.all_metrics), ("span", sp.span_metrics), ("span_max", sp.span_max_metrics)):
+        for level_name, attr in level_pairs:
+            m = getattr(sp, attr)
             if m.get("n_total", 0) == 0:
                 continue
             print(
-                f"{sp.split_name:32s}  {level_name:10s}  "
+                f"{sp.split_name:32s}  {level_name:26s}  "
                 f"{m.get('auc', float('nan')):6.3f}  "
                 f"{m.get('f1', float('nan')):6.3f}  "
                 f"{m.get('n_total', 0):7d}  {m.get('n_pos', 0):6d}"
             )
 
-    # Sanity asserts: the oracle should crush every level.
     failures = 0
     for sp in full.splits:
-        if len(sp.test_idx if False else []) == 0:  # placeholder
-            continue
-        for lvl_name, m in (("all", sp.all_metrics), ("span", sp.span_metrics), ("span_max", sp.span_max_metrics)):
+        for level_name, attr in level_pairs:
+            m = getattr(sp, attr)
             if m.get("n_total", 0) == 0:
                 continue
             auc = m.get("auc", float("nan"))
             if math.isnan(auc):
                 continue
-            if lvl_name == "span_max" and auc < 0.90:
-                print(f"  FAIL  {sp.split_name} {lvl_name}: span_max AUC={auc:.3f}")
+            if level_name == "example_max" and auc < 0.90:
+                print(f"  FAIL  {sp.split_name} {level_name}: AUC={auc:.3f}")
                 failures += 1
     if failures:
-        print(f"\n{failures} span_max AUC(s) below 0.90 — oracle plumbing broken.")
+        print(f"\n{failures} example_max AUC(s) below 0.90 — oracle plumbing broken.")
         return 2
-    print("\nall span_max AUCs >= 0.90 — token eval plumbing OK.")
+    print("\nall example_max AUCs >= 0.90 — token eval plumbing OK.")
     return 0
 
 

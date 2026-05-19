@@ -18,5 +18,12 @@ huggingface_hub>=0.24
 peft>=0.13
 trl>=0.11
 
+# AST-based live-code mask for the `tokens_code` eval level
+# (src/eval/code_mask.py). Mask silently falls back to keep-all if absent.
+tree-sitter>=0.21
+tree-sitter-python>=0.21
+tree-sitter-c>=0.21
+tree-sitter-cpp>=0.22
+
 # Optional: experiment tracking for training scripts (lazy-imported)
 wandb>=0.17

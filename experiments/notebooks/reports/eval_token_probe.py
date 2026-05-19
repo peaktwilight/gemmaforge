@@ -17,21 +17,32 @@
 # # GemmaForge token-level probe evaluation
 #
 # This is the **new** evaluation path: it consumes the token-labeled dataset
-# (`data/dataset.jsonl`) and reports metrics at the three aggregation levels
-# from the hallucination-probes paper (Obeso et al. 2025, Section 4):
+# (`data/dataset.jsonl`) and reports metrics at four aggregation levels (the
+# "scope" axis — see `src/eval/token_protocol.py` for the canonical
+# definition):
 #
-# - **all** — every token in every example. In-span tokens are positive;
-#   out-of-span tokens are negative. Measures the probe's behaviour on
-#   *every* generated token, the way the streaming UI sees it.
-# - **span** — only tokens inside annotated spans. Single-class on the SVEN
-#   corpus (no sanitizer entries) → AUC is NaN here. Will become meaningful
-#   when we add sanitizer-annotated negatives.
-# - **span_max** — one decision per example: `(row.label, max(probs))` over
-#   the whole file, symmetric across positives and negatives. The annotated
-#   spans are not consulted for scoring at this level — only the row's
-#   `label` field is. The framework also reports `proximal_all` and
-#   `dilated_span_max` which DO use the spans (see `_collect_for_indices`
-#   in `src/eval/token_protocol.py`).
+# - **tokens** — every token in every example. Negative class = complement
+#   of positive spans (includes comments / signatures / imports / whitespace).
+#   Measures probe behaviour on *every* generated token, the way the
+#   streaming UI sees it. Inflates AUC because most negatives are trivial.
+# - **tokens_code** — same scoring as `tokens`, but restricted to live-code
+#   tokens via tree-sitter (drops comments / imports / def-class-namespace
+#   signatures / decorators / preprocessor). Negatives are then
+#   live-code-but-not-vuln tokens — the actual hard case a deployed probe
+#   has to beat.
+# - **tokens_annotated_negative** — only tokens with an explicit annotation
+#   (positive OR sanitizer-negative). No complement-as-negative. Single-class
+#   on the current SVEN corpus → AUC NaN until more sanitizer annotations
+#   land.
+# - **example_max** — one `(row.label, max(probs))` pair per example. Pure
+#   example-level decision; does not consult the annotated spans at score
+#   time. Matches the streaming-UI rule "file is risky iff any token's
+#   prob is high" and the `ex_AUC` reported by
+#   `src/train_probe_spanmax.py`.
+#
+# Orthogonal preprocessing axis: `proximity_window` (W, default 0). When
+# W > 0, the positive labels used by `tokens` / `tokens_code` are dilated
+# by ±W tokens around each annotated positive span.
 #
 # The **old (sample-level) probe** runs as a `BroadcastProbeBaseline`: its
 # one-score-per-file output is broadcast to every token. That tells us
@@ -116,12 +127,10 @@ for k, n in key_counts.items():
         print(f"  {k:18s}  (none)")
 
 # %% [markdown]
-# **Note.** The SVEN dataset has zero sanitizer spans, so the `span`
-# aggregation level reduces to "in-span positive tokens" only and AUC at
-# that level is undefined (single-class). For real binary classification
-# at span granularity, we synthesise a whole-file negative span per
-# `label=0` example inside `token_protocol`. The `all` and `span_max`
-# levels are the operational metrics on this corpus.
+# **Note.** The SVEN dataset has zero sanitizer spans, so
+# `tokens_annotated_negative` is effectively single-class (all annotated
+# tokens are positive) and reports AUC = NaN. The operational metrics on
+# this corpus are `tokens`, `tokens_code`, and `example_max`.
 
 # %% [markdown]
 # ## Choose probe scores
@@ -203,20 +212,27 @@ full = token_protocol.full_token_report(
 print(f"ran {len(full.splits)} splits")
 
 # %% [markdown]
-# ## Pretty-print the three-level table
+# ## Pretty-print the four-level table
 
 # %%
-print(f"{'split':32s}  {'level':10s}  {'AUC':>6s}  {'F1':>6s}  {'R@10':>6s}  {'n_tot':>7s}  {'n_pos':>6s}")
-print("-" * 90)
+LEVEL_PAIRS = (
+    ("tokens", "tokens_metrics"),
+    ("tokens_code", "tokens_code_metrics"),
+    ("tokens_annotated_negative", "tokens_annotated_negative_metrics"),
+    ("example_max", "example_max_metrics"),
+)
+print(f"{'split':32s}  {'level':26s}  {'AUC':>6s}  {'F1':>6s}  {'R@10':>6s}  {'n_tot':>7s}  {'n_pos':>6s}")
+print("-" * 110)
 for sp in full.splits:
-    for level_name, m in (("all", sp.all_metrics), ("span", sp.span_metrics), ("span_max", sp.span_max_metrics)):
+    for level_name, attr in LEVEL_PAIRS:
+        m = getattr(sp, attr)
         if m.get("n_total", 0) == 0:
             continue
         auc = m.get("auc", float("nan"))
         f1 = m.get("f1", float("nan"))
         r10 = m.get("recall_at_fpr_0.10", float("nan"))
         print(
-            f"{sp.split_name:32s}  {level_name:10s}  "
+            f"{sp.split_name:32s}  {level_name:26s}  "
             f"{auc:6.3f}  {f1:6.3f}  {r10:6.3f}  "
             f"{m.get('n_total', 0):7d}  {m.get('n_pos', 0):6d}"
         )
@@ -225,24 +241,25 @@ for sp in full.splits:
 # ## Baselines comparison
 
 # %%
-print(f"{'split':32s}  {'baseline':24s}  {'all':>7s}  {'span':>7s}  {'span_max':>9s}")
-print("-" * 90)
+print(f"{'split':32s}  {'baseline':24s}  {'tokens':>7s}  {'code':>7s}  {'annot_neg':>10s}  {'ex_max':>7s}")
+print("-" * 100)
 for sp in full.splits:
     for bl_name, lvls in sp.baseline_aucs.items():
         print(
             f"{sp.split_name:32s}  {bl_name:24s}  "
-            f"{lvls.get('all_auc', float('nan')):7.3f}  "
-            f"{lvls.get('span_auc', float('nan')):7.3f}  "
-            f"{lvls.get('span_max_auc', float('nan')):9.3f}"
+            f"{lvls.get('tokens_auc', float('nan')):7.3f}  "
+            f"{lvls.get('tokens_code_auc', float('nan')):7.3f}  "
+            f"{lvls.get('tokens_annotated_negative_auc', float('nan')):10.3f}  "
+            f"{lvls.get('example_max_auc', float('nan')):7.3f}"
         )
 
 # %% [markdown]
-# ## Headline plot: span_max AUC per split
+# ## Headline plot: example_max AUC per split
 
 # %%
 labels_x, values, errs = [], [], []
 for sp in full.splits:
-    m = sp.span_max_metrics
+    m = sp.example_max_metrics
     auc = m.get("auc")
     if auc is None or (isinstance(auc, float) and np.isnan(auc)):
         continue
@@ -256,8 +273,8 @@ fig, ax = plt.subplots(figsize=(11, 4))
 ax.bar(labels_x, values, color="#5b8dbe", yerr=errs, capsize=4)
 ax.axhline(0.5, color="gray", linestyle="--", label="chance")
 ax.set_ylim(0, 1.02)
-ax.set_ylabel("span_max AUC")
-ax.set_title(f"Token-probe span_max AUC per split ({MODE} mode)")
+ax.set_ylabel("example_max AUC")
+ax.set_title(f"Token-probe example_max AUC per split ({MODE} mode)")
 ax.tick_params(axis="x", rotation=30)
 ax.legend()
 ax.grid(True, axis="y", linestyle="--", alpha=0.4)
@@ -283,7 +300,8 @@ lines = [
     "|---|---|---|---|---|---:|---:|",
 ]
 for sp in full.splits:
-    for level_name, m in (("all", sp.all_metrics), ("span", sp.span_metrics), ("span_max", sp.span_max_metrics)):
+    for level_name, attr in LEVEL_PAIRS:
+        m = getattr(sp, attr)
         if m.get("n_total", 0) == 0:
             continue
         auc = m.get("auc", float("nan"))

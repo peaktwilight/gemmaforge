@@ -40,6 +40,7 @@ sys.path.insert(0, str(ROOT))
 from src.eval import baselines as bl_mod  # noqa: E402
 from src.eval import token_data  # noqa: E402
 from src.eval import token_protocol  # noqa: E402
+from src.eval.code_mask import code_only_mask  # noqa: E402
 from src.eval.token_data import (  # noqa: E402
     char_spans_to_token_spans,
     parse_spans,
@@ -68,11 +69,16 @@ def main() -> int:
     ap.add_argument("--sample-activations", default=None,
                     help="Sample-level activation .npz (X, y) aligned to dataset.jsonl rows. "
                          "Required when --probe-baseline is set.")
-    ap.add_argument("--proximity-window", type=int, default=10,
-                    help="Token window for dilated_span_max (#25). For each "
-                         "positive annotated span, the probe's max prob is taken "
-                         "over [s-W, e+W]. 0 disables the level (it falls "
-                         "back to plain span_max).")
+    ap.add_argument("--proximity-window", type=int, default=0,
+                    help="Preprocessing axis: dilate the positive token "
+                         "labels used by `tokens` and `tokens_code` by ±W "
+                         "tokens around each annotated positive span. "
+                         "Default 0 (exact-span labels). Does not affect "
+                         "tokens_annotated_negative or example_max.")
+    ap.add_argument("--no-code-only", action="store_true",
+                    help="Skip the tokens_code aggregation level "
+                         "(default: compute it). Falls back silently if "
+                         "tree-sitter or a language grammar is missing.")
     args = ap.parse_args()
 
     rows = token_data.load_token_dataset(args.dataset)
@@ -89,10 +95,24 @@ def main() -> int:
 
     # Map char spans -> token spans per row.
     token_spans_per_row: list[list[tuple[int, int, int]]] = []
+    code_only_masks: list[np.ndarray] | None = [] if not args.no_code_only else None
     for r, offs in zip(rows, offsets_per_row):
-        char_spans = parse_spans(r)
         tok_offsets = [(int(s), int(e)) for s, e in offs]
+        char_spans = parse_spans(r)
         token_spans_per_row.append(char_spans_to_token_spans(char_spans, tok_offsets))
+        if code_only_masks is not None:
+            code_only_masks.append(
+                code_only_mask(r.get("code", ""), r.get("lang", "") or "", tok_offsets)
+            )
+    if code_only_masks is not None:
+        kept = sum(int(m.sum()) for m in code_only_masks)
+        total = sum(int(m.shape[0]) for m in code_only_masks)
+        dropped_pct = 100.0 * (1.0 - kept / max(1, total))
+        print(
+            f"[run_token_eval] tokens_code: kept {kept}/{total} tokens "
+            f"({dropped_pct:.1f}% dropped)",
+            file=sys.stderr,
+        )
 
     baselines = bl_mod.all_baselines()
     sample_X = None
@@ -121,6 +141,7 @@ def main() -> int:
         baselines=baselines,
         sample_X=sample_X,
         proximity_window=args.proximity_window,
+        code_only_masks=code_only_masks,
     )
 
     # Render: simple markdown table; full JSON dump for downstream.
@@ -129,17 +150,16 @@ def main() -> int:
     md_lines.append("")
     md_lines.append(f"Dataset: `{args.dataset}` (N={full.n_examples}, pos={full.n_pos_examples})")
     md_lines.append("")
-    md_lines.append(f"## Per-split metrics (W={args.proximity_window} for dilated_span_max)")
+    md_lines.append(f"## Per-split metrics (proximity_window W={args.proximity_window})")
     md_lines.append("")
     md_lines.append("| split | level | AUC (95% CI) | F1 | R@10%FPR | Brier | n_total | n_pos |")
     md_lines.append("|---|---|---|---|---|---|---:|---:|")
     for sp in full.splits:
         for level_name, m in (
-            ("all", sp.all_metrics),
-            ("proximal_all", sp.proximal_all_metrics),
-            ("span", sp.span_metrics),
-            ("span_max", sp.span_max_metrics),
-            ("dilated_span_max", sp.dilated_span_max_metrics),
+            ("tokens", sp.tokens_metrics),
+            ("tokens_code", sp.tokens_code_metrics),
+            ("tokens_annotated_negative", sp.tokens_annotated_negative_metrics),
+            ("example_max", sp.example_max_metrics),
         ):
             if m.get("n_total", 0) == 0:
                 continue
@@ -157,16 +177,16 @@ def main() -> int:
     md_lines.append("")
     md_lines.append("## Baselines (AUC at each level)")
     md_lines.append("")
-    md_lines.append("| split | baseline | all | span | span_max | dilated_span_max |")
+    md_lines.append("| split | baseline | tokens | tokens_code | tokens_annotated_negative | example_max |")
     md_lines.append("|---|---|---:|---:|---:|---:|")
     for sp in full.splits:
         for bl_name, lvls in sp.baseline_aucs.items():
             md_lines.append(
                 f"| `{sp.split_name}` | {bl_name} | "
-                f"{lvls.get('all_auc', float('nan')):.3f} | "
-                f"{lvls.get('span_auc', float('nan')):.3f} | "
-                f"{lvls.get('span_max_auc', float('nan')):.3f} | "
-                f"{lvls.get('dilated_span_max_auc', float('nan')):.3f} |"
+                f"{lvls.get('tokens_auc', float('nan')):.3f} | "
+                f"{lvls.get('tokens_code_auc', float('nan')):.3f} | "
+                f"{lvls.get('tokens_annotated_negative_auc', float('nan')):.3f} | "
+                f"{lvls.get('example_max_auc', float('nan')):.3f} |"
             )
     md = "\n".join(md_lines) + "\n"
 

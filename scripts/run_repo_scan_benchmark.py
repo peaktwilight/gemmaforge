@@ -44,10 +44,10 @@ def write_leads(path: Path, leads: list) -> None:
 
 def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--benchmark-root", type=Path, default=Path("data/repo_benchmark"))
+    ap.add_argument("--benchmark-root", type=Path, default=Path("data/repo_benchmark_heldout"))
     ap.add_argument("--manifest", type=Path, default=None)
-    ap.add_argument("--leads-dir", type=Path, default=Path("data/repo_benchmark/leads"))
-    ap.add_argument("--out-json", type=Path, default=Path("data/eval/repo_scan_report.json"))
+    ap.add_argument("--leads-dir", type=Path, default=Path("data/repo_benchmark_heldout/leads_spanmax"))
+    ap.add_argument("--out-json", type=Path, default=Path("data/eval/repo_scan_report_spanmax.json"))
     ap.add_argument("--max-repos", type=int, default=None)
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--num-shards", type=int, default=1)
@@ -62,12 +62,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         action="store_true",
         help="Re-scan even if --resume would skip an existing lead file.",
     )
-    ap.add_argument("--probe-profile", choices=sorted(SCAN_PROFILES), default="weak-probe")
+    ap.add_argument("--probe-profile", choices=sorted(SCAN_PROFILES), default="spanmax")
     ap.add_argument("--top-k", type=int, default=25)
     ap.add_argument("--min-confidence", type=float, default=0.5)
     ap.add_argument("--languages", type=str, default=None)
-    ap.add_argument("--probe-path", type=str, default="data/probe.npz")
-    ap.add_argument("--per-cwe-probe-path", type=str, default="data/probe_per_cwe.npz")
+    ap.add_argument("--probe-path", type=str, default="data/probe_spanmax.npz")
+    ap.add_argument("--per-cwe-probe-path", type=str, default="data/probe_per_cwe_sven.npz")
     ap.add_argument("--model-id", type=str, default="google/gemma-4-E2B-it")
     ap.add_argument("--max-tokens", type=int, default=None)
     ap.add_argument("--token-stride", type=int, default=None)

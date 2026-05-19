@@ -245,12 +245,13 @@ def stream(
 def main_cli() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="google/gemma-4-E2B-it")
-    ap.add_argument("--probe", default="data/probe.npz")
+    ap.add_argument("--probe", default="data/probe_spanmax.npz")
     ap.add_argument(
         "--per-cwe-probe",
         default=None,
-        help="Optional path to data/probe_per_cwe.npz; when set, every token "
-        "event also includes top_cwe / top_cwe_score from the multi-head probe.",
+        help="Optional path to data/probe_per_cwe_sven.npz (layer 8, pairs with "
+        "data/probe_spanmax.npz); when set, every token event also includes "
+        "top_cwe / top_cwe_score from the multi-head probe.",
     )
     ap.add_argument("--prompt", required=False)
     ap.add_argument("--max-tokens", type=int, default=150)

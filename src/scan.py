@@ -33,7 +33,16 @@ from src.events import SCHEMA_EVENTS, EventSink
 SCHEMA_LEADS = "gemmaforge.leads/v1"
 
 SCAN_PROFILES = {
-    # Laptop/default mode: smaller chunks, more overlap, cheap high-recall scan.
+    # Default mode: span-max-trained binary probe at layer 8 (paired with
+    # data/probe_per_cwe_sven.npz). Same 30/20 chunker as ``weak-probe`` —
+    # the difference is which probe weights are loaded, not the windowing.
+    "spanmax": {
+        "window": 30,
+        "stride": 20,
+        "max_tokens": 512,
+        "token_stride": 256,
+    },
+    # Legacy laptop/default mode: layer-17 sklearn LR probe (data/probe.npz).
     "weak-probe": {
         "window": 30,
         "stride": 20,
@@ -433,11 +442,12 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument(
         "--probe-profile",
         choices=sorted(SCAN_PROFILES),
-        default="weak-probe",
+        default="spanmax",
         help=(
-            "Initial probe-scan profile. weak-probe uses small overlapping ranges; "
-            "strong-probe uses larger ranges and token windows. For strong-probe "
-            "with a larger model, pass a matching --model-id and --probe-path."
+            "Initial probe-scan profile. spanmax (default) uses the layer-8 "
+            "span-max-trained probe; weak-probe uses the layer-17 sklearn LR "
+            "baseline; strong-probe uses larger ranges for a bigger model. "
+            "For strong-probe pass a matching --model-id and --probe-path."
         ),
     )
     ap.add_argument(
@@ -461,12 +471,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Chunk stride in lines (overlap = window - stride). Defaults come from --probe-profile.",
     )
     ap.add_argument(
-        "--probe-path", type=str, default="data/probe.npz",
+        "--probe-path", type=str, default="data/probe_spanmax.npz",
         help="Path to the binary probe .npz.",
     )
     ap.add_argument(
-        "--per-cwe-probe-path", type=str, default="data/probe_per_cwe.npz",
-        help="Path to the per-CWE probe .npz.",
+        "--per-cwe-probe-path", type=str, default="data/probe_per_cwe_sven.npz",
+        help="Path to the per-CWE probe .npz (layer-8, pairs with probe_spanmax).",
     )
     ap.add_argument(
         "--model-id", type=str, default="google/gemma-4-E2B-it",

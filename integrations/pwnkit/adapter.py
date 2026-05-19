@@ -102,19 +102,25 @@ class GemmaForgeFilter:
     # Per-CWE probe file to use when no explicit ``per_cwe_probe_path`` is
     # passed. Each scan profile pins its own per-CWE head so the binary probe
     # and per-CWE probe agree on the source layer / model.
+    #
+    # Both ``spanmax`` and ``weak-probe`` use the 30/20 chunker config; the
+    # difference is the binary probe weights (spanmax = layer-8 span-max
+    # training, weak-probe = layer-17 sklearn LR baseline). The matching
+    # per-CWE head must agree on the source layer.
     _PER_CWE_BY_PROFILE = {
+        "spanmax": "data/probe_per_cwe_sven.npz",
         "weak-probe": "data/probe_per_cwe.npz",
         "strong-probe": "data/probe_strong_per_cwe.npz",
     }
 
     def __init__(
         self,
-        probe_path: str = "data/probe.npz",
+        probe_path: str = "data/probe_spanmax.npz",
         per_cwe_probe_path: Optional[str] = None,
         model_id: str = "google/gemma-4-E2B-it",
         max_tokens: int = 512,
         token_stride: Optional[int] = None,
-        scan_profile: str = "weak-probe",
+        scan_profile: str = "spanmax",
     ) -> None:
         self.probe_path = Path(probe_path)
         if per_cwe_probe_path is None:

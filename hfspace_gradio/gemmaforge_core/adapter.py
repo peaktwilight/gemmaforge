@@ -101,12 +101,12 @@ class GemmaForgeFilter:
 
     def __init__(
         self,
-        probe_path: str = "data/probe.npz",
-        per_cwe_probe_path: str = "data/probe_per_cwe.npz",
+        probe_path: str = "data/probe_spanmax.npz",
+        per_cwe_probe_path: str = "data/probe_per_cwe_sven.npz",
         model_id: str = "google/gemma-4-E2B-it",
         max_tokens: int = 512,
         token_stride: Optional[int] = None,
-        scan_profile: str = "weak-probe",
+        scan_profile: str = "spanmax",
     ) -> None:
         self.probe_path = Path(probe_path)
         self.per_cwe_probe_path = Path(per_cwe_probe_path)

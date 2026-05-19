@@ -38,6 +38,21 @@ from urllib.error import URLError
 DASHBOARD_DIR = Path(__file__).resolve().parent
 REPO_ROOT = DASHBOARD_DIR.parent
 DEFAULT_LEADS = REPO_ROOT / "examples" / "leads.jsonl"
+# Defaults point at the spanmax probe results (data/probe_spanmax.npz, layer 8)
+# scanned against the heldout split. Override with --benchmark-root / --repo-report.
+DEFAULT_BENCHMARK_ROOT = REPO_ROOT / "data" / "repo_benchmark_heldout"
+DEFAULT_REPORT_PATH = REPO_ROOT / "data" / "eval" / "repo_scan_report_spanmax.json"
+# F1-max calibration sidecar: written by the F1-sweep job that scores all
+# heldout leads against vulnerability_traces. The visualizer uses
+# ``f1_max.threshold`` as the floor under which a lead is not painted at all.
+DEFAULT_F1_CALIBRATION_PATH = REPO_ROOT / "data" / "probe_spanmax_f1.json"
+LEADS_DIR_CANDIDATES = (
+    "leads_spanmax",
+    "leads_weak_spanmax",
+    "leads_weak_full",
+    "leads_weak_25",
+    "leads",
+)
 
 # In-memory run registry. Keys (API tokens) live only for the lifetime of
 # the run + a short grace period — never written to disk, never logged.
@@ -603,6 +618,274 @@ def stream_pwnkit_run(handler: BaseHTTPRequestHandler, run_id: str, pwnkit_db: P
     _emit(handler, {"kind": "pk.log", "message": "pwnkit run finished — stream closing", "level": ""})
 
 
+_REPO_INDEX_CACHE: dict = {}
+_REPO_INDEX_LOCK = threading.Lock()
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    out: list[dict] = []
+    if not path.exists():
+        return out
+    with path.open("r", encoding="utf-8") as fp:
+        for line in fp:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return out
+
+
+def _pick_leads_dir(benchmark_root: Path) -> Path | None:
+    for name in LEADS_DIR_CANDIDATES:
+        candidate = benchmark_root / name
+        if candidate.is_dir():
+            return candidate
+    return None
+
+
+def _load_repo_index(benchmark_root: Path, report_path: Path, f1_threshold: float = 0.0) -> dict:
+    """Build (and cache) the {repo_id: {manifest, lead_path, report_entry}} index.
+
+    Cache key includes the benchmark_root + leads_dir mtime so editing files
+    on disk doesn't require a server restart during development.
+
+    ``f1_threshold`` (if > 0) is the F1-max confidence floor; per-row we also
+    return ``n_leads_above_tau`` so the sidebar can show calibrated counts.
+    """
+    leads_dir = _pick_leads_dir(benchmark_root)
+    cache_key = (
+        str(benchmark_root),
+        str(leads_dir) if leads_dir else "",
+        str(report_path),
+        leads_dir.stat().st_mtime if leads_dir and leads_dir.exists() else 0,
+        report_path.stat().st_mtime if report_path.exists() else 0,
+        float(f1_threshold),
+    )
+    with _REPO_INDEX_LOCK:
+        cached = _REPO_INDEX_CACHE.get("index")
+        if cached and cached.get("key") == cache_key:
+            return cached
+
+        manifest_path = benchmark_root / "manifest.jsonl"
+        manifests = _read_jsonl(manifest_path)
+        manifest_by_id = {m["repo_id"]: m for m in manifests if "repo_id" in m}
+
+        report_entries: dict = {}
+        if report_path.exists():
+            try:
+                report = json.loads(report_path.read_text(encoding="utf-8"))
+                for entry in report.get("repos", []):
+                    rid = entry.get("repo_id")
+                    if rid:
+                        report_entries[rid] = entry
+            except json.JSONDecodeError:
+                pass
+
+        leads_files = {}
+        if leads_dir is not None:
+            for path in leads_dir.glob("*.jsonl"):
+                leads_files[path.stem] = path
+
+        rows: list[dict] = []
+        for repo_id, manifest in manifest_by_id.items():
+            lead_path = leads_files.get(repo_id)
+            n_leads = 0
+            n_leads_above_tau = 0
+            top_conf = None
+            if lead_path is not None:
+                leads = _read_jsonl(lead_path)
+                n_leads = len(leads)
+                if leads:
+                    top_conf = max(
+                        (float(l.get("gemmaforge_confidence", 0.0)) for l in leads),
+                        default=None,
+                    )
+                if f1_threshold > 0:
+                    n_leads_above_tau = sum(
+                        1 for l in leads
+                        if float(l.get("gemmaforge_confidence", 0.0)) >= f1_threshold
+                    )
+                else:
+                    n_leads_above_tau = n_leads
+            entry = report_entries.get(repo_id, {})
+            rows.append({
+                "repo_id": repo_id,
+                "cwe": manifest.get("cwe"),
+                "language": manifest.get("language"),
+                "n_traces": len(manifest.get("vulnerability_traces") or []),
+                "n_files": len(manifest.get("files") or []),
+                "n_leads": n_leads,
+                "n_leads_above_tau": n_leads_above_tau,
+                "top_confidence": top_conf,
+                "first_hit_rank": entry.get("first_hit_rank"),
+                "reciprocal_rank": entry.get("reciprocal_rank"),
+                "has_leads": lead_path is not None,
+            })
+        # Sort: has-leads first, then by first_hit_rank asc (None last), then repo_id.
+        def sort_key(r):
+            fhr = r["first_hit_rank"]
+            return (
+                0 if r["has_leads"] else 1,
+                0 if fhr is not None else 1,
+                fhr if fhr is not None else 0,
+                r["repo_id"],
+            )
+        rows.sort(key=sort_key)
+
+        result = {
+            "key": cache_key,
+            "benchmark_root": str(benchmark_root),
+            "leads_dir": str(leads_dir) if leads_dir else None,
+            "report_path": str(report_path) if report_path.exists() else None,
+            "n_repos": len(rows),
+            "n_with_leads": sum(1 for r in rows if r["has_leads"]),
+            "rows": rows,
+            "_manifest_by_id": manifest_by_id,
+            "_leads_files": leads_files,
+            "_report_entries": report_entries,
+        }
+        _REPO_INDEX_CACHE["index"] = result
+        return result
+
+
+def _clean_nan(obj):
+    """Replace NaN/Inf floats with None so the payload is RFC-8259 valid JSON.
+
+    `repo_scan_report_*.json` is written by Python's default json dumper,
+    which emits literal NaN tokens that `JSON.parse` in the browser then
+    rejects.
+    """
+    import math
+    if isinstance(obj, float):
+        return None if math.isnan(obj) or math.isinf(obj) else obj
+    if isinstance(obj, dict):
+        return {k: _clean_nan(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_clean_nan(v) for v in obj]
+    if isinstance(obj, tuple):
+        return [_clean_nan(v) for v in obj]
+    return obj
+
+
+def _send_json(handler: BaseHTTPRequestHandler, status: int, body: dict | list) -> None:
+    payload = json.dumps(_clean_nan(body), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    handler.send_response(status)
+    handler.send_header("Content-Type", "application/json; charset=utf-8")
+    handler.send_header("Cache-Control", "no-cache")
+    handler.send_header("Content-Length", str(len(payload)))
+    handler.end_headers()
+    handler.wfile.write(payload)
+
+
+def _load_f1_calibration(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return data
+
+
+def handle_repos_index(
+    handler: BaseHTTPRequestHandler,
+    benchmark_root: Path,
+    report_path: Path,
+    f1_calibration_path: Path,
+) -> None:
+    cal = _load_f1_calibration(f1_calibration_path)
+    tau = 0.0
+    if cal is not None:
+        try:
+            tau = float((cal.get("f1_max") or {}).get("threshold") or 0.0)
+        except (TypeError, ValueError):
+            tau = 0.0
+    idx = _load_repo_index(benchmark_root, report_path, f1_threshold=tau)
+    payload = {
+        "benchmark_root": idx["benchmark_root"],
+        "leads_dir": idx["leads_dir"],
+        "report_path": idx["report_path"],
+        "n_repos": idx["n_repos"],
+        "n_with_leads": idx["n_with_leads"],
+        "repos": idx["rows"],
+    }
+    if cal is not None:
+        payload["calibration"] = {
+            "path": str(f1_calibration_path),
+            "f1_max": cal.get("f1_max"),
+            "auc": cal.get("auc"),
+            "n_leads": cal.get("n_leads"),
+            "n_pos": cal.get("n_pos"),
+            "n_neg": cal.get("n_neg"),
+        }
+    _send_json(handler, 200, payload)
+
+
+def handle_repo_detail(
+    handler: BaseHTTPRequestHandler,
+    benchmark_root: Path,
+    report_path: Path,
+    repo_id: str,
+    f1_threshold: float = 0.0,
+) -> None:
+    idx = _load_repo_index(benchmark_root, report_path, f1_threshold=f1_threshold)
+    manifest = idx["_manifest_by_id"].get(repo_id)
+    if manifest is None:
+        _send_json(handler, 404, {"error": f"unknown repo_id {repo_id}"})
+        return
+    lead_path = idx["_leads_files"].get(repo_id)
+    leads = _read_jsonl(lead_path) if lead_path is not None else []
+    _send_json(handler, 200, {
+        "repo_id": repo_id,
+        "manifest": manifest,
+        "leads": leads,
+        "report_entry": idx["_report_entries"].get(repo_id),
+        "leads_path": str(lead_path) if lead_path else None,
+    })
+
+
+def handle_repo_file(
+    handler: BaseHTTPRequestHandler,
+    benchmark_root: Path,
+    report_path: Path,
+    repo_id: str,
+    rel_path: str,
+    f1_threshold: float = 0.0,
+) -> None:
+    idx = _load_repo_index(benchmark_root, report_path, f1_threshold=f1_threshold)
+    manifest = idx["_manifest_by_id"].get(repo_id)
+    if manifest is None:
+        _send_json(handler, 404, {"error": f"unknown repo_id {repo_id}"})
+        return
+    allowed = {f.get("path") for f in (manifest.get("files") or [])}
+    if rel_path not in allowed:
+        _send_json(handler, 403, {"error": f"path not in manifest: {rel_path}"})
+        return
+    repo_path = benchmark_root / str(manifest.get("repo_path") or "")
+    target = (repo_path / rel_path).resolve()
+    try:
+        target.relative_to(repo_path.resolve())
+    except ValueError:
+        _send_json(handler, 403, {"error": "path traversal blocked"})
+        return
+    if not target.is_file():
+        _send_json(handler, 404, {"error": "file missing on disk"})
+        return
+    try:
+        text = target.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        text = target.read_bytes().decode("utf-8", errors="replace")
+    _send_json(handler, 200, {
+        "repo_id": repo_id,
+        "path": rel_path,
+        "text": text,
+        "lines": text.count("\n") + (0 if text.endswith("\n") or not text else 1),
+    })
+
+
 def make_handler(args):
     leads_path = Path(args.leads_file) if args.leads_file else DEFAULT_LEADS
     events_file = Path(args.events_file) if args.events_file else None
@@ -611,6 +894,18 @@ def make_handler(args):
     pwnkit_cli = Path(args.pwnkit_cli) if args.pwnkit_cli else None
     pwnkit_db = Path(args.pwnkit_db) if args.pwnkit_db else Path("/tmp/pwnkit.db")
     speedup = float(args.replay_speedup)
+    benchmark_root = Path(args.benchmark_root).resolve()
+    repo_report_path = Path(args.repo_report).resolve()
+    f1_calibration_path = Path(args.f1_calibration).resolve()
+
+    def _current_tau() -> float:
+        cal = _load_f1_calibration(f1_calibration_path)
+        if cal is None:
+            return 0.0
+        try:
+            return float((cal.get("f1_max") or {}).get("threshold") or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *largs):
@@ -625,6 +920,35 @@ def make_handler(args):
                 return
             if path == "/style.css":
                 _send_static(self, DASHBOARD_DIR / "style.css", "text/css; charset=utf-8")
+                return
+            if path in ("/repos", "/repos.html"):
+                _send_static(self, DASHBOARD_DIR / "repos.html", "text/html; charset=utf-8")
+                return
+            if path == "/repos.css":
+                _send_static(self, DASHBOARD_DIR / "repos.css", "text/css; charset=utf-8")
+                return
+            if path == "/repos.js":
+                _send_static(self, DASHBOARD_DIR / "repos.js", "application/javascript; charset=utf-8")
+                return
+            if path == "/api/repos/index":
+                handle_repos_index(self, benchmark_root, repo_report_path, f1_calibration_path)
+                return
+            if path == "/api/repos/file":
+                qs = parse_qs(parsed.query)
+                rid = qs.get("repo", [""])[0]
+                rel = qs.get("path", [""])[0]
+                if not rid or not rel:
+                    _send_json(self, 400, {"error": "missing repo or path"})
+                    return
+                handle_repo_file(self, benchmark_root, repo_report_path, rid, rel, f1_threshold=_current_tau())
+                return
+            if path.startswith("/api/repos/"):
+                rid = path[len("/api/repos/"):]
+                if "/" in rid or not rid:
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+                handle_repo_detail(self, benchmark_root, repo_report_path, rid, f1_threshold=_current_tau())
                 return
             if path == "/sse/stream":
                 proxy_stream(self, parse_qs(parsed.query))
@@ -782,6 +1106,25 @@ def main(argv=None) -> int:
         default=str(DEFAULT_LEADS),
         help="leads.jsonl whose snippets are injected as scan.lead.record "
         "events alongside scan.lead during replay/demo.",
+    )
+    ap.add_argument(
+        "--benchmark-root",
+        default=str(DEFAULT_BENCHMARK_ROOT),
+        help="Repo-benchmark root containing manifest.jsonl + repos/ + a "
+        "leads_*/ directory. Powers the /repos visualizer.",
+    )
+    ap.add_argument(
+        "--repo-report",
+        default=str(DEFAULT_REPORT_PATH),
+        help="repo_scan_report_*.json file with per-repo metrics "
+        "(first_hit_rank, reciprocal_rank). Joined by repo_id for /repos.",
+    )
+    ap.add_argument(
+        "--f1-calibration",
+        default=str(DEFAULT_F1_CALIBRATION_PATH),
+        help="Sidecar JSON with the F1-max threshold for lead confidences. "
+        "Below this threshold the /repos visualizer doesn't paint a lead at "
+        "all; above it, intensity scales from 0 to 1.",
     )
     args = ap.parse_args(argv)
 

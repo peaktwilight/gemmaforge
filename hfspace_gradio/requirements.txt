@@ -4,3 +4,5 @@ torch>=2.4
 transformers>=4.45
 accelerate>=0.34
 numpy>=1.26
+fastapi
+uvicorn

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GemmaForge · last scan</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="repos.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>GemmaForge · last scan</h1>
+      <span class="pill">spanmax · F1-max τ</span>
+    </div>
+    <p class="tagline" id="summary-tagline">no scan yet — run one on the Scan tab.</p>
+  </header>
+
+  <main class="repos-grid">
+    <aside class="panel sidebar">
+      <div class="sidebar-controls">
+        <div class="counts" id="counts">—</div>
+      </div>
+      <ul id="repo-list" class="repo-list"></ul>
+    </aside>
+
+    <section class="panel viewer" id="viewer">
+      <div class="empty-state" id="empty-state">
+        <h2>no scan loaded</h2>
+        <p>
+          Switch to the <strong>Scan</strong> tab, scan a repo, then come back —
+          the most recent scan auto-opens here with the same viewer the
+          heldout benchmark uses (file overlay, F1-max threshold, per-file
+          lead dots).
+        </p>
+        <p>
+          <span class="legend swatch-lead">probe lead</span> — windows scored
+          ≥ F1-max τ on the heldout calibration set. Sub-τ leads listed in the
+          bottom table greyed out, but not painted on the code (probe didn't
+          really fire).
+        </p>
+      </div>
+      <div class="viewer-content hidden" id="viewer-content">
+        <div class="viewer-header">
+          <div>
+            <h2 id="repo-title">—</h2>
+            <p class="repo-sub" id="repo-sub"></p>
+          </div>
+          <div class="repo-metrics" id="repo-metrics"></div>
+        </div>
+        <div class="file-tabs" id="file-tabs"></div>
+        <div class="file-meta" id="file-meta"></div>
+        <div class="code-wrap"><pre class="code" id="code"></pre></div>
+        <div class="leads-summary" id="leads-summary"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.GEMMAFORGE_VIEWER = { basePath: "/gradio_api/scan", mode: "live" };
+  </script>
+  <script src="repos.js"></script>
+</body>
+</html>

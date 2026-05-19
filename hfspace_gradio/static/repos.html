@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GemmaForge · heldout benchmark</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="repos.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>GemmaForge · heldout benchmark</h1>
+      <span class="pill">spanmax · F1-max τ</span>
+    </div>
+    <p class="tagline" id="summary-tagline">loading repo index…</p>
+  </header>
+
+  <main class="repos-grid">
+    <aside class="panel sidebar">
+      <div class="sidebar-controls">
+        <input id="search" type="search" placeholder="search repo_id…" autocomplete="off">
+        <div class="filter-row">
+          <select id="filter-cwe"><option value="">all CWEs</option></select>
+          <select id="filter-lang"><option value="">all langs</option></select>
+          <select id="filter-status">
+            <option value="">all status</option>
+            <option value="hit">hit @≤25</option>
+            <option value="miss">miss</option>
+            <option value="no-leads">no leads on disk</option>
+          </select>
+        </div>
+        <div class="counts" id="counts">—</div>
+      </div>
+      <ul id="repo-list" class="repo-list"></ul>
+    </aside>
+
+    <section class="panel viewer" id="viewer">
+      <div class="empty-state" id="empty-state">
+        <h2>pick a repo on the left</h2>
+        <p>
+          136 SVEN-derived microrepos, each pre-scanned with the spanmax probe
+          (layer 8, paired with the layer-8 per-CWE head).
+        </p>
+        <p>
+          <span class="legend swatch-truth">ground-truth vuln span</span> (SVEN
+          diff oracle) + <span class="legend swatch-lead">probe lead</span>
+          (windows scored ≥ F1-max τ). Sub-τ leads listed in the bottom table
+          (greyed out) but not painted on the code.
+        </p>
+      </div>
+      <div class="viewer-content hidden" id="viewer-content">
+        <div class="viewer-header">
+          <div>
+            <h2 id="repo-title">—</h2>
+            <p class="repo-sub" id="repo-sub"></p>
+          </div>
+          <div class="repo-metrics" id="repo-metrics"></div>
+        </div>
+        <div class="file-tabs" id="file-tabs"></div>
+        <div class="file-meta" id="file-meta"></div>
+        <div class="code-wrap"><pre class="code" id="code"></pre></div>
+        <div class="leads-summary" id="leads-summary"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.GEMMAFORGE_VIEWER = { basePath: "/gradio_api/repos", mode: "static" };
+  </script>
+  <script src="repos.js"></script>
+</body>
+</html>

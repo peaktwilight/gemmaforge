@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GemmaForge · repo-benchmark visualizer</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/repos.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>GemmaForge · repo-benchmark</h1>
+      <span class="pill">probe replay</span>
+    </div>
+    <p class="tagline" id="summary-tagline">loading repo index…</p>
+    <div class="status-row">
+      <a href="/" class="nav-link">← live dashboard</a>
+    </div>
+  </header>
+
+  <main class="repos-grid">
+    <aside class="panel sidebar">
+      <div class="sidebar-controls">
+        <input id="search" type="search" placeholder="search repo_id…" autocomplete="off">
+        <div class="filter-row">
+          <select id="filter-cwe"><option value="">all CWEs</option></select>
+          <select id="filter-lang"><option value="">all langs</option></select>
+          <select id="filter-status">
+            <option value="">all status</option>
+            <option value="hit">hit @≤25</option>
+            <option value="miss">miss</option>
+            <option value="no-leads">no leads on disk</option>
+          </select>
+        </div>
+        <div class="counts" id="counts">—</div>
+      </div>
+      <ul id="repo-list" class="repo-list"></ul>
+    </aside>
+
+    <section class="panel viewer" id="viewer">
+      <div class="empty-state" id="empty-state">
+        <h2>pick a repo on the left</h2>
+        <p>
+          Each row is a microrepo from <code>data/repo_benchmark/manifest.jsonl</code>:
+          one vulnerable file, one fixed counterpart, and a few unrelated safe
+          decoys, all under one <code>repos/&lt;repo_id&gt;/</code> tree.
+        </p>
+        <p>
+          Selecting a repo loads its files inline with two overlays:
+          <span class="legend swatch-truth">ground-truth vuln span</span> (from the
+          SVEN diff oracle) and
+          <span class="legend swatch-lead">probe lead</span> (windows scored
+          ≥ the F1-max threshold τ on heldout). Sub-τ leads are listed in the
+          bottom table (greyed out) but are not painted on the code — the
+          probe didn't really fire there. Above τ, wash intensity scales
+          linearly from 0.25 (at τ) to 0.85 (at conf=1). Ranks &amp; predicted
+          CWEs are in the gutter.
+        </p>
+      </div>
+      <div class="viewer-content hidden" id="viewer-content">
+        <div class="viewer-header">
+          <div>
+            <h2 id="repo-title">—</h2>
+            <p class="repo-sub" id="repo-sub"></p>
+          </div>
+          <div class="repo-metrics" id="repo-metrics"></div>
+        </div>
+        <div class="file-tabs" id="file-tabs"></div>
+        <div class="file-meta" id="file-meta"></div>
+        <div class="code-wrap"><pre class="code" id="code"></pre></div>
+        <div class="leads-summary" id="leads-summary"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/repos.js"></script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 """Capture the GemmaForge streaming probe demo as timestamped screenshots.
 
 Drives the web UI at http://localhost:8787/ with headless Chromium, clicking
-each preset in sequence and writing one PNG per scene to ``demo-recordings/``.
+each preset in sequence and writing one PNG per scene to
+``archive/submission/demo-recordings/``.
 Also captures an animated GIF of the CWE-89 "quick and dirty" run to use as
 the hero figure in the hackathon writeup. Closes a chunk of issue #10.
 
@@ -44,7 +45,7 @@ MIN_TOKENS_PER_SCENE = 50
 # At ~2-2.5s/token on a warm server we want generous headroom for 50 tokens,
 # plus a beat for SSE handshake. Empirically 50 tokens lands around 100-130s.
 SCENE_TIMEOUT_S = 240
-OUTPUT_DIR = Path(__file__).resolve().parent.parent / "demo-recordings"
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "archive" / "submission" / "demo-recordings"
 
 # Each preset matched by its prompt-data prefix (which is unique per scene).
 # Slug + CWE label are used for filenames and the final markdown summary.

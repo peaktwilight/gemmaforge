@@ -3,8 +3,9 @@
 
 PYTHON ?= python3
 VENV   ?= .venv
+REPO   ?= .
 
-.PHONY: help install dataset extract probe serve test demo-record hf-deploy clean
+.PHONY: help install dataset extract probe spanmax-probe scan repo-benchmark repo-scan serve test demo-record hf-deploy clean
 
 help: ## show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -13,14 +14,26 @@ help: ## show this help message
 install: ## create .venv and install requirements.txt
 	$(PYTHON) -m venv $(VENV) && . $(VENV)/bin/activate && pip install -r requirements.txt
 
-dataset: ## build the pairs.jsonl training dataset
+dataset: ## build the canonical SVEN before/after token dataset
 	$(PYTHON) scripts/build_dataset.py
 
-extract: ## extract hidden-state activations for the probe
+extract: ## extract sample-level hidden-state activations for the baseline probe
 	$(PYTHON) -m src.extract_activations
 
-probe: ## train the linear probe on data/pairs.jsonl
+probe: ## train the sample-level baseline probe on data/pairs.jsonl
 	$(PYTHON) -m src.train_probe --pairs data/pairs.jsonl
+
+spanmax-probe: ## train the token-level span-max probe from data/token_activations
+	$(PYTHON) -m src.train_probe_spanmax
+
+scan: ## scan a repo path: make scan REPO=./examples/vuln-express-app
+	$(PYTHON) -m src.scan $(REPO)
+
+repo-benchmark: ## build the held-out repo benchmark fixtures
+	$(PYTHON) scripts/build_repo_benchmark.py --input data/dataset_sven_heldout.jsonl --out-root data/repo_benchmark_heldout --max-repos 9999
+
+repo-scan: ## run the repo-level benchmark scan over data/repo_benchmark_heldout
+	$(PYTHON) scripts/run_repo_scan_benchmark.py --benchmark-root data/repo_benchmark_heldout --resume
 
 serve: ## launch the streaming probe inference server
 	$(PYTHON) -m src.stream_with_probe --serve

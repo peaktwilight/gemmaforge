@@ -11,7 +11,8 @@ set -euo pipefail
 
 HF_USER="${HF_USER:-peaktwilight}"
 SPACE_NAME="${SPACE_NAME:-gemmaforge}"
-SDK="${SDK:-docker}"
+SDK="${SDK:-gradio}"
+SPACE_DIR="${SPACE_DIR:-hfspace_gradio}"
 
 if ! command -v hf >/dev/null 2>&1; then
   echo "error: \`hf\` CLI not found. install with: pip install -U huggingface_hub" >&2
@@ -24,19 +25,11 @@ if ! hf auth whoami >/dev/null 2>&1; then
   hf auth login
 fi
 
-# Sync the canonical dashboard sources + demo leads into the space staging
-# dir (idempotent — overwrites if they have drifted since the last deploy).
-mkdir -p hfspace/dashboard hfspace/examples
-cp dashboard/index.html dashboard/style.css dashboard/server.py dashboard/__init__.py hfspace/dashboard/
-cp examples/leads.jsonl hfspace/examples/leads.jsonl
-cp examples/events.ndjson hfspace/examples/events.ndjson
-[ -f examples/pwnkit-events.ndjson ] && cp examples/pwnkit-events.ndjson hfspace/examples/pwnkit-events.ndjson || true
-
 # Try create, ignore "already exists".
 hf repo create "${HF_USER}/${SPACE_NAME}" --repo-type space --space-sdk "${SDK}" || true
 
-# Upload everything in hfspace/ to the Space root.
-hf upload "${HF_USER}/${SPACE_NAME}" hfspace/ . --repo-type space
+# Upload the current Gradio Space package to the Space root.
+hf upload "${HF_USER}/${SPACE_NAME}" "${SPACE_DIR}/" . --repo-type space
 
 echo ""
 echo "deployed: https://huggingface.co/spaces/${HF_USER}/${SPACE_NAME}"

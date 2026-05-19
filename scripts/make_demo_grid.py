@@ -1,7 +1,7 @@
 """Assemble the four demo screenshots into a 2x2 grid for the writeup.
 
 Reads the four ``scene-NN-*.png`` files produced by ``scripts/record_demo.py``
-from ``demo-recordings/`` and pastes them into a single 2800x1800 image at
+from ``archive/submission/demo-recordings/`` and pastes them into a single 2800x1800 image at
 ``web/demo-grid.png`` for use as the "demo at a glance" figure.
 
 Usage::
@@ -21,7 +21,7 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parent.parent
-INPUT_DIR = ROOT / "demo-recordings"
+INPUT_DIR = ROOT / "archive" / "submission" / "demo-recordings"
 OUTPUT_PATH = ROOT / "web" / "demo-grid.png"
 
 GRID_W, GRID_H = 2800, 1800

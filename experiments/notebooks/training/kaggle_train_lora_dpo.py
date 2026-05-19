@@ -97,10 +97,32 @@ print(f"out_dir={OUT_DIR}")
 # install what's missing. `trl>=0.21` keeps `beta`/`max_length` on DPOConfig.
 import sys
 import subprocess
+
+# Detect GPU BEFORE importing torch. Kaggle's stock torch wheel ships only
+# sm_70+, so when Kaggle rolls a P100 (sm_60) the model init crashes with
+# "no kernel image available". Swap in a cu118 wheel that still has sm_60.
+gpu_check = subprocess.run(
+    ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+    capture_output=True, text=True, check=False,
+)
+gpu_name = gpu_check.stdout.strip()
+print(f"detected gpu: {gpu_name!r}")
+if "P100" in gpu_name:
+    print("P100 detected -> reinstalling torch 2.5.1+cu118 + matching torchvision (sm_60)")
+    # Must reinstall torchvision in the same pair — transformers 5.x imports
+    # torchvision at module load, and a stale torchvision built against a newer
+    # torch crashes with "operator torchvision::nms does not exist".
+    subprocess.run([
+        sys.executable, "-m", "pip", "install", "-q", "--no-warn-script-location",
+        "--force-reinstall", "--no-deps",
+        "--index-url", "https://download.pytorch.org/whl/cu118",
+        "torch==2.5.1", "torchvision==0.20.1",
+    ], check=True)
+
 # Kaggle's base image has transformers ~4.42 which doesn't know gemma4.
 # Force-upgrade JUST transformers (not torch, not nvidia-* which would mismatch CUDA).
 subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "--upgrade", "--no-deps", "transformers>=4.49"], check=True)
-subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "peft", "trl>=0.21", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
+subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", "peft", "trl>=0.21,<1.0", "accelerate", "datasets", "huggingface_hub", "wandb"], check=True)
 import transformers
 print(f"transformers version after install: {transformers.__version__}")
 
@@ -112,6 +134,7 @@ assert torch.cuda.is_available(), (
 # Kaggle assigns Tesla T4, P100, V100, or A100 depending on the accelerator
 # setting; print the device name so the notebook author can pick the right one.
 print(f"gpu={torch.cuda.get_device_name(0)}  bf16_ok={torch.cuda.is_bf16_supported()}")
+print(f"torch supported_archs={torch.cuda.get_arch_list()}")
 subprocess.run(["nvidia-smi"], check=False)
 
 # In[4]:
@@ -196,12 +219,26 @@ print(f"model loaded on {next(model.parameters()).device}  dtype={next(model.par
 # matches across modules.
 from peft import LoraConfig
 
+# Diagnostic: peek at the first few q/k/v/o_proj module paths so the regex
+# below matches reality. Gemma 4 E2B's layout varies by transformers version.
+import torch.nn as _nn
+_proj_names = [n for n, m in model.named_modules()
+               if n.endswith(("q_proj", "k_proj", "v_proj", "o_proj"))][:6]
+print(f"sample proj paths: {_proj_names}")
+_inner_names = [n for n, m in model.named_modules()
+                if n.endswith(".linear") and isinstance(m, _nn.Linear)
+                and any(p in n for p in ("q_proj", "k_proj", "v_proj", "o_proj"))][:6]
+print(f"sample inner linear paths: {_inner_names}")
+
 peft_config = LoraConfig(
     r=R,
     lora_alpha=ALPHA,
     lora_dropout=DROPOUT,
     bias="none",
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    # transformers 5.x wraps Gemma 4's q/k/v/o_proj in Gemma4ClippableLinear,
+    # so target the inner `.linear` (an actual nn.Linear) that PEFT can wrap.
+    # Liberal regex — matches across both text and any vision/audio towers.
+    target_modules=r".*(q_proj|k_proj|v_proj|o_proj)\.linear$",
     task_type="CAUSAL_LM",
 )
 print(f"LoRA: r={R} alpha={ALPHA} dropout={DROPOUT} targets={peft_config.target_modules}")
@@ -212,6 +249,15 @@ print(f"LoRA: r={R} alpha={ALPHA} dropout={DROPOUT} targets={peft_config.target_
 # `save_steps=50` keeps a few intermediate checkpoints in case the Kaggle
 # session dies mid-run (9-hour cap, but idle disconnects happen).
 import time
+# trl >=0.20 imports FSDPModule unconditionally from torch.distributed.fsdp,
+# but FSDPModule only exists in torch >= 2.6. On the cu118 P100 path we're
+# stuck on torch 2.5.1 (newer cu118 wheels drop sm_60). We don't use FSDP, so
+# stub it out before importing trl.
+import torch.distributed.fsdp as _fsdp_mod
+if not hasattr(_fsdp_mod, "FSDPModule"):
+    class _FSDPModuleStub:  # noqa: D401 — stub
+        pass
+    _fsdp_mod.FSDPModule = _FSDPModuleStub
 from trl import DPOConfig, DPOTrainer
 
 dpo_args = DPOConfig(

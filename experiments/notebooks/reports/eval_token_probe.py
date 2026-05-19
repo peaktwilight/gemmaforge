@@ -26,9 +26,12 @@
 # - **span** — only tokens inside annotated spans. Single-class on the SVEN
 #   corpus (no sanitizer entries) → AUC is NaN here. Will become meaningful
 #   when we add sanitizer-annotated negatives.
-# - **span_max** — one decision per span. Positive examples contribute their
-#   evidence-span max; negative examples contribute a whole-file max
-#   (see `pad_negatives_for_span_max` in `token_protocol.py`).
+# - **span_max** — one decision per example: `(row.label, max(probs))` over
+#   the whole file, symmetric across positives and negatives. The annotated
+#   spans are not consulted for scoring at this level — only the row's
+#   `label` field is. The framework also reports `proximal_all` and
+#   `dilated_span_max` which DO use the spans (see `_collect_for_indices`
+#   in `src/eval/token_protocol.py`).
 #
 # The **old (sample-level) probe** runs as a `BroadcastProbeBaseline`: its
 # one-score-per-file output is broadcast to every token. That tells us

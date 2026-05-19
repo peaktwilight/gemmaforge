@@ -14,7 +14,7 @@ Generated from the following artefacts in this repo (all read-only for this doc)
 
 The numbers below are pulled directly from those files. If you re-train you may see floating-point drift in the 4th decimal place; everything to 3 decimals should match exactly.
 
-> **Scope note — two probe paths.** Every number in this document is from the **sample-level** probe (one label per snippet, last-token hidden state). A **token-level** value-head probe (per-token spans, BCE + span-max loss) is being trained in parallel via `notebooks/colab_train_gemma4_probe.py` and `scripts/train_value_head.py` as the intended replacement; its head-to-head eval against the sample-level numbers will land in a future revision of this doc.
+> **Scope note — two probe paths.** Every number in this document is from the **sample-level** probe (one label per snippet, last-token hidden state). A **token-level** value-head probe (per-token spans, BCE + span-max loss) is being trained in parallel via `experiments/notebooks/training/colab_train_gemma4_probe.py` and `scripts/train_value_head.py` as the intended replacement; its head-to-head eval against the sample-level numbers will land in a future revision of this doc.
 
 ---
 
@@ -542,9 +542,9 @@ The HuggingFace Space records anonymised generation traces (with consent). With 
 
 - Source code for the probe: `src/train_probe.py`, `scripts/train_per_cwe_probe.py`, `scripts/eval_splits.py`, `src/eval/`.
 - Source code for the LoRA: `scripts/train_lora.py`, `scripts/eval_lora.py`.
-- Source code for the streaming demo: `src/stream_with_probe.py`, `web/index.html`, `hfspace/app.py`.
+- Source code for the streaming demo: `src/stream_with_probe.py`, `web/index.html`, `hfspace_gradio/app.py`.
 - Submission writeup: `WRITEUP.md`.
-- Submission checklist: `SUBMISSION.md`.
+- Submission checklist: `archive/submission/SUBMISSION.md`.
 - Per-language coverage analysis: `docs/coverage.md`.
 - Bootstrap-CI report: `data/eval/report.md`, `data/eval/report.json`.
 - Leakage-aware split summary: `data/eval_splits.md`.

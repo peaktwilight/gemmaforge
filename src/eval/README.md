@@ -9,12 +9,12 @@ and specialised to vulnerability-detection probes on Gemma 4 hidden states.
 |   | Sample-level (legacy / baseline) | Token-level (new / primary) |
 |---|---|---|
 | Dataset | `data/pairs.jsonl` (one row per file) | `data/dataset.jsonl` (one row per file + char-range `token_labels`) |
-| Activations | `data/activations_v2/activations_layer*.npz` (last-token vector per file) | per-token vectors (extractor blocked by [#17](https://github.com/peaktwilight/gemmaforge/issues/17)) |
+| Activations | `data/activations_v2/activations_layer*.npz` (last-token vector per file) | `data/token_activations/token_activations_layer*.npz` from `src/extract_token_activations.py` |
 | Probe artifact | `data/probe.npz` (the shipped sample-level probe) | output of `src/train_probe_spanmax.py` |
 | Decision granularity | one score per file | one score per token |
 | Library entry point | `src.eval.protocol.full_report` | `src.eval.token_protocol.full_token_report` |
 | CLI | `scripts/run_eval_framework.py` | `scripts/run_token_eval.py` |
-| Notebooks | `eval_probe_report`, `eval_calibration`, `eval_baselines` | `eval_token_probe` |
+| Notebooks | `experiments/notebooks/reports/eval_probe_report`, `eval_calibration`, `eval_baselines` | `experiments/notebooks/reports/eval_token_probe` |
 | Smoke test | `scripts/test_eval_framework.py` | `scripts/test_token_eval.py` |
 
 The shipped sample-level probe is treated as a **baseline** in either
@@ -32,25 +32,29 @@ tables, not as the headline.
 | `probe_io.py` | `Probe` dataclass, `load_probe`, `load_activations`, `load_pairs`, `fit_logreg_on_split`. |
 | `protocol.py` | Sample-level: `evaluate_split`, `full_report`. |
 | `token_data.py` | Token-level dataset: `load_token_dataset`, `parse_spans`, `char_spans_to_token_spans`. |
-| `token_protocol.py` | Token-level: `evaluate_token_split`, `full_token_report` with `all`/`span`/`span_max` aggregations. |
+| `token_protocol.py` | Token-level: `evaluate_token_split`, `full_token_report` with `all` / `proximal_all` / `span` / `span_max` / `dilated_span_max` aggregations. |
 | `repo_protocol.py` | Repo-level scan metrics: `repo_recall@K`, `trace_recall@K`, `precision@K`, MRR, CWE accuracy on hit leads. |
 | `report.py` | Markdown + JSON renderers for the sample-level path. |
 | `runtime.py` | Per-token probe overhead measurement (model-agnostic). |
 
-## Three aggregation levels (paper Section 4)
+## Aggregation levels (paper Section 4 + #25 dilation)
 
 | Level | Definition | Use case |
 |---|---|---|
-| `all` | every token, in or out of span | streaming-UI noise floor — measures false-alarm rate over arbitrary safe code |
-| `span` | tokens inside annotated spans only | localisation quality on the labelled regions |
-| `span_max` | one decision per span: `max(probs[start:end+1])` | example-level decision metric |
+| `all` | every token; positive iff inside any positive span | streaming-UI noise floor — measures false-alarm rate over arbitrary safe code |
+| `proximal_all` | per-token; positive mask dilated by ±W tokens around each positive span | tolerates probe firing near (but not exactly on) the labelled region |
+| `span` | tokens inside annotated spans only (NaN on SVEN — sanitizer spans absent → single-class) | localisation quality on the labelled regions |
+| `span_max` | one pair per example: `(row.label, max(probs))` over the WHOLE FILE, symmetric across positives and negatives | example-level decision metric matching the streaming-UI rule |
+| `dilated_span_max` | one pair per example. Positives: `max(probs)` over the union of positive spans dilated by ±W. Negatives: whole-file max | partial-credit version of `span_max` (#25) |
 
 **Note on the current SVEN dataset.** `data/dataset.jsonl` has zero
 sanitizer spans, so the `span` level is single-class and AUC is NaN
-there. The framework pads negative examples (label=0) with a synthetic
-whole-file negative span for the `span_max` computation
-(`pad_negatives_for_span_max=True`), so span_max becomes a proper binary
-classifier matching the streaming-UI operational metric.
+there. `span_max` does NOT consult the annotated spans for scoring —
+it is a strict per-example whole-file-max on both sides — so it is
+unaffected by the absence of sanitizer spans. The
+`pad_negatives_for_span_max` argument is retained on
+`_collect_for_indices` for API compatibility but is now a no-op (see
+the function's docstring for the asymmetry-fix rationale).
 
 ## What we do that the paper doesn't
 
@@ -99,10 +103,8 @@ uv run --with scikit-learn --with numpy python scripts/run_token_eval.py \
 
 The two `.npz` inputs are per-row probability arrays + per-row
 `(T, 2)` char offsets; format: `probs_row_NNNN` / `offsets_row_NNNN`
-keys. They land once the extractor in `src/extract_token_activations.py`
-is fixed ([#17](https://github.com/peaktwilight/gemmaforge/issues/17)).
-The notebook below runs in demo mode against synthetic oracle scores
-while waiting.
+keys. The extractor is `src/extract_token_activations.py`; issue #17 was
+closed after wiring `token_labels` and tokenizer offsets correctly.
 
 ### Repo-level generated benchmark
 
@@ -168,15 +170,15 @@ MAX_REPOS=5 CUDA_VISIBLE_DEVICES=0 bash scripts/run_repo_scan_gpu.sh
 
 ### Notebooks
 
-- `notebooks/eval_probe_report.ipynb` — sample-level top-line.
-- `notebooks/eval_calibration.ipynb` — sample-level reliability + threshold.
-- `notebooks/eval_baselines.ipynb` — sample-level probe vs trivial baselines.
-- `notebooks/eval_token_probe.ipynb` — token-level three-level table, demo + real modes.
+- `experiments/notebooks/reports/eval_probe_report.ipynb` — sample-level top-line.
+- `experiments/notebooks/reports/eval_calibration.ipynb` — sample-level reliability + threshold.
+- `experiments/notebooks/reports/eval_baselines.ipynb` — sample-level probe vs trivial baselines.
+- `experiments/notebooks/reports/eval_token_probe.ipynb` — token-level three-level table, demo + real modes.
 
 `.py` (jupytext-percent) is the source. Convert via:
 
 ```bash
-uvx jupytext --to ipynb notebooks/eval_token_probe.py
+uvx jupytext --to ipynb experiments/notebooks/reports/eval_token_probe.py
 ```
 
 ### Library
@@ -197,7 +199,7 @@ full = protocol.full_report(
 )
 report.write_report(full, "data/eval/report.md", "data/eval/report.json")
 
-# Token-level (once #17 lands)
+# Token-level
 from src.eval import token_data, token_protocol
 
 rows = token_data.load_token_dataset("data/dataset.jsonl")

@@ -1,6 +1,6 @@
 """Train a token-level value-head probe on a frozen Gemma layer, locally.
 
-Local equivalent of `notebooks/colab_train_gemma4_probe.py`. Reads
+Local equivalent of `experiments/notebooks/training/colab_train_gemma4_probe.py`. Reads
 `data/dataset.jsonl` (the SVEN-diff dataset built by `scripts/build_dataset.py`),
 loads the base model frozen, trains a single linear value head on one decoder
 layer with BCE + span-max loss, and writes the probe + card to disk.

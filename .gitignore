@@ -8,10 +8,13 @@ data/activations/
 data/activations_dataset/
 data/activations_e4b/
 data/activations_sven/
+data/activations_v2/
 data/token_activations/
 data/token_activations_smoke/
 data/repo_benchmark/leads*/
 data/repo_benchmark_heldout/leads*/
+hfspace_gradio/data/
+hfspace_gradio/probes/
 .claude/
 .playwright-mcp/
 .DS_Store

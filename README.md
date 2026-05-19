@@ -22,6 +22,7 @@ Nothing leaves the laptop. The probe is what the metrics below validate. The age
 - In-distribution baseline AUC 0.963, group-by-repo AUC 0.958, held-out CWE 0.92–0.96. <1 ms per-token overhead on M1/M2/M3.
 
 Full audit trail: [`RESULTS.md`](RESULTS.md). Submission write-up: [`WRITEUP.md`](WRITEUP.md).
+Repository layout and artifact ownership: [`docs/repo-map.md`](docs/repo-map.md) and [`data/README.md`](data/README.md).
 
 ![AUC ladder — every credible OOD split, plus the stacked headline](web/auc-ladder.png)
 
@@ -48,7 +49,7 @@ Tier 1 is inspired by [Obeso, Arditi et al. (2025)](https://arxiv.org/abs/2509.0
 
 Every number above is from the **sample-level** path — one label per snippet, linear probe on the last-token hidden state (`src/extract_activations.py` + `src/train_probe.py`). That is what ships in the demo today.
 
-In parallel we are training a **token-level** path — per-token spans (`evidence` / `sink` / `source` / `sanitizer`), value head on every position, BCE + span-max loss à la Obeso §3 — via `notebooks/colab_train_gemma4_probe.py` and `scripts/train_value_head.py`. Current token-level numbers on SVEN-diff at layer 8: **token AUC 0.768 / example AUC 0.700** (`data/probe_spanmax_card.json`). The token-level path is the principled streaming version; the intent is for it to *replace* sample-level once the head-to-head eval lands.
+In parallel we are training a **token-level** path — per-token spans (`evidence` / `sink` / `source` / `sanitizer`), value head on every position, BCE + span-max loss à la Obeso §3 — via `experiments/notebooks/training/colab_train_gemma4_probe.py` and `scripts/train_value_head.py`. Current token-level numbers on SVEN-diff at layer 8: **token AUC 0.768 / example AUC 0.700** (`data/probe_spanmax_card.json`). The token-level path is the principled streaming version; the intent is for it to *replace* sample-level once the head-to-head eval lands.
 
 ## Results at a glance
 
@@ -144,7 +145,7 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
 - **Two entry points:**
   - `python -m src.scan <repo>` — repo walk, sliding-window chunks, ranked `gemmaforge.leads/v1` JSONL on stdout, `gemmaforge.events/v1` ND-JSON to `--events <path>`. Schemas in [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md).
   - `python -m src.stream_with_probe --serve` — single-snippet streaming SSE UI in `web/index.html`. Max-pool aggregation by default (T3-robust).
-- **HF Space** (`hfspace/app.py`, Gradio + ZeroGPU) wraps the streaming demo.
+- **HF Space** (`hfspace_gradio/app.py`, Gradio + ZeroGPU) wraps the streaming demo. The older Docker/dashboard Space lives under `archive/deploy/hfspace-dashboard/`.
 
 **Tier 2 (pwnkit#371, merged 2026-05-18):**
 - `--seed-findings <path|->` — parses our `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s and threads them through the pipeline. Stable wire format.
@@ -251,7 +252,7 @@ Every number in [`RESULTS.md`](RESULTS.md) is regenerated from these scripts; fl
 ## Colab training
 
 To train and publish the probe from a fresh GPU Colab runtime, open
-[`notebooks/colab_train_gemma4_probe.ipynb`](notebooks/colab_train_gemma4_probe.ipynb).
+[`experiments/notebooks/training/colab_train_gemma4_probe.ipynb`](experiments/notebooks/training/colab_train_gemma4_probe.ipynb).
 The notebook clones this repo, installs the Hugging Face stack, builds the dataset,
 trains/evaluates a frozen-model token-level value head on a Gemma 4 decoder layer,
 and uploads the resulting bundle to Hugging Face Hub.
@@ -282,12 +283,13 @@ The streaming web UI uses the Server-Sent-Events feed at `/stream?prompt=…`. T
 | `src/` | Probe core: activation extraction, train (`train_probe.py`, `train_probe_spanmax.py`), streaming inference + SSE server (`stream_with_probe.py`), calibration, attention-probe variant. |
 | `data/` | Datasets (`pairs_v2.jsonl`, `pairs_sven.jsonl`, `dataset.jsonl`), cached activations (`activations_v2/`), shipped probe weights (`probe.npz`), every eval JSON cited in `RESULTS.md`. |
 | `scripts/` | Pipeline runners: `build_dataset.py`, `eval_*.py` (maxpool, per-CWE, ensemble, MLP-ensemble, length-matched, LoRA), `train_lora.py`, `train_value_head.py`, `adversarial_full_suite.py`, `make_demo_grid.py`, `record_demo.py`, `deploy_hf.sh`. |
-| `notebooks/` | Colab/Kaggle training (`colab_train_gemma4_probe.ipynb` + `.py`, `colab_train_lora_dpo.py`, `kaggle_train_lora_dpo.py`) and eval companions (`eval_token_probe.ipynb`, `eval_baselines.ipynb`, `eval_calibration.ipynb`, `eval_probe_report.ipynb`). |
+| `experiments/notebooks/` | Colab/Kaggle training notebooks and report/eval companion notebooks, grouped under `training/`, `remote/`, and `reports/`. |
 | `docs/` | `coverage.md` (per-language probe coverage), `attention_probe_notes.md`, `findings_writeup_snippet.md`. |
 | `web/` | Single-file streaming UI (`index.html`, vanilla JS + SSE), cover art (`cover.svg`), demo screenshots (`screenshot-demo.png`, `demo-grid.png`), result charts (`auc-ladder.png`, `data-efficiency-curve.png`). |
-| `hfspace/` | HuggingFace Space deployment (Gradio + ZeroGPU `app.py`, requirements, space metadata). |
+| `hfspace_gradio/` | Current HuggingFace Space deployment (Gradio + ZeroGPU app, requirements, static viewer assets). |
+| `archive/` | Submission/video/process history and the older Docker/dashboard HF Space. |
 
-Top-level docs: [`WRITEUP.md`](WRITEUP.md) (Kaggle submission, ~1400 words), [`RESULTS.md`](RESULTS.md) (full metrics dashboard), [`SUBMISSION.md`](SUBMISSION.md) (submission checklist), [`VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md) (2:50 demo script), [`LINKEDIN.md`](LINKEDIN.md) (launch post).
+Top-level docs: [`WRITEUP.md`](WRITEUP.md) (Kaggle submission, ~1400 words), [`RESULTS.md`](RESULTS.md) (full metrics dashboard). Submission checklist, video script, voiceover, launch post, and recordings live under `archive/submission/`.
 
 ## Data efficiency
 
@@ -339,7 +341,7 @@ This is the load-bearing argument. No closed model and no open non-Gemma model g
 
 Tracked as open GitHub issues. Highlights:
 
-- **Token-level probe head-to-head vs sample-level.** Both trainers are live (`notebooks/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces sample-level as the production probe.
+- **Token-level probe head-to-head vs sample-level.** Both trainers are live (`experiments/notebooks/training/colab_train_gemma4_probe.py`, `scripts/train_value_head.py`) against `data/dataset.jsonl` with per-token spans. The eval decides whether token-level replaces sample-level as the production probe.
 - **`strong-probe` validation run.** Train the linear head against a larger Gemma checkpoint's hidden states and publish the same metric table for it.
 - **Full DPO LoRA on dedicated GPU.** `scripts/train_lora.py` already supports `--max_steps 500`; we need a clean CUDA box. Stretch goal: re-train the probe *jointly* with the LoRA, the way Obeso §3 does — probe gradient gets a stop-grad on the base, the LoRA gradient flows.
 - **More languages.** Rust + Go via CyberSecEval-2; Ruby via RubySec advisory DB; PHP via SARD/Juliet. The activation-extraction pipeline is the bottleneck, not the probe.

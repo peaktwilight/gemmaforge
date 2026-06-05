@@ -9,7 +9,7 @@
 
 ## Team — security meets interpretability
 
-- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. Disclosed [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`, plus a number of additional CVE-grade vulnerabilities across widely-deployed npm packages. Builder of [`pwnkit`](https://github.com/0sec-labs/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source — and built the Tier-2 agent runtime this submission depends on.
+- [**Doruk Tan Ozturk**](https://doruk.ch) ([@peaktwilight](https://github.com/peaktwilight)) — security researcher, ex-ETH Zürich. Disclosed [CVE-2026-33896](https://github.com/digitalbazaar/forge/security/advisories) in `node-forge`, plus a number of additional CVE-grade vulnerabilities across widely-deployed npm packages. Builder of [`pwnkit`](https://0sec.ai/pwnkit) (agentic AI pentest framework) and [**0sec.ai**](https://0sec.ai). Knows what a bug looks like in source — and built the Tier-2 agent runtime this submission depends on.
 - **Mehmet Efe Akça** — MSc Data Science, ETH Zürich. Coursework in *Reliable and Trustworthy AI*, *Probabilistic AI*. TA for *Mathematics of Signals, Networks, and Learning*. Built the linear-probe path: dataset, activation capture, training, evaluation. Knows how to read what a neural network is thinking.
 
 Doruk alone gives you a scanner; Efe alone gives you a probe. Together: **a probe that knows about danger, and an agent that can prove it.**
@@ -49,7 +49,7 @@ Best layer: **17 of 35**. Stacked ablations: 4-layer ensemble → 0.976 random; 
 
 **Per-CWE multi-head probe** — 5 one-vs-rest logits on layer 17 covering CWE-78/338/95/94/328. **Macro AUC 0.9726.** The argmax populates `gemmaforge_top_cwe` so the Tier 2 agent receives both *where* and *what kind of bug* the probe suspects.
 
-### Tier 2 — big Gemma + agentic verifier (consumer: [`0sec-labs/pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371), merged 2026-05-18)
+### Tier 2 — big Gemma + agentic verifier (consumer: [`0sec-labs/pwnkit#371`](https://0sec.ai/pwnkit), merged 2026-05-18)
 
 Tier 1 emits a `gemmaforge.leads/v1` JSONL stream (see `docs/leads-schema.md`):
 
@@ -60,7 +60,7 @@ Tier 1 emits a `gemmaforge.leads/v1` JSONL stream (see `docs/leads-schema.md`):
  "gemmaforge_layer": 17, "model_id": "google/gemma-4-E2B-it", "rank": 0}
 ```
 
-Doruk's pwnkit consumes this via `pwnkit review --seed-findings leads.jsonl --seed-only --runtime ollama` and runs an agentic auditor driven by Gemma 4 8B through Ollama. The runtime hits Ollama's `/api/chat` with `tools[]` and translates tool-calls into pwnkit `tool_use` blocks — native function-calling, no API key, no network. **Shipped end-to-end today (two merged PRs, 2026-05-18):** [`pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371) adds `--seed-findings`, the `--runtime ollama` driver for Gemma 4 8B, and the `/live` three-lane dashboard. [`pwnkit#372`](https://github.com/0sec-labs/pwnkit/pull/372) adds worklist injection (leads prepended as `SemgrepFinding`-shaped records), streaming tool-calls, and the Hunt-lane SSE channel with click-to-highlight provenance back to the originating lead. Two Gemma sizes, two roles, zero cloud.
+Doruk's pwnkit consumes this via `pwnkit review --seed-findings leads.jsonl --seed-only --runtime ollama` and runs an agentic auditor driven by Gemma 4 8B through Ollama. The runtime hits Ollama's `/api/chat` with `tools[]` and translates tool-calls into pwnkit `tool_use` blocks — native function-calling, no API key, no network. **Shipped end-to-end today (two merged PRs, 2026-05-18):** [`pwnkit#371`](https://0sec.ai/pwnkit) adds `--seed-findings`, the `--runtime ollama` driver for Gemma 4 8B, and the `/live` three-lane dashboard. [`pwnkit#372`](https://0sec.ai/pwnkit) adds worklist injection (leads prepended as `SemgrepFinding`-shaped records), streaming tool-calls, and the Hunt-lane SSE channel with click-to-highlight provenance back to the originating lead. Two Gemma sizes, two roles, zero cloud.
 
 ## Why Gemma 4 specifically — *the model-size family is the architecture*
 

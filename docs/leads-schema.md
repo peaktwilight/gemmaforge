@@ -1,6 +1,6 @@
 # GemmaForge → external-tool leads schema
 
-The contract that downstream agentic hunters (e.g. [pwnkit](https://github.com/0sec-labs/pwnkit) via `--seed-findings`) consume from `gemmaforge scan`.
+The contract that downstream agentic hunters (e.g. [pwnkit](https://0sec.ai/pwnkit) via `--seed-findings`) consume from `gemmaforge scan`.
 
 Wire format: **ND-JSON** (one JSON object per line, UTF-8, LF-terminated). One file per scan; one record per ranked candidate vulnerable region.
 

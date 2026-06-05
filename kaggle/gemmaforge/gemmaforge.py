@@ -33,7 +33,7 @@
 # - Repo: https://github.com/peaktwilight/gemmaforge
 # - Writeup: https://www.kaggle.com/competitions/gemma-4-good-hackathon/writeups
 # - Dashboard: https://huggingface.co/spaces/peaktwilight/gemmaforge
-# - Pwnkit (Tier 3 verifier): https://github.com/0sec-labs/pwnkit
+# - Pwnkit (Tier 3 verifier): https://0sec.ai/pwnkit
 
 # %%
 # ## Bootstrap
@@ -285,7 +285,7 @@ print("See https://github.com/peaktwilight/gemmaforge/blob/main/data/eval/strong
 #   re-scores Tier 1 leads with the E4B strong-probe and adds cascade
 #   decisions (`promote` / `defer` / `drop`).
 # - **Tier 3 verifier** — `pwnkit review --seed-findings scored.jsonl
-#   --runtime ollama` (see https://github.com/0sec-labs/pwnkit/pull/371)
+#   --runtime ollama` (see https://0sec.ai/pwnkit)
 #   picks up the JSONL as a worklist and runs the Gemma 4 27B agent
 #   locally via Ollama — fully off-cloud audit.
 # - **Live dashboard** — https://huggingface.co/spaces/peaktwilight/gemmaforge

@@ -43,7 +43,7 @@ and run `python -m src.scan` locally — the same probe, same schema, no caps.
 
 ## Related
 
-- Tier 2 verifier — [`pwnkit`](https://github.com/0sec-labs/pwnkit) consumes the
+- Tier 2 verifier — [`pwnkit`](https://0sec.ai/pwnkit) consumes the
   same `gemmaforge.leads/v1` JSONL via `--seed-findings`, drives Gemma 4 27B as an
   agent that reads files and corroborates each lead.
 - Dashboard Space — [`peaktwilight/gemmaforge`](https://huggingface.co/spaces/peaktwilight/gemmaforge)

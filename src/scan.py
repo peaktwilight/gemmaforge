@@ -11,7 +11,7 @@ Usage::
         --languages py,js > leads.jsonl
 
 Pairs with pwnkit's ``--seed-findings`` flag (see
-https://github.com/0sec-labs/pwnkit/issues/368) so a smaller GemmaForge probe
+https://0sec.ai/pwnkit) so a smaller GemmaForge probe
 can pick leads for a larger agentic hunter to chase.
 """
 from __future__ import annotations

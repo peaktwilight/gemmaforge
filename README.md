@@ -8,9 +8,9 @@ GemmaForge is a two-tier, fully-local pipeline built on the Gemma 4 family.
 - **`weak-probe`** — Gemma 4 E2B backbone, bounded line/token windows, high recall, **laptop-class**. Default; what the metrics below validate.
 - **`strong-probe`** — larger Gemma checkpoint as the probe backbone, larger windows, more repo context, better ranking. **Workstation-class.** Same `gemmaforge.leads/v1` schema.
 
-**Tier 2 — pwnkit verifier.** Gemma 4 8B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://github.com/0sec-labs/pwnkit/pull/371)) that consumes the leads as its **primary worklist**, reads files, greps call sites, and produces tool-grounded audit verdicts. Consumes leads from either probe.
+**Tier 2 — pwnkit verifier.** Gemma 4 8B via Ollama drives a tool-using agent ([`pwnkit review --seed-findings --runtime ollama`](https://0sec.ai/pwnkit)) that consumes the leads as its **primary worklist**, reads files, greps call sites, and produces tool-grounded audit verdicts. Consumes leads from either probe.
 
-Nothing leaves the laptop. The probe is what the metrics below validate. The agent verifier is shipped end-to-end at the CLI + runtime + dashboard layer in two merged pwnkit PRs: [`#371`](https://github.com/0sec-labs/pwnkit/pull/371) (CLI, Ollama runtime, three-lane dashboard) and [`#372`](https://github.com/0sec-labs/pwnkit/pull/372) (seed-findings worklist injection, streaming Ollama tool-calls, live Hunt lane). Both merged 2026-05-18.
+Nothing leaves the laptop. The probe is what the metrics below validate. The agent verifier is shipped end-to-end at the CLI + runtime + dashboard layer in two merged pwnkit PRs: [`#371`](https://0sec.ai/pwnkit) (CLI, Ollama runtime, three-lane dashboard) and [`#372`](https://0sec.ai/pwnkit) (seed-findings worklist injection, streaming Ollama tool-calls, live Hunt lane). Both merged 2026-05-18.
 
 ## Headline numbers
 
@@ -33,7 +33,7 @@ Repository layout and artifact ownership: [`docs/repo-map.md`](docs/repo-map.md)
 Two demo flows:
 
 1. **IDE-mode (Tier 1 only)** — the probe rides every token Gemma 4 emits. Green (<0.4), yellow (0.4–0.7), red (>0.7). The red cluster above — `db.query(\`SELECT * FROM users WHERE id = ${id}\`)` — is a CWE-89 SQL-injection pattern. This is the streaming UI in `src/stream_with_probe.py` and the HuggingFace Space below.
-2. **Repo-audit mode (Tier 1 → leads → Tier 2)** — `python -m src.scan ./repo --events live.ndjson > leads.jsonl` walks the codebase, emits ranked `gemmaforge.leads/v1` JSONL, streams `gemmaforge.events/v1` to the [pwnkit `/live` dashboard](https://github.com/0sec-labs/pwnkit/pull/371) (Lane 1 · Probe, Lane 2 · Leads), then hands the leads to `pwnkit review --seed-findings ... --runtime ollama` for Gemma 4 8B agentic verification.
+2. **Repo-audit mode (Tier 1 → leads → Tier 2)** — `python -m src.scan ./repo --events live.ndjson > leads.jsonl` walks the codebase, emits ranked `gemmaforge.leads/v1` JSONL, streams `gemmaforge.events/v1` to the [pwnkit `/live` dashboard](https://0sec.ai/pwnkit) (Lane 1 · Probe, Lane 2 · Leads), then hands the leads to `pwnkit review --seed-findings ... --runtime ollama` for Gemma 4 8B agentic verification.
 
 **Live HF Space:** [`peaktwilight/gemmaforge`](https://huggingface.co/spaces/peaktwilight/gemmaforge) (HuggingFace Space, ZeroGPU).
 
@@ -113,7 +113,7 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
                                                  ranked leads JSONL (gemmaforge.leads/v1)
                                                  + events stream     (gemmaforge.events/v1)
                                                                      │
-   ┌─────────────────────────  Tier 2 (0sec-labs/pwnkit#371)  ─────────────────┘
+   ┌──────────────────────────────  Tier 2 (pwnkit#371)  ──────────────────────┘
                                                                      │
               pwnkit `/live` dashboard ◄── SSE ──┐                    │
               (Lane 1 · Probe, Lane 2 · Leads,                         │
@@ -149,7 +149,7 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
 
 **Tier 2 (pwnkit#371, merged 2026-05-18):**
 - `--seed-findings <path|->` — parses our `gemmaforge.leads/v1` JSONL into typed `SeedFinding`s and threads them through the pipeline. Stable wire format.
-- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:latest`. **Streaming tool-calls** ship in [pwnkit#372](https://github.com/0sec-labs/pwnkit/pull/372).
+- `--runtime ollama` — drives Ollama `/api/chat` with `tools[]`; defaults to `gemma4:latest`. **Streaming tool-calls** ship in [pwnkit#372](https://0sec.ai/pwnkit).
 - `/live` dashboard — three lanes (Probe / Leads / Hunt), all live-wired via SSE. The Hunt lane subscribes to `pwnkit.events/v1`, click-to-highlight resolves a verdict back to its originating lead.
 - **Worklist injection.** `pwnkit#372` converts each `SeedFinding` into a `SemgrepFinding`-shaped record (severity bucketed from probe confidence, `ruleId` prefixed with the source + CWE for visible provenance, full payload preserved in `metadata`) and prepends it to the agent's worklist so the agent sees probe leads first. `--seed-only` honours that by skipping the static-scan pass entirely.
 
@@ -161,7 +161,7 @@ CWE coverage in `pairs_v2.jsonl`: CWE-22/78/79/89/94/95/185/208/312/319/328/338/
 
 ## Team
 
-**Doruk Tan Ozturk** — [@peaktwilight](https://github.com/peaktwilight) · [doruk.ch](https://doruk.ch) · security researcher, ex-ETH Zürich, building [0sec.ai](https://0sec.ai). Disclosed CVE-2026-33896 in `node-forge` and additional CVE-grade vulnerabilities across widely-deployed npm packages; the public patches inform our training set. **Built Tier 2** — the [`pwnkit`](https://github.com/0sec-labs/pwnkit) agentic verifier and its [GemmaForge integration PR](https://github.com/0sec-labs/pwnkit/pull/371).
+**Doruk Tan Ozturk** — [@peaktwilight](https://github.com/peaktwilight) · [doruk.ch](https://doruk.ch) · security researcher, ex-ETH Zürich, building [0sec.ai](https://0sec.ai). Disclosed CVE-2026-33896 in `node-forge` and additional CVE-grade vulnerabilities across widely-deployed npm packages; the public patches inform our training set. **Built Tier 2** — the [`pwnkit`](https://0sec.ai/pwnkit) agentic verifier and its [GemmaForge integration PR](https://0sec.ai/pwnkit).
 
 **Mehmet Efe Akça** — MSc Data Science @ **ETH Zürich** · TA for *Mathematics of Signals, Networks, and Learning*. Coursework: *Reliable and Trustworthy AI: interpretability & verifiability*, *Probabilistic AI*, *Large-Scale AI*. **Built Tier 1** — the linear-probe path: dataset, activation capture, training, evaluation, the per-CWE multi-head, and the streaming/scan entry points. The interpretability technique sits directly in his area of study.
 
@@ -203,18 +203,18 @@ python -m src.scan ./your-repo \
     --events live.ndjson > leads.jsonl
 
 # 2. hand the leads to pwnkit's agentic auditor driving Gemma 4 8B locally
-#    (install pwnkit from https://github.com/0sec-labs/pwnkit)
+#    (install pwnkit from https://0sec.ai/pwnkit)
 pwnkit review ./your-repo \
     --seed-findings leads.jsonl \
     --seed-only \
     --runtime ollama
 ```
 
-The pwnkit `/live` dashboard renders all three lanes live (Probe / Leads / Hunt) — see [`pwnkit#371`](https://github.com/0sec-labs/pwnkit/pull/371) for the CLI + runtime + dashboard scaffold and [`pwnkit#372`](https://github.com/0sec-labs/pwnkit/pull/372) for worklist injection, streaming Ollama tool-calls, and live hunt-lane wiring. With `--seed-only`, the probe's leads are the agent's only worklist; without it, they prepend the static scan.
+The pwnkit `/live` dashboard renders all three lanes live (Probe / Leads / Hunt) — see [`pwnkit#371`](https://0sec.ai/pwnkit) for the CLI + runtime + dashboard scaffold and [`pwnkit#372`](https://0sec.ai/pwnkit) for worklist injection, streaming Ollama tool-calls, and live hunt-lane wiring. With `--seed-only`, the probe's leads are the agent's only worklist; without it, they prepend the static scan.
 
 ## Pipeline: GemmaForge → pwnkit (small Gemma finds, big Gemma hunts)
 
-The probe doesn't have to stop at "this looks risky" — it can hand findings to an agentic hunter that actually exploits them. Today GemmaForge ships a first-party integration with [pwnkit](https://github.com/0sec-labs/pwnkit), an open-source agentic-AI pentest framework:
+The probe doesn't have to stop at "this looks risky" — it can hand findings to an agentic hunter that actually exploits them. Today GemmaForge ships a first-party integration with [pwnkit](https://0sec.ai/pwnkit), an open-source agentic-AI pentest framework:
 
 ```bash
 # 1. scan a repo with the probe → ND-JSON leads (gemmaforge.leads/v1)
@@ -227,7 +227,7 @@ pwnkit-cli review examples/vuln-express-app \
     --model gemma4:latest
 ```
 
-Same Gemma family, two roles: small E2B probe finds, Gemma 4 8B agent hunts. Zero cloud spend, zero data leaving the laptop. Schema contracts at [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md). Pre-computed [`examples/leads.jsonl`](examples/leads.jsonl) is shipped so judges without local Gemma weights can run step 2 alone. The pwnkit side landed in [PR #371](https://github.com/0sec-labs/pwnkit/pull/371) and [PR #372](https://github.com/0sec-labs/pwnkit/pull/372).
+Same Gemma family, two roles: small E2B probe finds, Gemma 4 8B agent hunts. Zero cloud spend, zero data leaving the laptop. Schema contracts at [`docs/leads-schema.md`](docs/leads-schema.md) and [`docs/events.md`](docs/events.md). Pre-computed [`examples/leads.jsonl`](examples/leads.jsonl) is shipped so judges without local Gemma weights can run step 2 alone. The pwnkit side landed in [PR #371](https://0sec.ai/pwnkit) and [PR #372](https://0sec.ai/pwnkit).
 
 ## How to reproduce the headline numbers
 

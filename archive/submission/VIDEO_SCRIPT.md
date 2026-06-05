@@ -303,7 +303,7 @@ node-forge · plus ~10 more in npm packages totalling 200M+ DL/mo.
 
    Repo:    github.com/peaktwilight/gemmaforge
    Live:    huggingface.co/spaces/peaktwilight/gemmaforge
-   pwnkit:  github.com/0sec-labs/pwnkit  (PR #371, #372)
+   pwnkit:  0sec.ai/pwnkit  (PR #371, #372)
 
    Tracks:  Main · Safety & Trust · Ollama
 ```

@@ -1,6 +1,6 @@
 # GemmaForge live event stream
 
-ND-JSON event stream emitted by `src/scan.py` and `src/stream_with_probe.py` when invoked with `--events <path|->`. Designed for live dashboards (e.g. the pwnkit dashboard `live` view, see [0sec-labs/pwnkit#370](https://github.com/0sec-labs/pwnkit/issues/370)) and for replay tooling.
+ND-JSON event stream emitted by `src/scan.py` and `src/stream_with_probe.py` when invoked with `--events <path|->`. Designed for live dashboards (e.g. the pwnkit dashboard `live` view, see [0sec-labs/pwnkit#370](https://0sec.ai/pwnkit)) and for replay tooling.
 
 Schema id: `gemmaforge.events/v1`.
 

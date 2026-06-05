@@ -23,4 +23,4 @@ Every byte on Panels 2–4 came out of genuine pipeline runs — no hand-crafted
 
 Built for the [Gemma 4 Good Hackathon](https://kaggle.com/competitions/gemma-4-good-hackathon) by [Doruk Tan Ozturk](https://doruk.ch) and Mehmet Efe Akça.
 
-[GitHub repo](https://github.com/peaktwilight/gemmaforge) · [Kaggle writeup](https://kaggle.com/competitions/gemma-4-good-hackathon/writeups) · [pwnkit](https://github.com/0sec-labs/pwnkit)
+[GitHub repo](https://github.com/peaktwilight/gemmaforge) · [Kaggle writeup](https://kaggle.com/competitions/gemma-4-good-hackathon/writeups) · [pwnkit](https://0sec.ai/pwnkit)

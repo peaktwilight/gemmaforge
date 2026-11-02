@@ -6,3 +6,4 @@ accelerate>=0.34
 numpy>=1.26
 fastapi
 uvicorn
+pillow==13.0.0

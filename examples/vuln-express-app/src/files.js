@@ -42,7 +42,12 @@ router.get('/files', (req, res) => {
 // BUG (CWE-22): same class of issue, this time using string concatenation
 // instead of path.join. Equally bypassable with "../" segments.
 router.get('/files/raw/:name', (req, res) => {
-  const filePath = DATA_ROOT + '/' + req.params.name;
+  let filePath;
+  try {
+    filePath = safeJoin(DATA_ROOT, req.params.name);
+  } catch (e) {
+    return res.status(400).json({ error: 'bad path' });
+  }
   fs.readFile(filePath, (err, buf) => {
     if (err) return res.status(404).end();
     res.send(buf);

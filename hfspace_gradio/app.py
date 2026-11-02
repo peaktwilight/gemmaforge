@@ -225,9 +225,14 @@ def _trim_file_list(root: Path, languages: set[str], cap: int) -> list[Path]:
     from gemmaforge_core.scan import LANG_BY_EXT, SKIP_DIRS
 
     picked: list[Path] = []
+    root_resolved = root.resolve()
     for path in sorted(root.rglob("*")):
         if len(picked) >= cap:
             break
+        try:
+            path.resolve().relative_to(root_resolved)
+        except (OSError, RuntimeError, ValueError):
+            continue
         if not path.is_file():
             continue
         if any(part in SKIP_DIRS for part in path.relative_to(root).parts):

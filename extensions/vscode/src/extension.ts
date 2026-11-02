@@ -54,7 +54,8 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const cfg = vscode.workspace.getConfiguration("gemmaforge");
-      const baseUrl: string = cfg.get("serverUrl", "http://localhost:8787");
+      const baseUrl: string =
+        cfg.inspect<string>("serverUrl")?.globalValue ?? "http://localhost:8787";
 
       statusBarItem.text = "$(sync~spin) GemmaForge: streaming...";
       const startLine = selection.start.line;

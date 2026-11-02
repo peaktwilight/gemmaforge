@@ -698,6 +698,25 @@ def make_handler(args):
                 if api_key.startswith("AIza")
                 else "https://openrouter.ai/api/v1"
             )
+            try:
+                parsed_base_url = urlparse(base_url)
+                allowed_hosts = {"generativelanguage.googleapis.com", "openrouter.ai"}
+                valid_base_url = (
+                    isinstance(base_url, str)
+                    and parsed_base_url.scheme == "https"
+                    and parsed_base_url.hostname in allowed_hosts
+                    and parsed_base_url.port in (None, 443)
+                    and parsed_base_url.username is None
+                    and parsed_base_url.password is None
+                )
+            except (TypeError, ValueError):
+                valid_base_url = False
+            if not valid_base_url:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"unsupported baseUrl"}')
+                return
 
             # Pick the repo to scan — bake in our vuln-express-app demo.
             repo_path = REPO_ROOT / "examples" / "vuln-express-app"

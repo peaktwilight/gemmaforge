@@ -14,9 +14,11 @@ const router = express.Router();
 // "safe" pattern would be execFile('ping', ['-c', '1', host]) with no shell
 // metachar parsing at all (see /ping/safe below).
 router.get('/ping', (req, res) => {
-  const host = req.query.host || 'localhost';
-  const cmd = `ping -c 1 ${host}`;
-  exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
+  const host = String(req.query.host || 'localhost');
+  if (!/^[a-zA-Z0-9.\\-]+$/.test(host)) {
+    return res.status(400).json({ error: 'bad host' });
+  }
+  execFile('ping', ['-c', '1', host], { timeout: 5000 }, (err, stdout, stderr) => {
     if (err) {
       return res.status(500).type('text/plain').send(stderr || String(err));
     }

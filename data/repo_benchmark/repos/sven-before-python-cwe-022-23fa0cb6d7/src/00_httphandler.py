@@ -6,7 +6,7 @@
                 return 'not_permitted'
         # make sure nobody tries to escape from basedir
         for f in filelist:
-            if '/../' in f:
+            if '/../' in f or f.startswith('../') or os.path.isabs(f):
                 return 'invalid_file'
         # make sure all files are smaller than maximum download size
         size_limit = cherry.config['media.maximum_download_size']

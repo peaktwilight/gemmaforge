@@ -693,7 +693,7 @@ def make_handler(args):
                 return
 
             model = body.get("model") or "google/gemma-4-31b-it"
-            base_url = body.get("baseUrl") or (
+            base_url = (
                 "https://generativelanguage.googleapis.com/v1beta/openai"
                 if api_key.startswith("AIza")
                 else "https://openrouter.ai/api/v1"

@@ -3,7 +3,7 @@
 // Intentionally vulnerable demo code for GemmaForge → pwnkit pipeline testing.
 // DO NOT deploy this anywhere reachable.
 const express = require('express');
-const { exec, execFile } = require('child_process');
+const { execFile } = require('child_process');
 
 const router = express.Router();
 
@@ -14,9 +14,11 @@ const router = express.Router();
 // "safe" pattern would be execFile('ping', ['-c', '1', host]) with no shell
 // metachar parsing at all (see /ping/safe below).
 router.get('/ping', (req, res) => {
-  const host = req.query.host || 'localhost';
-  const cmd = `ping -c 1 ${host}`;
-  exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
+  const host = String(req.query.host || 'localhost');
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9.\\-]*$/.test(host)) {
+    return res.status(400).json({ error: 'bad host' });
+  }
+  execFile('ping', ['-c', '1', host], { timeout: 5000 }, (err, stdout, stderr) => {
     if (err) {
       return res.status(500).type('text/plain').send(stderr || String(err));
     }
@@ -29,8 +31,11 @@ router.get('/ping', (req, res) => {
 // BUG (CWE-78): string-template into exec(). Even with a basic regex
 // allowlist this would still be safer as execFile.
 router.get('/traceroute', (req, res) => {
-  const host = req.query.host || '127.0.0.1';
-  exec('traceroute -n -m 5 ' + host, { timeout: 10000 }, (err, stdout) => {
+  const host = String(req.query.host || '127.0.0.1');
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9.\\-]*$/.test(host)) {
+    return res.status(400).json({ error: 'bad host' });
+  }
+  execFile('traceroute', ['-n', '-m', '5', host], { timeout: 10000 }, (err, stdout) => {
     if (err) return res.status(500).end();
     res.type('text/plain').send(stdout);
   });

@@ -230,6 +230,10 @@ def _trim_file_list(root: Path, languages: set[str], cap: int) -> list[Path]:
             break
         if not path.is_file():
             continue
+        try:
+            path.resolve().relative_to(root.resolve())
+        except (OSError, RuntimeError, ValueError):
+            continue
         if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
             continue
         ext = path.suffix.lower()

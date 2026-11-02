@@ -27,7 +27,7 @@ function safeJoin(root, name) {
 // ?name=../../etc/passwd resolves to /etc/passwd and is happily served.
 router.get('/files', (req, res) => {
   const name = req.query.name || 'index.txt';
-  const target = path.join(DATA_ROOT, name);
+  const target = safeJoin(DATA_ROOT, name);
   fs.readFile(target, 'utf8', (err, data) => {
     if (err) {
       console.error('read failed', err);
@@ -42,7 +42,7 @@ router.get('/files', (req, res) => {
 // BUG (CWE-22): same class of issue, this time using string concatenation
 // instead of path.join. Equally bypassable with "../" segments.
 router.get('/files/raw/:name', (req, res) => {
-  const filePath = DATA_ROOT + '/' + req.params.name;
+  const filePath = safeJoin(DATA_ROOT, req.params.name);
   fs.readFile(filePath, (err, buf) => {
     if (err) return res.status(404).end();
     res.send(buf);

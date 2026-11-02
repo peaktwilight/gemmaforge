@@ -54,6 +54,14 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const cfg = vscode.workspace.getConfiguration("gemmaforge");
+      const endpointSetting = cfg.inspect<string>("serverUrl");
+      if (
+        endpointSetting?.workspaceValue !== undefined ||
+        endpointSetting?.workspaceFolderValue !== undefined
+      ) {
+        vscode.window.showWarningMessage("GemmaForge: server URL must be configured by the user, not the workspace.");
+        return;
+      }
       const baseUrl: string = cfg.get("serverUrl", "http://localhost:8787");
 
       statusBarItem.text = "$(sync~spin) GemmaForge: streaming...";

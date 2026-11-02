@@ -46,8 +46,8 @@ router.get('/users/:id', (req, res) => {
 // validation or parameter binding.
 router.get('/users', (req, res) => {
   const role = req.query.role || 'member';
-  const sql = "SELECT id, email, role FROM users WHERE role='" + role + "' ORDER BY id";
-  db.query(sql, (err, rows) => {
+  const sql = 'SELECT id, email, role FROM users WHERE role=? ORDER BY id';
+  db.query(sql, [role], (err, rows) => {
     if (err) return res.status(500).json({ error: 'list failed' });
     res.json(rows);
   });

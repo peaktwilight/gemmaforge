@@ -71,3 +71,7 @@ static int oidc_handle_session_management_iframe_rp(request_rec *r, oidc_cfg *c,
 
 	return oidc_util_html_send(r, NULL, java_script, "setTimer", NULL, DONE);
 }
+	long poll_interval = strtol(s_poll_interval, NULL, 10);
+	if ((poll_interval <= 0) || (poll_interval > 3600 * 24))
+		poll_interval = 3000;
+	s_poll_interval = apr_psprintf(r->pool, "%ld", poll_interval);

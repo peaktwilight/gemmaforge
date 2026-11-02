@@ -1017,11 +1017,18 @@ def make_handler(args):
                 return
 
             model = body.get("model") or "google/gemma-4-31b-it"
-            base_url = body.get("baseUrl") or (
+            provider_base_url = (
                 "https://generativelanguage.googleapis.com/v1beta/openai"
                 if api_key.startswith("AIza")
                 else "https://openrouter.ai/api/v1"
             )
+            base_url = body.get("baseUrl") or provider_base_url
+            if base_url != provider_base_url:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"unsupported baseUrl"}')
+                return
 
             # Pick the repo to scan — bake in our vuln-express-app demo.
             repo_path = REPO_ROOT / "examples" / "vuln-express-app"

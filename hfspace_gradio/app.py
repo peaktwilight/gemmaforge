@@ -228,7 +228,7 @@ def _trim_file_list(root: Path, languages: set[str], cap: int) -> list[Path]:
     for path in sorted(root.rglob("*")):
         if len(picked) >= cap:
             break
-        if not path.is_file():
+        if path.is_symlink() or not path.is_file():
             continue
         if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
             continue

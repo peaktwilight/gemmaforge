@@ -13,8 +13,10 @@ const DATA_ROOT = process.env.DATA_ROOT || '/var/data';
 // safe helper — restricts a name to a single non-traversing segment.
 // Not used by the vulnerable routes below, on purpose.
 function safeJoin(root, name) {
-  const resolved = path.resolve(root, name);
-  if (!resolved.startsWith(path.resolve(root) + path.sep)) {
+  const rootPath = path.resolve(root);
+  const resolved = path.resolve(rootPath, name);
+  const prefix = rootPath.endsWith(path.sep) ? rootPath : rootPath + path.sep;
+  if (resolved !== rootPath && !resolved.startsWith(prefix)) {
     throw new Error('path escapes root');
   }
   return resolved;
@@ -27,7 +29,12 @@ function safeJoin(root, name) {
 // ?name=../../etc/passwd resolves to /etc/passwd and is happily served.
 router.get('/files', (req, res) => {
   const name = req.query.name || 'index.txt';
-  const target = path.join(DATA_ROOT, name);
+  let target;
+  try {
+    target = safeJoin(DATA_ROOT, name);
+  } catch (e) {
+    return res.status(400).json({ error: 'bad path' });
+  }
   fs.readFile(target, 'utf8', (err, data) => {
     if (err) {
       console.error('read failed', err);

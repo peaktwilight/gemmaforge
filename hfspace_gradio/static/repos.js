@@ -497,15 +497,31 @@ function renderLeadsSummary(detail) {
     const conf = Number(lead.gemmaforge_confidence || 0);
     const tau = state.confidenceThreshold || 0;
     if (conf < tau) tr.classList.add("below-tau");
-    const truthCell = MODE === "live" ? "" : `<td>${truthHit ? "✓ span" : ""} ${cweMatch ? "✓ cwe" : ""}</td>`;
-    tr.innerHTML = `
-      <td>#${(lead.rank ?? 0) + 1}</td>
-      <td>${lead.file}</td>
-      <td>${lead.start_line}–${lead.end_line}</td>
-      <td>${conf.toFixed(3)}<span class="conf-bar" style="width:${Math.round(conf * 60)}px"></span></td>
-      <td>${lead.gemmaforge_top_cwe || "—"}</td>
-      ${truthCell}
-    `;
+    const cells = [
+      `#${(lead.rank ?? 0) + 1}`,
+      lead.file,
+      `${lead.start_line}–${lead.end_line}`,
+    ];
+    for (const value of cells) {
+      const td = document.createElement("td");
+      td.textContent = String(value);
+      tr.appendChild(td);
+    }
+    const confidenceCell = document.createElement("td");
+    confidenceCell.textContent = conf.toFixed(3);
+    const bar = document.createElement("span");
+    bar.className = "conf-bar";
+    bar.style.width = `${Math.round(conf * 60)}px`;
+    confidenceCell.appendChild(bar);
+    tr.appendChild(confidenceCell);
+    const cweCell = document.createElement("td");
+    cweCell.textContent = lead.gemmaforge_top_cwe || "—";
+    tr.appendChild(cweCell);
+    if (MODE !== "live") {
+      const truthCell = document.createElement("td");
+      truthCell.textContent = `${truthHit ? "✓ span" : ""} ${cweMatch ? "✓ cwe" : ""}`;
+      tr.appendChild(truthCell);
+    }
     tbody.appendChild(tr);
   }
   wrap.appendChild(table);

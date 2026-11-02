@@ -705,8 +705,20 @@ def make_handler(args):
                 # Fallback: use whatever's under /app/examples/vuln-express-app
                 repo_path = Path("/app/examples/vuln-express-app")
 
-            run_id = _new_run_id()
             with _RUNS_LOCK:
+                # Bound concurrent subprocesses and retained per-run state.
+                for old_run_id in list(_RUNS):
+                    if len(_RUNS) < 100:
+                        break
+                    if _RUNS[old_run_id].get("done"):
+                        del _RUNS[old_run_id]
+                if len(_RUNS) >= 100 or sum(not run.get("done") for run in _RUNS.values()) >= 2:
+                    self.send_response(429)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(b'{"error":"pwnkit capacity reached"}')
+                    return
+                run_id = _new_run_id()
                 _RUNS[run_id] = {
                     "api_key": api_key,
                     "model": model,

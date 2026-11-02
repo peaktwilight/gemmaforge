@@ -145,6 +145,7 @@ def clone_shallow(url: str, dest: Path) -> None:
         "--quiet",
         url, str(dest),
     ]
+    # The post-clone size check does not bound bytes fetched/materialized here.
     proc = subprocess.run(
         cmd,
         capture_output=True,

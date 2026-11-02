@@ -65,6 +65,19 @@ export function activate(context: vscode.ExtensionContext) {
       let tokenIdx = 0;
 
       try {
+        const destination = new URL(baseUrl).origin;
+        if (destination !== "http://localhost:8787") {
+          const confirmation = await vscode.window.showWarningMessage(
+            `GemmaForge will send the selected text to ${destination}. Continue?`,
+            { modal: true },
+            "Send selection",
+          );
+          if (confirmation !== "Send selection") {
+            statusBarItem.text = "$(shield) GemmaForge: idle";
+            return;
+          }
+        }
+
         await streamSSE(baseUrl, prompt, (evt) => {
           if (evt.event !== "token" || typeof evt.risk !== "number") return;
           ema = tokenIdx === 0 ? evt.risk : EMA_ALPHA * evt.risk + (1 - EMA_ALPHA) * ema;

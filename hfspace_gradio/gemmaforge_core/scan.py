@@ -131,8 +131,13 @@ class Lead:
 
 
 def _iter_files(root: Path, languages: Optional[set[str]]) -> Iterator[Path]:
+    root_resolved = root.resolve()
     for path in sorted(root.rglob("*")):
         if not path.is_file():
+            continue
+        try:
+            path.resolve().relative_to(root_resolved)
+        except (OSError, RuntimeError, ValueError):
             continue
         if any(part in SKIP_DIRS for part in path.relative_to(root).parts):
             continue

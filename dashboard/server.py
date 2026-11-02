@@ -1031,15 +1031,23 @@ def make_handler(args):
 
             run_id = _new_run_id()
             with _RUNS_LOCK:
-                _RUNS[run_id] = {
-                    "api_key": api_key,
-                    "model": model,
-                    "base_url": base_url,
-                    "scan_id": None,
-                    "process": None,
-                    "started_at": time.time(),
-                    "done": False,
-                }
+                busy = any(not run["done"] for run in _RUNS.values())
+                if not busy:
+                    _RUNS[run_id] = {
+                        "api_key": api_key,
+                        "model": model,
+                        "base_url": base_url,
+                        "scan_id": None,
+                        "process": None,
+                        "started_at": time.time(),
+                        "done": False,
+                    }
+            if busy:
+                self.send_response(429)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"error":"a pwnkit run is already active"}')
+                return
             threading.Thread(
                 target=_spawn_pwnkit,
                 args=(run_id, leads_path, repo_path, pwnkit_cli, pwnkit_db),

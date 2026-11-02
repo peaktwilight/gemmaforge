@@ -707,6 +707,12 @@ def make_handler(args):
 
             run_id = _new_run_id()
             with _RUNS_LOCK:
+                if sum(not run.get("done", False) for run in _RUNS.values()) >= 2:
+                    self.send_response(429)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    self.wfile.write(b'{"error":"too many active pwnkit runs"}')
+                    return
                 _RUNS[run_id] = {
                     "api_key": api_key,
                     "model": model,

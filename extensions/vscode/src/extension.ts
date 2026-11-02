@@ -54,7 +54,19 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const cfg = vscode.workspace.getConfiguration("gemmaforge");
+      const serverUrlSetting = cfg.inspect<string>("serverUrl");
       const baseUrl: string = cfg.get("serverUrl", "http://localhost:8787");
+      if (
+        serverUrlSetting?.workspaceValue !== undefined ||
+        serverUrlSetting?.workspaceFolderValue !== undefined
+      ) {
+        const confirmation = await vscode.window.showWarningMessage(
+          `This workspace configures GemmaForge to send your selected text to ${baseUrl}. Continue?`,
+          { modal: true },
+          "Send selection",
+        );
+        if (confirmation !== "Send selection") return;
+      }
 
       statusBarItem.text = "$(sync~spin) GemmaForge: streaming...";
       const startLine = selection.start.line;

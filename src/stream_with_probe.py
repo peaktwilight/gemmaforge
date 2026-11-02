@@ -380,7 +380,7 @@ def run_server(args) -> None:
             except Exception as e:
                 self.wfile.write(f"data: {json.dumps({'event': 'error', 'message': str(e)})}\n\n".encode())
 
-    server = ThreadingHTTPServer(("0.0.0.0", 8787), Handler)
+    server = ThreadingHTTPServer(("127.0.0.1", 8787), Handler)
     print("[serve] listening on http://0.0.0.0:8787/  (UI: /  · SSE: /stream?prompt=…)", file=sys.stderr)
     server.serve_forever()
 

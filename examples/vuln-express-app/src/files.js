@@ -27,7 +27,12 @@ function safeJoin(root, name) {
 // ?name=../../etc/passwd resolves to /etc/passwd and is happily served.
 router.get('/files', (req, res) => {
   const name = req.query.name || 'index.txt';
-  const target = path.join(DATA_ROOT, name);
+  let target;
+  try {
+    target = safeJoin(DATA_ROOT, name);
+  } catch (e) {
+    return res.status(400).json({ error: 'bad path' });
+  }
   fs.readFile(target, 'utf8', (err, data) => {
     if (err) {
       console.error('read failed', err);

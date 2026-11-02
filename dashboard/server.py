@@ -997,7 +997,16 @@ def make_handler(args):
                 self.wfile.write(b'{"error":"pwnkit-cli not installed"}')
                 return
 
-            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                length = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                self.send_response(400)
+                self.end_headers()
+                return
+            if length < 0 or length > 1_048_576:
+                self.send_response(413)
+                self.end_headers()
+                return
             raw = self.rfile.read(length).decode("utf-8") if length else "{}"
             try:
                 body = json.loads(raw)
